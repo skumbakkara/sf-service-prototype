@@ -3,7 +3,7 @@
  * No page refresh; back/forward supported.
  */
 
-const DEFAULT_TITLE = 'LWC Vite Demo';
+const DEFAULT_TITLE = 'Salesforce';
 
 const routes = [
   { path: '/', component: 'page-home', title: 'Home' },
