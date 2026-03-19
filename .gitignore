@@ -6,6 +6,9 @@ dist/
 dist-ssr/
 src/generated/
 
+# scripts/sync-slds-css.mjs (postinstall / dev / build)
+public/slds/
+
 # Environment
 .env
 .env.*.local

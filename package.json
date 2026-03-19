@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf dist .vite node_modules",
+    "postinstall": "node scripts/sync-slds-css.mjs",
     "prebuild-icons": "node scripts/prebuild-icons.mjs",
-    "dev": "node scripts/prebuild-icons.mjs && vite",
-    "build": "node scripts/prebuild-icons.mjs && vite build",
+    "sync-slds-css": "node scripts/sync-slds-css.mjs",
+    "dev": "node scripts/prebuild-icons.mjs && node scripts/sync-slds-css.mjs && vite",
+    "build": "node scripts/prebuild-icons.mjs && node scripts/sync-slds-css.mjs && vite build",
     "preview": "vite preview",
     "dev:native-shadow": "echo 'To use native shadow, set disableSyntheticShadowSupport: true in vite.config.js'"
   },
@@ -18,6 +20,7 @@
   "dependencies": {
     "@lwc/synthetic-shadow": "^9.0.2",
     "@salesforce-ux/design-system": "^2.29.0",
+    "@salesforce-ux/design-system-2": "^0.0.0-alpha.0",
     "lightning-base-components": "^1.28.15-alpha",
     "lwc": "^9.0.2",
     "vite": "^7.3.1",

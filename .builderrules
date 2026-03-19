@@ -56,8 +56,8 @@ Before writing ANY UI code, complete this checklist **IN ORDER**:
           **If YES** → Use it.
           **If NO** → Proceed to step 2.
 
-2. **[ ] Search SLDS Component Blueprints index (from Lightning Design System Components)** – Does a component exist for this?
-          - Reference: Lightning Design System Components
+2. **[ ] Search SLDS Component Blueprints** – Does a blueprint exist for this?
+          - **Use the MCP tool `explore_slds_blueprints`** to search by name, category, or keyword. Use `guide_slds_blueprints` for general blueprint guidance and a full index of all available blueprints.
           **If YES** → Create a new LWC that implements this component blueprint.
           **If NO** → Proceed to step 3.
 
@@ -100,7 +100,8 @@ Vanilla HTML markup with SLDS CSS classes for when LBCs don't exist or aren't su
 If a lightning base component is not available, create a _new LWC_ that implements the component blueprint.
 
 **How to Find Component Blueprints:**
-- Lightning Design System Components
+- **Use the MCP tool `explore_slds_blueprints`** to search and retrieve full blueprint specs. You can search by `name`, `category`, `search` keyword, `lightning_component`, `slds_class`, or `styling_hook`.
+- **Use the MCP tool `guide_slds_blueprints`** for a comprehensive overview of all 85 available blueprints organized by category, and general guidance on how to use them.
 
 ---
 

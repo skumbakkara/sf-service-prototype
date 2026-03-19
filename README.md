@@ -24,7 +24,7 @@ npm install
 npm run dev
 ```
 
-Dev server runs at **http://localhost:3000**. Icons are generated on first run (and when you run `build`). To build and preview a production bundle:
+Dev server runs at **http://localhost:3000**. After `npm install`, **`postinstall`** fills **`public/slds/`** (SLDS 1 + SLDS 2 stylesheets under `styles/`, SLDS 1 `images/`; all gitignored). Icons for `<lightning-icon>` are generated on `dev` / `build`. To build and preview a production bundle:
 
 ```bash
 npm run build
@@ -57,7 +57,8 @@ salesforce-ui/
 │   ├── slds-loader.js             # SLDS CSS loading
 │   └── index.js                   # App entry point
 ├── scripts/
-│   └── prebuild-icons.mjs         # Icon codegen (run via npm scripts)
+│   ├── prebuild-icons.mjs         # Icon codegen (run via npm scripts)
+│   └── sync-slds-css.mjs          # SLDS 1 styles+images, SLDS 2 CSS → public/ (postinstall / dev / build)
 ├── index.html
 ├── vite.config.js
 └── package.json
@@ -107,7 +108,13 @@ The app uses a small client-side router in `src/router.js`:
 - **lwc** — Lightning Web Components framework  
 - **@lwc/synthetic-shadow** — Synthetic shadow DOM (Salesforce-like)  
 - **lightning-base-components** — Salesforce component library  
-- **@salesforce-ux/design-system** — SLDS (styles, tokens, components)
+- **@salesforce-ux/design-system** — Classic SLDS; sync copies `assets/styles/salesforce-lightning-design-system.min.css` (only that stylesheet) and `assets/images/` → `public/slds/`  
+- **@salesforce-ux/design-system-2** — SLDS 2 / Cosmos (`dist/css/slds2.cosmos.css` → `public/slds/styles/slds2.cosmos.css`)  
+- **`npm run sync-slds-css`** and **`postinstall`** run that script. **`public/slds/`** is **gitignored**; version bumps show up in `package.json` / the lockfile only. **`public/images/`** (e.g. favicon `salesforce.svg`) stays in the repo as app-owned assets.
+
+## SLDS 1 and SLDS 2
+
+The app loads **two** global stylesheets from `index.html` and toggles them via `src/slds-loader.js` (theme switcher): **SLDS 2** (`public/slds/styles/slds2.cosmos.css`) and **SLDS 1** (`public/slds/styles/salesforce-lightning-design-system.min.css`), plus SLDS 1 image assets under `public/slds/images/` for `url(...)` references in the SLDS 1 CSS. Icon templates come from **lightning-base-components** via `prebuild-icons.mjs`. Resync: `npm run sync-slds-css`. If you install with **`npm ci --ignore-scripts`**, run that (or `npm run dev` / `npm run build`) before loading the app.
 
 ## Shadow DOM (synthetic vs native)
 
