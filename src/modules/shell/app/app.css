@@ -8,7 +8,7 @@
 }
 
 /* Global shell stays fixed at top and stacks above the body/panel */
-:host > main-global-shell {
+:host > shell-global-shell {
     flex-shrink: 0;
     position: relative;
     z-index: 2;

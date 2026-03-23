@@ -14,7 +14,7 @@ A **starter template** for prototyping and developing Salesforce experiences loc
 - **Client-side routing** — Declarative routes in `src/router.js` with path params (e.g. `/users/:id`), History API, no full page reload  
 - **SLDS + Lightning Base Components** — Design system and Salesforce component library wired and ready to use  
 - **Synthetic Shadow DOM** — Matches Salesforce platform behavior so styles and DOM semantics align with production  
-- **Icon setup** — Prebuild script and reserved `lightning/` namespace for SLDS icons; generated modules in `src/generated/`  
+- **Icon setup** — Prebuild script, Vite aliases for `lightning/iconSvgTemplates*`, and shim modules under `src/build/lightning-icon/shims/`; generated bundles in `src/build/generated/`  
 - **Example pages** — Home, Settings, Icons, and a sample parameterized page (`/users/:id`). See `src/modules/page/` and `src/modules/ui/` for patterns.
 
 ## Quick start
@@ -24,7 +24,7 @@ npm install
 npm run dev
 ```
 
-Dev server runs at **http://localhost:3000**. Global SLDS styles are resolved from **`@salesforce-ux/design-system`** and **`@salesforce-ux/design-system-2`** by Vite (hashed CSS in `dist/assets/` on build); see **`src/slds-loader.js`**. Icons for `<lightning-icon>` are generated on `dev` / `build`. To build and preview a production bundle:
+Dev server runs at **http://localhost:3000**. Global SLDS styles are resolved from **`@salesforce-ux/design-system`** and **`@salesforce-ux/design-system-2`** by Vite (hashed CSS in `dist/assets/` on build); see **`src/build/slds-loader.js`**. Icons for `<lightning-icon>` are generated on `dev` / `build`. To build and preview a production bundle:
 
 ```bash
 npm run build
@@ -37,7 +37,7 @@ npm run preview
 salesforce-ui/
 ├── src/
 │   ├── modules/
-│   │   ├── main/                  # App shell (main-*)
+│   │   ├── shell/                 # App shell (shell-*)
 │   │   │   ├── app/               # Root app, route rendering
 │   │   │   ├── globalShell/       # Layout wrapper
 │   │   │   ├── globalHeader/      # Top bar
@@ -51,12 +51,15 @@ salesforce-ui/
 │   │   │   └── iconTest/
 │   │   ├── ui/                    # Reusable building blocks (ui-*)
 │   │   │   └── example/
-│   │   └── lightning/             # Reserved — do not use
-│   ├── generated/                 # Generated icon modules (do not edit)
-│   ├── slds/
-│   │   └── slds1-url.js           # Lazy chunk: resolved URL for SLDS 1 stylesheet
+│   │   └── data/                  # Shared modules (e.g. fixtures) imported as data/*
+│   ├── build/                     # Build wiring, generated assets, shims (not LWC app UI)
+│   │   ├── generated/             # Generated icon modules (do not edit)
+│   │   ├── shim/                  # LWC / package shims (e.g. gate modules)
+│   │   ├── slds/
+│   │   │   └── slds1-url.js       # Lazy chunk: resolved URL for SLDS 1 stylesheet
+│   │   ├── lightning-icon/shims/  # Icon template overrides (lightning/iconSvgTemplates* → here)
+│   │   └── slds-loader.js         # SLDS stylesheet link injection, theme bootstrap, lazy SLDS 1
 │   ├── router.js                  # Route definitions and navigation
-│   ├── slds-loader.js             # SLDS stylesheet link injection, theme bootstrap, lazy SLDS 1
 │   └── index.js                   # App entry point
 ├── scripts/
 │   └── prebuild-icons.mjs         # Icon codegen (run via npm scripts)
@@ -71,12 +74,12 @@ Folder-based namespaces under `src/modules/` define the LWC tag prefix:
 
 | Folder        | Tag prefix | Use for |
 |---------------|------------|--------|
-| **main/**     | `main-*`   | App shell only (e.g. `main-app`, `main-global-header`). Not for feature pages. |
+| **shell/**    | `shell-*`  | App shell only (e.g. `shell-app`, `shell-global-header`). Not for feature pages. |
 | **page/**     | `page-*`   | Route-level views (one per URL). e.g. `page-user` → `/users/:id`. |
 | **ui/**       | `ui-*`     | Reusable building blocks (cards, buttons, modals). Used inside pages or other components. |
-| **lightning/**| —          | **Do not use.** Reserved for lightning-base-components and icon templates. |
+| **data/**     | —          | Plain modules (e.g. fixtures), imported as `data/<name>`. Not LWC tags. |
 
-Only add components under **page/** or **ui/**. Do not add custom components under **lightning/**.
+Only add components under **page/** or **ui/**. Put shell chrome in **`shell/`** only. Icon template shims live under **`src/build/lightning-icon/shims/`**; do not add other files there. Do not add a **`lightning/`** folder under **`src/modules`** for custom components.
 
 **Examples:** Add `src/modules/page/dashboard/` → register in router and app, use as `page-dashboard` on e.g. `/dashboard`. Add `src/modules/ui/card/` → use in templates as `<ui-card>`.
 
@@ -85,7 +88,7 @@ Only add components under **page/** or **ui/**. Do not add custom components und
 1. Clone or copy the repo, then `npm install` and `npm run dev`.
 2. **Add a page:** Create a folder under `src/modules/page/<name>/`, then:
    - Add a route in `src/routes.config.js` (e.g. `{ path: '/dashboard', component: 'page-dashboard', title: 'Dashboard', navPage: 'dashboard', navLabel: 'Dashboard' }`).
-   - In `src/modules/main/app/app.js`, import the component and add it to `ROUTE_COMPONENTS`.
+   - In `src/modules/shell/app/app.js`, import the component and add it to `ROUTE_COMPONENTS`.
    - For child routes under an existing tab (e.g. `/contacts/:id`), use `navHighlight: '<parentNavPage>'` instead of `navPage` so the parent tab is highlighted without creating a new nav entry.
 3. **Add a reusable component:** Create a folder under `src/modules/ui/<name>/` and use it as `<ui-<name>>` in any page or other component.
 4. Follow the namespace rules above and the SLDS/LWC conventions referenced in this repo (e.g. `.cursor/rules` if present).
@@ -115,9 +118,9 @@ The app uses a small client-side router in `src/router.js`:
 
 ## SLDS 1 and SLDS 2
 
-**SLDS 2** is the default. `src/index.js` awaits **`initSldsFromStorage()`** from **`src/slds-loader.js`** before mounting LWC so the correct theme is active on first paint (including when `localStorage` says the last session used SLDS 1).
+**SLDS 2** is the default. `src/index.js` awaits **`initSldsFromStorage()`** from **`src/build/slds-loader.js`** before mounting LWC so the correct theme is active on first paint (including when `localStorage` says the last session used SLDS 1).
 
-The loader injects **`<link rel="stylesheet" data-slds="...">`** elements and toggles the active sheet with the **`media`** attribute (`all` vs `not all`), matching the previous static-HTML behavior. Stylesheet URLs come from **`new URL(..., import.meta.url)`** pointing at files under **`node_modules/@salesforce-ux/...`** so Vite emits versioned CSS assets and rewrites nested **`url(...)`** references. **SLDS 1** is loaded **lazily** (dynamic `import()` of `src/slds/slds1-url.js`) until the user switches themes or a saved preference requires it—so the default bundle does not fetch classic SLDS until needed.
+The loader injects **`<link rel="stylesheet" data-slds="...">`** elements and toggles the active sheet with the **`media`** attribute (`all` vs `not all`), matching the previous static-HTML behavior. Stylesheet URLs come from **`new URL(..., import.meta.url)`** pointing at files under **`node_modules/@salesforce-ux/...`** so Vite emits versioned CSS assets and rewrites nested **`url(...)`** references. **SLDS 1** is loaded **lazily** (dynamic `import()` of `src/build/slds/slds1-url.js`) until the user switches themes or a saved preference requires it—so the default bundle does not fetch classic SLDS until needed.
 
 Icon templates come from **lightning-base-components** via **`prebuild-icons.mjs`**.
 
@@ -132,7 +135,7 @@ This template uses **Synthetic Shadow DOM** so behavior and styling match the Sa
 | DOM queries    | Can query inside components| Cannot query in |
 | `shadowRoot`   | `null`                     | ShadowRoot      |
 
-**Verify:** In the browser console at http://localhost:3000 run `document.querySelector('main-app').shadowRoot` — `null` means synthetic shadow is active.
+**Verify:** In the browser console at http://localhost:3000 run `document.querySelector('shell-app').shadowRoot` — `null` means synthetic shadow is active.
 
 **Switch to native shadow:** In `vite.config.js` set `disableSyntheticShadowSupport: true` in the LWC plugin options.
 
@@ -140,7 +143,7 @@ This template uses **Synthetic Shadow DOM** so behavior and styling match the Sa
 
 ## Icons
 
-SLDS icons are generated by a prebuild step. Run `npm run dev` or `npm run build` so `scripts/prebuild-icons.mjs` runs and updates `src/generated/`. The reserved `lightning/` namespace is used for icon SVG templates; do not add your own components there.
+SLDS icons are generated by a prebuild step. Run `npm run dev` or `npm run build` so `scripts/prebuild-icons.mjs` runs and updates `src/build/generated/`. Vite resolves **`lightning/iconSvgTemplates*`** to the shim modules under **`src/build/lightning-icon/shims/`**; do not add unrelated code there.
 
 ## Conventions and design system
 

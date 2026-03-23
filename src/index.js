@@ -2,14 +2,14 @@
 import '@lwc/synthetic-shadow';
 
 import { createElement } from 'lwc';
-import App from 'main/app';
-import { initSldsFromStorage } from './slds-loader.js';
+import App from 'shell/app';
+import { initSldsFromStorage } from './build/slds-loader.js';
 
 await initSldsFromStorage();
 
 // Create and mount the app component
 try {
-    const app = createElement('main-app', {
+    const app = createElement('shell-app', {
         is: App
     });
     document.querySelector('#app').appendChild(app);

@@ -1,7 +1,7 @@
 import { LightningElement, track } from 'lwc';
 import { subscribe, navigate } from '../../../router';
 import { routes } from '../../../routes.config';
-import { toggleSLDS, activeSLDSVersion } from '../../../slds-loader';
+import { toggleSLDS, activeSLDSVersion } from '../../../build/slds-loader';
 import Home from 'page/home';
 import IconTest from 'page/iconTest';
 import Settings from 'page/settings';

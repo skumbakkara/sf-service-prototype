@@ -10,7 +10,7 @@ import path from 'path';
 
 const projectRoot = path.resolve('./');
 const lbcRoot = path.join(projectRoot, 'node_modules/lightning-base-components/src/lightning');
-const srcLightning = path.join(projectRoot, 'src/modules/lightning');
+const srcLightning = path.join(projectRoot, 'src/build/lightning-icon/shims');
 
 const ICON_TEMPLATE_DIR_NAMES = [
   'iconSvgTemplatesStandard',

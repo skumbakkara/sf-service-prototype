@@ -15,27 +15,27 @@ const ICON_SETS = [
     {
         name: 'utility',
         dir: 'node_modules/lightning-base-components/src/lightning/iconSvgTemplatesUtility/buildTemplates/utility',
-        output: 'src/generated/iconSvgUtility.js',
+        output: 'src/build/generated/iconSvgUtility.js',
     },
     {
         name: 'standard',
         dir: 'node_modules/lightning-base-components/src/lightning/iconSvgTemplatesStandard/buildTemplates/standard',
-        output: 'src/generated/iconSvgStandard.js',
+        output: 'src/build/generated/iconSvgStandard.js',
     },
     {
         name: 'doctype',
         dir: 'node_modules/lightning-base-components/src/lightning/iconSvgTemplatesDoctype/buildTemplates/doctype',
-        output: 'src/generated/iconSvgDoctype.js',
+        output: 'src/build/generated/iconSvgDoctype.js',
     },
     {
         name: 'action',
         dir: 'node_modules/lightning-base-components/src/lightning/iconSvgTemplatesAction/buildTemplates/action',
-        output: 'src/generated/iconSvgAction.js',
+        output: 'src/build/generated/iconSvgAction.js',
     },
 ];
 
 // Ensure output directory exists
-const outDir = 'src/generated';
+const outDir = 'src/build/generated';
 if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir, { recursive: true });
 }

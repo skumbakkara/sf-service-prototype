@@ -8,9 +8,10 @@ alwaysApply: true
 
 ## TEMPLATE STRUCTURE (where to add components)
 
-- **Route-level views** → `src/modules/page/<name>/` → tag `page-<name>`. Register in `src/router.js` and in `main/app/app.js` (`ROUTE_COMPONENTS`; optionally `ROUTE_TO_NAV_PAGE` / `NAV_PAGE_TO_PATH` for nav).
+- **Route-level views** → `src/modules/page/<name>/` → tag `page-<name>`. Register in `src/router.js` and in `shell/app/app.js` (`ROUTE_COMPONENTS`; optionally `ROUTE_TO_NAV_PAGE` / `NAV_PAGE_TO_PATH` for nav).
 - **Reusable UI** → `src/modules/ui/<name>/` → tag `ui-<name>`. Use inside pages or other components.
-- **Do not add custom components under `main/`** (app shell only) or **`lightning/`** (reserved for base components and icon templates).
+- **App shell** → `src/modules/shell/<name>/` → tag `shell-<name>`. Root app, layout, header, nav, theme—**not** route views (`page-*`) and **not** generic reusable widgets (`ui-*`).
+- **Do not** add components under **`src/build/lightning-icon/shims/`** except the checked-in icon overrides, or under **`src/modules/lightning/`**.
 
 ---
 

@@ -1,7 +1,7 @@
 <template>
     <!-- Global shell: top, edge to edge, height by content -->
-    <main-global-shell current-page={currentNavPage} nav-items={navItems} onnavigate={handleNavNavigate} onpanelselect={handlePanelSelect}>
-    </main-global-shell>
+    <shell-global-shell current-page={currentNavPage} nav-items={navItems} onnavigate={handleNavNavigate} onpanelselect={handlePanelSelect}>
+    </shell-global-shell>
 
     <!-- Main content and docked panel -->
     <main class="app-body">
@@ -15,17 +15,17 @@
                             <lwc:component lwc:is={componentCtor} onnavigateback={handleNavigateBack}></lwc:component>
                         </template>
                     </div>
-                    <main-theme-switcher
+                    <shell-theme-switcher
                         slds-version={_sldsVersion}
                         dark-mode={_darkMode}
                         ontoggleslds={handleToggleSLDS}
                         ontoggledarkmode={handleToggleDarkMode}>
-                    </main-theme-switcher>
+                    </shell-theme-switcher>
                     </div>
                 </div>
             </lightning-layout-item>
             <lightning-layout-item class={panelClasses}>
-                <main-panel selected-panel={selectedPanel} onpanelclose={handlePanelClose}></main-panel>
+                <shell-panel selected-panel={selectedPanel} onpanelclose={handlePanelClose}></shell-panel>
             </lightning-layout-item>
         </lightning-layout>
     </main>

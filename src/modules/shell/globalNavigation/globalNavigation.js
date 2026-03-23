@@ -98,7 +98,7 @@ export default class GlobalNavigation extends LightningElement {
     }
 
     _focusWaffle() {
-        const waffle = this.template.querySelector('main-waffle');
+        const waffle = this.template.querySelector('shell-waffle');
         if (waffle && typeof waffle.focus === 'function') {
             waffle.focus();
         }

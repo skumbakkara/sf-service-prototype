@@ -4,10 +4,11 @@
 
 ## TEMPLATE STRUCTURE (where to add components)
 
-- **Route-level views** → `src/modules/page/<name>/` → tag `page-<name>`. Register in `src/routes.config.js` and in `main/app/app.js` (`ROUTE_COMPONENTS`).
+- **Route-level views** → `src/modules/page/<name>/` → tag `page-<name>`. Register in `src/routes.config.js` and in `shell/app/app.js` (`ROUTE_COMPONENTS`).
 - **Child routes** (e.g. `/contacts/:id` under a `/contacts` tab) → set `navHighlight: '<parentNavPage>'` instead of `navPage`. This highlights the parent tab without creating a separate nav entry. Only routes with `navPage` create tabs; `navHighlight` is for active-state only.
 - **Reusable UI** → `src/modules/ui/<name>/` → tag `ui-<name>`. Use inside pages or other components.
-- **Do not add custom components under `main/`** (app shell only) or **`lightning/`** (reserved for base components and icon templates).
+- **App shell** → `src/modules/shell/<name>/` → tag `shell-<name>`. Do not put feature UI here—use **`page/`** or **`ui/`**.
+- **Do not** add custom components under **`src/modules/lightning/`** or under **`src/build/lightning-icon/shims/`** except the checked-in icon overrides.
 
 ---
 
