@@ -46,6 +46,9 @@ function notify() {
 }
 
 export function navigate(path) {
+  if (!path || path === window.location.pathname) {
+    return;
+  }
   history.pushState({}, '', path);
   notify();
 }

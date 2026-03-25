@@ -5,6 +5,8 @@ export default class GlobalShell extends LightningElement {
     @api navItems = [];
 
     handleNavigate(event) {
+        // Prevent the original child event from continuing to bubble, then relay once.
+        event.stopPropagation();
         this.dispatchEvent(
             new CustomEvent('navigate', {
                 detail: event.detail,
