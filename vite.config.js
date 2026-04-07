@@ -66,6 +66,8 @@ export default defineConfig({
         // Global SLDS from node_modules (new URL in slds-loader.js) must not pass through LWC:
         // LWC rejects :root in this pipeline when synthetic shadow is enabled.
         /(salesforce-lightning-design-system\.min\.css|slds2\.cosmos\.css)(\?.*)?$/,
+        // Global styles loaded via new URL() pattern must also bypass LWC plugin
+        /\/styles\/global\.css(\?.*)?$/,
         ...iconTemplateExcludeDirs,
       ],
     }),
