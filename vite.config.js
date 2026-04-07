@@ -7,9 +7,43 @@ import {
   iconTemplateAliases,
 } from './vite-plugins/icon-templates.js';
 
+/** LBC ships templates that trip many LWC diagnostics; app code cannot fix those. */
+const LBC_UNDER_NODE_MODULES = /node_modules[/\\]lightning-base-components[/\\]/;
+
+function isLightningBaseComponentsLwcRollupWarning(warning) {
+  const locFile = warning.loc?.file ?? '';
+  const id = warning.id ?? '';
+  const message = warning.message ?? '';
+  return (
+    LBC_UNDER_NODE_MODULES.test(String(locFile)) ||
+    LBC_UNDER_NODE_MODULES.test(String(id)) ||
+    LBC_UNDER_NODE_MODULES.test(String(message))
+  );
+}
+
+function suppressLbcLwcLoggerNoisePlugin() {
+  return {
+    name: 'suppress-lbc-lwc-logger-noise',
+    configResolved(config) {
+      const { logger } = config;
+      const origWarn = logger.warn.bind(logger);
+      logger.warn = (msg, options) => {
+        if (LBC_UNDER_NODE_MODULES.test(String(msg))) return;
+        origWarn(msg, options);
+      };
+      const origWarnOnce = logger.warnOnce.bind(logger);
+      logger.warnOnce = (msg, options) => {
+        if (LBC_UNDER_NODE_MODULES.test(String(msg))) return;
+        origWarnOnce(msg, options);
+      };
+    },
+  };
+}
+
 export default defineConfig({
   base: './',
   plugins: [
+    suppressLbcLwcLoggerNoisePlugin(),
     resolveIconTemplatesPlugin(),
     lwc({
       modules: [
@@ -36,6 +70,14 @@ export default defineConfig({
       ],
     }),
   ],
+  build: {
+    rollupOptions: {
+      onwarn(warning, defaultHandler) {
+        if (isLightningBaseComponentsLwcRollupWarning(warning)) return;
+        defaultHandler(warning);
+      },
+    },
+  },
   appType: 'spa',
   server: {
     port: 3000,
