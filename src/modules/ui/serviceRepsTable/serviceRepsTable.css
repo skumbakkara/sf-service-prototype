@@ -1,0 +1,185 @@
+:host {
+    display: block;
+}
+
+/* ── Change 1: align table edges with card header padding ── */
+.table-container {
+    overflow-x: auto;
+    padding: 0 var(--slds-g-spacing-4, 1rem);
+}
+
+/* ── Checkbox column fixed width ────────────────────────── */
+.slds-cell_shrink {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+}
+
+/* ── Column header sort hover ───────────────────────────── */
+.slds-is-sortable {
+    cursor: pointer;
+}
+.th-action-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+.col-chevron {
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.15s;
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+}
+th:hover .col-chevron {
+    opacity: 1;
+}
+
+/* ── Rep name cell ──────────────────────────────────────── */
+.rep-name-td {
+    white-space: nowrap;
+}
+.rep-name-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+}
+.rep-name {
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    font-weight: var(--slds-g-font-weight-5, 500);
+}
+
+/* Change 2: toggle button — bare, no chrome; chevron hidden when expanded */
+.toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none;
+    cursor: pointer;
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+}
+.toggle-btn lightning-icon {
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+}
+.toggle-spacer {
+    display: inline-block;
+    width: 1rem;
+    flex-shrink: 0;
+}
+
+/* ── Status cell colour per state ───────────────────────── */
+.status-cell .status-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+    white-space: nowrap;
+}
+.status-cell_online  { color: var(--slds-g-color-success-1, #2e844a); }
+.status-cell_break   { color: var(--slds-g-color-warning-1, #a86304); }
+.status-cell_offline { color: var(--slds-g-color-error-1, #ba0517); }
+
+/* ── Capacity cell ───────────────────────────────────────── */
+.cap-full,
+.cap-high,
+.cap-mid,
+.cap-low,
+.cap-warn-high,
+.cap-warn-low { background-color: transparent; color: inherit; }
+
+/* ── Channels column: icon row ───────────────────────────── */
+.channel-icons {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+}
+.channel-icon {
+    color: var(--slds-g-color-on-surface-2, #3e3e3c);
+}
+
+/* ── Work Items title row ────────────────────────────────── */
+.work-items-title-row {
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
+}
+.work-items-title-cell {
+    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-1, 0.25rem) !important;
+}
+.work-items-title {
+    font-size: var(--slds-g-font-size-2, 0.75rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    color: var(--slds-g-color-on-surface-3, #706e6b);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding-left: 2.5rem;
+}
+
+/* ── Work item rows ─────────────────────────────────────── */
+.work-item-row {
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
+}
+.work-item-cell {
+    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem) !important;
+}
+.work-item-content {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    position: relative;
+    width: 100%;
+    padding-left: 2.5rem;
+    gap: 24px;
+}
+.wi-description {
+    white-space: nowrap;
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    font-size: var(--slds-g-font-size-3, 0.875rem);
+    flex: 0 0 auto;
+    text-decoration: none;
+}
+.wi-description:hover {
+    text-decoration: underline;
+}
+/* Change 4: right-aligned group */
+.wi-right {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    flex-shrink: 0;
+}
+.wi-channel-icon {
+    color: var(--slds-g-color-on-surface-2, #3e3e3c);
+}
+.wi-flag-btn {
+    position: absolute;
+    /* checkbox(40) + name(168) + status(140) + flag(68) + work-summary(148) + channels(90) + login(80) + state(80) + capacity(128) = 942px */
+    left: 942px;
+    flex-shrink: 0;
+}
+.wi-flag-inner-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px 10px;
+    background: none;
+    border: 1.5px solid var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    border-radius: 999px;
+    cursor: pointer;
+}
+.wi-flag-inner-btn lightning-icon {
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+}
+.wi-down-icon {
+    display: inline-flex;
+    transform: scale(0.6);
+    transform-origin: center;
+}

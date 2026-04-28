@@ -13,6 +13,9 @@ src/build/generated/
 # Cursor (local-only)
 .cursor/commands/
 
+# Claude local settings (may contain secrets)
+.claude/settings.local.json
+
 # Agent skills synced from afv-library
 .agent/skills/afv-library/
 

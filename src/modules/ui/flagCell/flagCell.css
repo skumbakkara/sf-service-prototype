@@ -1,0 +1,15 @@
+:host {
+    display: block;
+}
+
+.flag-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 var(--slds-g-spacing-2, 0.5rem);
+}
+
+.flag-cell__icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-warning-1, #a86304);
+}

@@ -1,0 +1,66 @@
+<template>
+    <div class="service-reps-page">
+
+        <!-- Tab bar -->
+        <div class="slds-tabs_default">
+            <ul class="slds-tabs_default__nav" role="tablist">
+                <template for:each={tabs} for:item="tab">
+                    <li key={tab.id} class={tab.tabClass} role="presentation">
+                        <a
+                            class="slds-tabs_default__link"
+                            role="tab"
+                            data-id={tab.id}
+                            onclick={handleTabClick}
+                        >{tab.label}</a>
+                    </li>
+                </template>
+            </ul>
+        </div>
+
+        <!-- Card -->
+        <div class="slds-card slds-m-around_medium">
+
+            <!-- Card header -->
+            <div class="slds-card__header slds-p-around_medium slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                <div class="slds-grid slds-grid_vertical-align-center">
+                    <lightning-icon
+                        icon-name="standard:service_crew"
+                        size="medium"
+                        class="slds-m-right_small">
+                    </lightning-icon>
+                    <div>
+                        <h2 class="slds-text-heading_medium">Service Reps Overview</h2>
+                        <p class="slds-text-body_small slds-text-color_weak">An overview of all the service representatives in your team</p>
+                    </div>
+                </div>
+                <div class="slds-grid slds-grid_vertical-align-center">
+                    <lightning-button label="Change Queue" variant="neutral" class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button label="Change Skills" variant="neutral" class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button label="Change Groups" variant="neutral" class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button-icon icon-name="utility:chevrondown" variant="neutral" class="slds-m-right_x-small"></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:settings" variant="neutral"></lightning-button-icon>
+                </div>
+            </div>
+
+            <!-- Stats + search bar -->
+            <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-horizontal_medium slds-p-bottom_small">
+                <p class="slds-text-body_small slds-text-color_weak">312 Reps &bull; 3 Flags Raised</p>
+                <div class="slds-grid slds-grid_vertical-align-center">
+                    <lightning-input
+                        type="search"
+                        label="Search reps"
+                        variant="label-hidden"
+                        placeholder="Search..."
+                        class="search-input slds-m-right_x-small">
+                    </lightning-input>
+                    <lightning-button-icon icon-name="utility:filter" variant="neutral" class="slds-m-right_xx-small"></lightning-button-icon>
+                    <lightning-button-icon icon-name="utility:chevrondown" variant="neutral"></lightning-button-icon>
+                </div>
+            </div>
+
+            <!-- Tree Grid table -->
+            <ui-service-reps-table data={reps}></ui-service-reps-table>
+
+        </div>
+    </div>
+</template>

@@ -15,10 +15,10 @@
 export const routes = [
   {
     path: '/',
-    component: 'page-home',
-    title: 'Home',
-    navPage: 'home',
-    navLabel: 'Home',
+    component: 'page-service-reps',
+    title: 'Service Reps',
+    navPage: 'service-reps',
+    navLabel: 'Service Reps',
   },
   {
     path: '/icons',

@@ -1,0 +1,111 @@
+<template>
+    <div class="table-container">
+        <table class="slds-table slds-table_bordered slds-table_col-bordered">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th scope="col" class="slds-cell_shrink">
+                        <div class="slds-th__action slds-text-align_center">
+                            <input type="checkbox" class="hdr-checkbox" checked={allSelected} onchange={handleSelectAll} />
+                        </div>
+                    </th>
+                    <template for:each={columnHeaders} for:item="col">
+                        <th key={col.fieldName} scope="col" style={col.style} class={col.thClass} data-field={col.fieldName} onclick={handleSort}>
+                            <div class="slds-th__action th-action-inner">
+                                <span class="slds-truncate">{col.label}</span>
+                                <lightning-icon icon-name="utility:chevrondown" size="xx-small" class="col-chevron"></lightning-icon>
+                            </div>
+                        </th>
+                    </template>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={tableRows} for:item="row">
+                    <!-- Parent rep row -->
+                    <tr key={row.id} class="slds-hint-parent rep-row">
+                        <td class="slds-cell_shrink">
+                            <div class="slds-text-align_center">
+                                <input type="checkbox" class="row-checkbox" checked={row.isSelected} data-id={row.id} onchange={handleRowSelect} />
+                            </div>
+                        </td>
+                        <!-- Change 2: chevron always visible, rotates to down when expanded -->
+                        <td class="rep-name-td">
+                            <div class="rep-name-inner">
+                                <template if:true={row.hasChildren}>
+                                    <button class="toggle-btn" data-id={row.id} onclick={handleExpandToggle} aria-expanded={row.isExpanded}>
+                                        <template if:false={row.isExpanded}>
+                                            <lightning-icon icon-name="utility:chevronright" size="xx-small"></lightning-icon>
+                                        </template>
+                                        <template if:true={row.isExpanded}>
+                                            <lightning-icon icon-name="utility:chevrondown" size="xx-small"></lightning-icon>
+                                        </template>
+                                    </button>
+                                </template>
+                                <template if:false={row.hasChildren}>
+                                    <span class="toggle-spacer"></span>
+                                </template>
+                                <span class="rep-name">{row.name}</span>
+                            </div>
+                        </td>
+                        <td class={row.statusCellClass}>
+                            <div class="status-inner">
+                                <lightning-icon icon-name={row.statusIcon} size="xx-small" class="status-dot"></lightning-icon>
+                                <span>{row.statusDisplay}</span>
+                            </div>
+                        </td>
+                        <td class="slds-text-align_center">
+                            <template if:true={row.hasFlagIcon}>
+                                <lightning-icon icon-name="utility:priority" size="xx-small"></lightning-icon>
+                            </template>
+                        </td>
+                        <td>{row.workSummary}</td>
+                        <!-- Change 1: icons instead of text in Channels column -->
+                        <td>
+                            <div class="channel-icons">
+                                <template for:each={row.channelIcons} for:item="ch">
+                                    <lightning-icon key={ch.icon} icon-name={ch.icon} size="xx-small" title={ch.label} class="channel-icon"></lightning-icon>
+                                </template>
+                            </div>
+                        </td>
+                        <td class="slds-text-align_right">{row.login}</td>
+                        <td class="slds-text-align_right">{row.state}</td>
+                        <td class={row.capacityCellClass}>{row.capacityDisplay}</td>
+                        <td class="slds-text-align_right">{row.accept}</td>
+                        <td class="slds-text-align_right">{row.workload}</td>
+                        <td class="slds-text-align_right">{row.acw}</td>
+                        <td>{row.queuesDisplay}</td>
+                        <td>{row.skillsDisplay}</td>
+                    </tr>
+                    <!-- Change 3: "Work Items" title row + child work item rows -->
+                    <template if:true={row.isExpanded}>
+                        <tr key={row.id} class="work-items-title-row">
+                            <td colspan="14" class="work-items-title-cell">
+                                <span class="work-items-title">Work Items</span>
+                            </td>
+                        </tr>
+                        <template for:each={row.workItems} for:item="wi">
+                            <tr key={wi.id} class="work-item-row">
+                                <td colspan="14" class="work-item-cell">
+                                    <!-- Change 4: description left, channel icon + queue right -->
+                                    <div class="work-item-content">
+                                        <a href="#" class="wi-description" onclick={handleWorkItemClick}>{wi.description} &nbsp;·&nbsp; {wi.queue}</a>
+                                        <div class="wi-right">
+                                            <lightning-icon icon-name={wi.channelIcon} size="xx-small" class="wi-channel-icon" title={wi.channelLabel}></lightning-icon>
+                                        </div>
+                                        <template if:true={wi.hasFlagIcon}>
+                                            <div class="wi-flag-btn">
+                                                <button class="wi-flag-inner-btn">
+                                                    <lightning-icon icon-name="utility:priority" size="xx-small"></lightning-icon>
+                                                    <span class="wi-down-icon"><lightning-icon icon-name="utility:down" size="xx-small"></lightning-icon></span>
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </template>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</template>

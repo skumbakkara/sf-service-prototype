@@ -33,27 +33,9 @@
                     </ul>
                 </div>
                 <span class="slds-context-bar__label-action slds-context-bar__app-name">
-                    <span class="slds-truncate" title="Salesforce UI Starter Kit">Salesforce UI Starter Kit</span>
+                    <span class="slds-truncate" title="Service Console">Service Console</span>
                 </span>
             </div>
         </div>
-        <nav class="slds-context-bar__secondary" role="navigation" aria-label="App navigation">
-            <ul class="slds-grid slds-container_fluid">
-                <template for:each={navItemsWithActive} for:item="item">
-                    <li key={item.page} class={item.tabClass}>
-                        <a
-                            href={item.href}
-                            class="slds-context-bar__label-action"
-                            title={item.label}
-                            aria-current={item.ariaCurrent}
-                            data-page={item.page}
-                            onclick={handleNavItemClick}>
-                            <span class="slds-assistive-text" if:true={item.isActive}>Current Page:</span>
-                            <span class="slds-truncate" title={item.label}>{item.label}</span>
-                        </a>
-                    </li>
-                </template>
-            </ul>
-        </nav>
     </div>
 </template>
