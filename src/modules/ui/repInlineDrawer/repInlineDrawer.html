@@ -1,0 +1,51 @@
+<template>
+    <div class="drawer-card">
+        <!-- Tab bar -->
+        <div class="drawer-tabbar">
+            <template for:each={tabs} for:item="tab">
+                <div key={tab.id} class={tab.tabClass} data-id={tab.id} onclick={handleTabSelect}>
+                    <span class="tab-label">{tab.name}</span>
+                    <button class="tab-close" data-id={tab.id} onclick={handleTabClose} title="Close">
+                        <lightning-icon icon-name="utility:close" size="xx-small"></lightning-icon>
+                    </button>
+                </div>
+            </template>
+        </div>
+
+        <!-- Active tab body -->
+        <template if:true={activeTab}>
+            <div class="drawer-body">
+                <h2 class="drawer-rep-name">{activeTab.name}</h2>
+                <p class="drawer-section-title">Current Work Items</p>
+
+                <template for:each={activeTab.workItems} for:item="wi">
+                    <div key={wi.id} class="work-item">
+                        <p class="wi-customer">{wi.customer}</p>
+                        <div class="wi-meta">
+                            <a href="#" class="wi-link" onclick={handleWorkItemClick}>{wi.subject}</a>
+                            <span class="wi-sep">|</span>
+                            <lightning-icon icon-name={wi.channelIcon} size="xx-small" class="wi-icon"></lightning-icon>
+                            <span class="wi-sep">|</span>
+                            <span class="wi-status">{wi.status}</span>
+                            <span class="wi-sep">|</span>
+                            <span class="wi-case">{wi.caseNumber}</span>
+                            <span class="wi-sep">|</span>
+                            <span>{wi.priority}</span>
+                            <span class="wi-sep">|</span>
+                            <span>{wi.queue}</span>
+                        </div>
+                        <template if:true={wi.flagCount}>
+                            <div class="wi-flag">
+                                <span class="wi-flag-count">{wi.flagCount}</span>
+                                <button class="wi-flag-btn">
+                                    <lightning-icon icon-name="utility:priority" size="xx-small" class="wi-flag-icon"></lightning-icon>
+                                    <lightning-icon icon-name="utility:down" size="xx-small" class="wi-flag-chevron"></lightning-icon>
+                                </button>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
+</template>

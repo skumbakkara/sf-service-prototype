@@ -7,36 +7,6 @@
     min-height: 100vh;
 }
 
-/* ── Tabs ───────────────────────────────────────────── */
-.slds-tabs_default {
-    background-color: var(--slds-g-color-surface-1, #ffffff);
-    border-bottom: 1px solid var(--slds-g-color-border-1, #e5e5e5);
-    padding: 0 var(--slds-g-spacing-4, 1rem);
-}
-
-.slds-tabs_default__nav {
-    display: flex;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.slds-tabs_default__link {
-    display: block;
-    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
-    font-size: var(--slds-g-font-size-4, 0.875rem);
-    color: var(--slds-g-color-on-surface-2, #444);
-    text-decoration: none;
-    border-bottom: 2px solid transparent;
-    white-space: nowrap;
-}
-
-.slds-tabs_default__item.slds-is-active .slds-tabs_default__link {
-    color: var(--slds-g-color-brand-1, #0176d3);
-    border-bottom-color: var(--slds-g-color-brand-1, #0176d3);
-    font-weight: var(--slds-g-font-weight-6, 600);
-}
-
 /* ── Card ───────────────────────────────────────────── */
 .slds-card {
     background-color: var(--slds-g-color-surface-1, #ffffff);

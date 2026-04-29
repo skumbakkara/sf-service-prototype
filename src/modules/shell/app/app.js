@@ -3,6 +3,7 @@ import { subscribe, navigate, linkHref } from '../../../router';
 import { routes } from '../../../routes.config';
 import { toggleSLDS, activeSLDSVersion, STORAGE_KEY_SLDS_VERSION } from '../../../build/slds-loader';
 import ServiceReps from 'page/serviceReps';
+import ServiceRepsInlineDrawer from 'page/serviceRepsInlineDrawer';
 import Home from 'page/home';
 import IconTest from 'page/iconTest';
 import User from 'page/user';
@@ -13,6 +14,7 @@ import NotFound from 'page/notFound';
 /** Option A: explicit registration – add one import + one entry here when adding a route */
 const ROUTE_COMPONENTS = {
     'page-service-reps': ServiceReps,
+    'page-service-reps-inline-drawer': ServiceRepsInlineDrawer,
     'page-home': Home,
     'page-icon-test': IconTest,
     'page-user': User,

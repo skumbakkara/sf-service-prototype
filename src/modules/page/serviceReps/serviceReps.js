@@ -1,4 +1,5 @@
 import { LightningElement } from 'lwc';
+import { navigate } from '../../../router';
 
 const WORK_ITEMS = [
     { id: 'wi-a', description: 'Sarah Mitchell | Billing dispute on recent invoice — overcharge on plan upgrade | 100847321 | Working | Medium Priority', channel: 'cases', queue: 'Billing', hasFlag: false },
@@ -26,22 +27,11 @@ export default class ServiceReps extends LightningElement {
     activeTab = 'service-reps';
     reps = REPS_DATA;
 
-    get tabs() {
-        return [
-            { id: 'wallboard',   label: 'Wallboard' },
-            { id: 'service-reps', label: 'Service Reps' },
-            { id: 'in-progress', label: 'In-Progress Work' },
-            { id: 'backlog',     label: 'Backlog' },
-        ].map(tab => ({
-            ...tab,
-            tabClass: tab.id === this.activeTab
-                ? 'slds-tabs_default__item slds-is-active'
-                : 'slds-tabs_default__item',
-        }));
+    handleTabChange(event) {
+        this.activeTab = event.target.value;
     }
 
-    handleTabClick(event) {
-        event.preventDefault();
-        this.activeTab = event.currentTarget.dataset.id;
+    handleInlineDrawerToggle() {
+        navigate('/service-reps-inline-drawer');
     }
 }

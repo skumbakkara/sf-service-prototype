@@ -1,0 +1,165 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
+.drawer-card {
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    border: 1px solid var(--slds-g-color-border-1, #e5e5e5);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Tab bar ─────────────────────────────────────────── */
+.drawer-tabbar {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid var(--slds-g-color-border-1, #e5e5e5);
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    overflow-x: auto;
+    flex-shrink: 0;
+}
+
+.drawer-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-3, 0.75rem);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    font-size: var(--slds-g-font-size-4, 0.875rem);
+    color: var(--slds-g-color-on-surface-2, #444);
+    user-select: none;
+}
+
+.drawer-tab_active {
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    border-bottom-color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    font-weight: var(--slds-g-font-weight-6, 600);
+}
+
+.tab-label {
+    flex: 1;
+}
+
+.tab-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: var(--slds-g-color-on-surface-3, #706e6b);
+}
+.tab-close:hover {
+    background-color: var(--slds-g-color-surface-2, #f3f3f3);
+}
+
+/* ── Body ────────────────────────────────────────────── */
+.drawer-body {
+    padding: var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-5, 1.5rem);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.drawer-rep-name {
+    font-size: var(--slds-g-font-size-6, 1.25rem);
+    font-weight: var(--slds-g-font-weight-7, 700);
+    color: var(--slds-g-color-on-surface-1, #181818);
+    margin: 0 0 var(--slds-g-spacing-2, 0.5rem);
+}
+
+.drawer-section-title {
+    font-size: var(--slds-g-font-size-4, 0.875rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    color: var(--slds-g-color-on-surface-1, #181818);
+    margin: 0 0 var(--slds-g-spacing-4, 1rem);
+}
+
+/* ── Work items ──────────────────────────────────────── */
+.work-item {
+    padding: var(--slds-g-spacing-4, 1rem) 0;
+    border-top: 1px solid var(--slds-g-color-border-1, #e5e5e5);
+}
+.work-item:first-of-type {
+    border-top: none;
+}
+
+.wi-customer {
+    font-size: var(--slds-g-font-size-4, 0.875rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    color: var(--slds-g-color-on-surface-1, #181818);
+    margin: 0 0 var(--slds-g-spacing-1, 0.25rem);
+}
+
+.wi-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+    font-size: var(--slds-g-font-size-3, 0.8125rem);
+    color: var(--slds-g-color-on-surface-2, #444);
+}
+
+.wi-link {
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    text-decoration: none;
+}
+.wi-link:hover {
+    text-decoration: underline;
+}
+
+.wi-sep {
+    color: var(--slds-g-color-border-1, #c9c9c9);
+}
+
+.wi-icon {
+    color: var(--slds-g-color-on-surface-2, #3e3e3c);
+}
+
+.wi-status {
+    color: var(--slds-g-color-on-surface-2, #444);
+}
+
+.wi-flag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: var(--slds-g-spacing-1, 0.25rem);
+    font-size: var(--slds-g-font-size-3, 0.8125rem);
+}
+
+.wi-flag-count {
+    color: var(--slds-g-color-on-surface-2, #444);
+}
+
+.wi-flag-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px 10px;
+    background: none;
+    border: 1.5px solid var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.wi-flag-icon {
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+}
+
+.wi-flag-chevron {
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    transform: scale(0.7);
+    transform-origin: center;
+}

@@ -1,0 +1,66 @@
+<template>
+    <div class="table-container">
+        <table class="slds-table slds-table_bordered slds-table_col-bordered">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th scope="col" class="slds-cell_shrink">
+                        <div class="slds-th__action slds-text-align_center">
+                            <input type="checkbox" class="hdr-checkbox" checked={allSelected} onchange={handleSelectAll} />
+                        </div>
+                    </th>
+                    <template for:each={columnHeaders} for:item="col">
+                        <th key={col.fieldName} scope="col" style={col.style} class={col.thClass} data-field={col.fieldName} onclick={handleSort}>
+                            <div class="slds-th__action th-action-inner">
+                                <span class="slds-truncate">{col.label}</span>
+                                <lightning-icon icon-name="utility:chevrondown" size="xx-small" class="col-chevron"></lightning-icon>
+                            </div>
+                        </th>
+                    </template>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={tableRows} for:item="row">
+                    <tr key={row.id} class={row.rowClass} data-id={row.id} onclick={handleRowClick}>
+                        <td class="slds-cell_shrink">
+                            <div class="slds-text-align_center">
+                                <input type="checkbox" class="row-checkbox" checked={row.isSelected} data-id={row.id} onchange={handleRowSelect} />
+                            </div>
+                        </td>
+                        <td class="rep-name-td">
+                            <div class="rep-name-inner">
+                                <span class="rep-name">{row.name}</span>
+                            </div>
+                        </td>
+                        <td class={row.statusCellClass}>
+                            <div class="status-inner">
+                                <lightning-icon icon-name={row.statusIcon} size="xx-small" class="status-dot"></lightning-icon>
+                                <span>{row.statusDisplay}</span>
+                            </div>
+                        </td>
+                        <td class="slds-text-align_center">
+                            <template if:true={row.hasFlagIcon}>
+                                <lightning-icon icon-name="utility:priority" size="xx-small"></lightning-icon>
+                            </template>
+                        </td>
+                        <td>{row.workSummary}</td>
+                        <td>
+                            <div class="channel-icons">
+                                <template for:each={row.channelIcons} for:item="ch">
+                                    <lightning-icon key={ch.icon} icon-name={ch.icon} size="xx-small" title={ch.label} class="channel-icon"></lightning-icon>
+                                </template>
+                            </div>
+                        </td>
+                        <td class="slds-text-align_right">{row.login}</td>
+                        <td class="slds-text-align_right">{row.state}</td>
+                        <td class={row.capacityCellClass}>{row.capacityDisplay}</td>
+                        <td class="slds-text-align_right">{row.accept}</td>
+                        <td class="slds-text-align_right">{row.workload}</td>
+                        <td class="slds-text-align_right">{row.acw}</td>
+                        <td>{row.queuesDisplay}</td>
+                        <td>{row.skillsDisplay}</td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</template>

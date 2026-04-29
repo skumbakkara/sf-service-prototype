@@ -21,6 +21,13 @@ export const routes = [
     navLabel: 'Service Reps',
   },
   {
+    path: '/service-reps-inline-drawer',
+    component: 'page-service-reps-inline-drawer',
+    title: 'Service Reps — Inline Drawer',
+    navPage: 'service-reps-inline-drawer',
+    navLabel: 'Reps (Inline Drawer)',
+  },
+  {
     path: '/icons',
     component: 'page-icon-test',
     title: 'Icons',
