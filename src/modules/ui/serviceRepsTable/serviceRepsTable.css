@@ -8,6 +8,14 @@
     padding: 0 var(--slds-g-spacing-4, 1rem);
 }
 
+/* ── Header row corner radius matches card ───────────────── */
+thead tr th:first-child {
+    border-top-left-radius: var(--slds-g-radius-border-2, 0.5rem);
+}
+thead tr th:last-child {
+    border-top-right-radius: var(--slds-g-radius-border-2, 0.5rem);
+}
+
 /* ── Checkbox column fixed width ────────────────────────── */
 .slds-cell_shrink {
     width: 40px !important;
@@ -103,6 +111,12 @@ th:hover .col-chevron {
 }
 .channel-icon {
     color: var(--slds-g-color-on-surface-2, #3e3e3c);
+}
+
+/* ── Row hover — suppress border bleed onto row below ───── */
+.rep-row:hover td {
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
 }
 
 /* ── Work Items title row ────────────────────────────────── */
