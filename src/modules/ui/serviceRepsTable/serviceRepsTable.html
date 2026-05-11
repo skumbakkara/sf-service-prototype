@@ -4,7 +4,7 @@
             <thead>
                 <tr class="slds-line-height_reset">
                     <th scope="col" class="slds-cell_shrink">
-                        <div class="slds-th__action slds-text-align_center">
+                        <div class="slds-text-align_center">
                             <input type="checkbox" class="hdr-checkbox" checked={allSelected} onchange={handleSelectAll} />
                         </div>
                     </th>
@@ -49,12 +49,17 @@
                         <td class={row.statusCellClass}>
                             <div class="status-inner">
                                 <lightning-icon icon-name={row.statusIcon} size="xx-small" class="status-dot"></lightning-icon>
-                                <span>{row.statusDisplay}</span>
+                                <div class="status-text">
+                                    <span class="status-label">{row.statusLabel}</span>
+                                    <span class="status-time">{row.statusTime}</span>
+                                </div>
                             </div>
                         </td>
                         <td class="slds-text-align_center">
                             <template if:true={row.hasFlagIcon}>
-                                <lightning-icon icon-name="utility:priority" size="xx-small"></lightning-icon>
+                                <span class="flag-pill" role="img" aria-label="Flagged" title="Flagged">
+                                    <lightning-icon icon-name="utility:priority" size="xx-small"></lightning-icon>
+                                </span>
                             </template>
                         </td>
                         <td>{row.workSummary}</td>
@@ -68,7 +73,12 @@
                         </td>
                         <td class="slds-text-align_right">{row.login}</td>
                         <td class="slds-text-align_right">{row.state}</td>
-                        <td class={row.capacityCellClass}>{row.capacityDisplay}</td>
+                        <td class="capacity-cell">
+                            <div class="capacity-badges">
+                                <span class="capacity-badge capacity-badge_primary" data-tooltip="Primary capacity">{row.capacityPLabel}</span>
+                                <span class="capacity-badge capacity-badge_interruptible" data-tooltip="Interruptible capacity">{row.capacityILabel}</span>
+                            </div>
+                        </td>
                         <td class="slds-text-align_right">{row.accept}</td>
                         <td class="slds-text-align_right">{row.workload}</td>
                         <td class="slds-text-align_right">{row.acw}</td>
@@ -79,26 +89,46 @@
                     <template if:true={row.isExpanded}>
                         <tr key={row.id} class="work-items-title-row">
                             <td colspan="14" class="work-items-title-cell">
-                                <span class="work-items-title">Work Items</span>
+                                <span class="work-items-title">Work Summary</span>
                             </td>
                         </tr>
                         <template for:each={row.workItems} for:item="wi">
                             <tr key={wi.id} class="work-item-row">
                                 <td colspan="14" class="work-item-cell">
-                                    <!-- Change 4: description left, channel icon + queue right -->
-                                    <div class="work-item-content">
-                                        <a href="#" class="wi-description" onclick={handleWorkItemClick}>{wi.description} &nbsp;·&nbsp; {wi.queue}</a>
-                                        <div class="wi-right">
-                                            <lightning-icon icon-name={wi.channelIcon} size="xx-small" class="wi-channel-icon" title={wi.channelLabel}></lightning-icon>
+                                    <div class="wi-grid">
+                                        <div class="wi-grid__card">
+                                            <article class="wi-card">
+                                                <div class="wi-card__main">
+                                                    <div class="wi-card__icon">
+                                                        <span class="wi-card__icon-inner">
+                                                            <lightning-icon icon-name={wi.channelIcon} size="xx-small" title={wi.channelLabel}></lightning-icon>
+                                                        </span>
+                                                    </div>
+                                                    <div class="wi-card__head">
+                                                        <div class="wi-card__head-row">
+                                                            <span class="wi-customer">{wi.customer}</span>
+                                                            <span class={wi.priorityClass}>{wi.priorityLabel}</span>
+                                                        </div>
+                                                        <div class="wi-meta">
+                                                            <span class="wi-case">{wi.caseNumberDisplay}</span>
+                                                            <span class="wi-meta-sep" aria-hidden="true"></span>
+                                                            <span class="wi-status">{wi.statusLabel}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span class="wi-subject-link">{wi.subject}</span>
+                                                <div class="wi-card__queue">
+                                                    <span class="wi-queue-badge">{wi.queue}</span>
+                                                </div>
+                                            </article>
                                         </div>
-                                        <template if:true={wi.hasFlagIcon}>
-                                            <div class="wi-flag-btn">
-                                                <button class="wi-flag-inner-btn">
+                                        <div class="wi-grid__flag">
+                                            <template if:true={wi.hasFlagIcon}>
+                                                <span class="flag-pill" role="img" aria-label="Flagged" title="Flagged">
                                                     <lightning-icon icon-name="utility:priority" size="xx-small"></lightning-icon>
-                                                    <span class="wi-down-icon"><lightning-icon icon-name="utility:down" size="xx-small"></lightning-icon></span>
-                                                </button>
-                                            </div>
-                                        </template>
+                                                </span>
+                                            </template>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>

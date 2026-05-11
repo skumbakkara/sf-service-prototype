@@ -1,16 +1,15 @@
 <template>
     <div class="service-reps-page">
+
+        <!-- Tab bar + content -->
         <div class="slds-m-horizontal_medium slds-m-top_medium">
             <lightning-tabset active-tab-value={activeTab} ontabchange={handleTabChange}>
 
                 <lightning-tab label="Wallboard" value="wallboard"></lightning-tab>
 
                 <lightning-tab label="Service Reps" value="service-reps">
-                <div class="page-layout slds-m-top_medium">
-
-                <!-- Table area -->
-                <div class={tableAreaClass}>
-                    <div class="slds-card">
+                    <!-- Card -->
+                    <div class="slds-card slds-m-top_medium">
 
                         <!-- Card header -->
                         <div class="slds-card__header slds-p-around_medium slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
@@ -24,12 +23,6 @@
                                     <h2 class="slds-text-heading_medium">Service Reps Overview</h2>
                                     <p class="slds-text-body_small slds-text-color_weak">An overview of all the service representatives in your team</p>
                                 </div>
-                            </div>
-                            <div class="slds-grid slds-grid_vertical-align-center">
-                                <lightning-button-group>
-                                    <lightning-button label="Accordion" variant="neutral" onclick={handleAccordionToggle}></lightning-button>
-                                    <lightning-button label="Inline Drawer" variant="brand"></lightning-button>
-                                </lightning-button-group>
                             </div>
                         </div>
 
@@ -49,29 +42,10 @@
                             </div>
                         </div>
 
-                        <!-- Table -->
-                        <ui-service-reps-table-inline
-                            data={reps}
-                            open-rep-ids={openRepIds}
-                            onrowclick={handleRowClick}>
-                        </ui-service-reps-table-inline>
+                        <!-- Tree Grid table (accordion only) -->
+                        <ui-service-reps-table data={reps}></ui-service-reps-table>
 
                     </div>
-                </div>
-
-                <!-- Inline drawer -->
-                <template if:true={drawerOpen}>
-                    <div class="drawer-area">
-                        <ui-rep-inline-drawer
-                            tabs-data={openTabs}
-                            active-tab-id={activeTabId}
-                            ontabselect={handleTabSelect}
-                            ontabclose={handleTabClose}>
-                        </ui-rep-inline-drawer>
-                    </div>
-                </template>
-
-                </div>
                 </lightning-tab>
 
                 <lightning-tab label="In-Progress Work" value="in-progress"></lightning-tab>

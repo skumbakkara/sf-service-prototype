@@ -1,11 +1,32 @@
 :host {
     display: block;
+
+    /* Used by the expanded work-item grid. Each track maps to a parent table
+       column above so the card and the flag pill stay aligned with the
+       corresponding columns:
+       - card starts at the Service Rep Name column (offset by Checkbox)
+       - card spans Service Rep Name + Status columns
+       - flag track aligns the work-item flag pill with the Flag column */
+    --wi-checkbox-col-width: 40px;  /* Checkbox column width */
+    --wi-name-col-width: 240px;     /* Service Rep Name column width */
+    --wi-status-col-width: 140px;   /* Status column width */
+    --wi-flag-col-width: 68px;      /* Flag column width */
 }
 
 /* ── Change 1: align table edges with card header padding ── */
 .table-container {
     overflow-x: auto;
     padding: 0 var(--slds-g-spacing-4, 1rem);
+}
+
+/* ── Table borders use SLDS 2 Neutral Base 90 ───────────── */
+.slds-table,
+.slds-table thead th,
+.slds-table tbody td,
+.slds-table tbody th,
+.slds-table tfoot td,
+.slds-table tfoot th {
+    border-color: var(--slds-g-color-neutral-base-90, #e5e5e5);
 }
 
 /* ── Header row corner radius matches card ───────────────── */
@@ -16,11 +37,19 @@ thead tr th:last-child {
     border-top-right-radius: var(--slds-g-radius-border-2, 0.5rem);
 }
 
-/* ── Checkbox column fixed width ────────────────────────── */
+/* ── Checkbox column fixed width + vertical centering ───── */
 .slds-cell_shrink {
     width: 40px !important;
     min-width: 40px !important;
     max-width: 40px !important;
+    vertical-align: middle;
+}
+
+/* ── Rep row cells: +4px row height (2px top/bottom), keep content centered ───── */
+.rep-row > td {
+    padding-top: calc(var(--slds-g-spacing-2, 0.5rem) + 2px);
+    padding-bottom: calc(var(--slds-g-spacing-2, 0.5rem) + 2px);
+    vertical-align: middle;
 }
 
 /* ── Column header sort hover ───────────────────────────── */
@@ -75,8 +104,11 @@ th:hover .col-chevron {
     color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
 }
 .toggle-btn lightning-icon {
-    --sds-c-icon-color-foreground: var(--slds-g-color-palette-electric-blue-40, #0250d9);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-blue-40, #0176d3);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-40, #0176d3);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-blue-40, #0176d3);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-40, #0176d3);
+    fill: var(--slds-g-color-palette-blue-40, #0176d3);
 }
 .toggle-spacer {
     display: inline-block;
@@ -84,24 +116,132 @@ th:hover .col-chevron {
     flex-shrink: 0;
 }
 
-/* ── Status cell colour per state ───────────────────────── */
+/* ── Status cell: dot + stacked label/timestamp ─────────── */
 .status-cell .status-inner {
     display: flex;
     align-items: center;
-    gap: var(--slds-g-spacing-1, 0.25rem);
+    gap: var(--slds-g-spacing-2, 0.5rem);
     white-space: nowrap;
 }
-.status-cell_online  { color: var(--slds-g-color-success-1, #2e844a); }
-.status-cell_break   { color: var(--slds-g-color-warning-1, #a86304); }
-.status-cell_offline { color: var(--slds-g-color-error-1, #ba0517); }
+.status-cell .status-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+}
+.status-cell .status-label {
+    font-weight: var(--slds-g-font-weight-5, 500);
+}
+.status-cell .status-time {
+    font-size: var(--slds-g-font-size-1, 0.625rem);
+    color: var(--slds-g-color-palette-gray-40, #706e6b);
+    font-weight: var(--slds-g-font-weight-4, 400);
+}
+.status-cell_online  .status-label { color: var(--slds-g-color-palette-green-30, #14524b); }
+.status-cell_break   .status-label { color: var(--slds-g-color-warning-1, #a86304); }
+.status-cell_offline .status-label { color: var(--slds-g-color-palette-red-30, #8e030f); }
+.status-cell_online .status-dot {
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-green-50, #45c65a);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-green-50, #45c65a);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-green-50, #45c65a);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-green-50, #45c65a);
+    fill: var(--slds-g-color-palette-green-50, #45c65a);
+}
+.status-cell_break .status-dot {
+    --slds-c-icon-color-foreground: var(--slds-g-color-warning-1, #a86304);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-warning-1, #a86304);
+    --sds-c-icon-color-foreground: var(--slds-g-color-warning-1, #a86304);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-warning-1, #a86304);
+    fill: var(--slds-g-color-warning-1, #a86304);
+}
+.status-cell_offline .status-dot {
+    --slds-c-icon-color-foreground: var(--slds-g-color-error-1, #ba0517);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-error-1, #ba0517);
+    --sds-c-icon-color-foreground: var(--slds-g-color-error-1, #ba0517);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-error-1, #ba0517);
+    fill: var(--slds-g-color-error-1, #ba0517);
+}
 
-/* ── Capacity cell ───────────────────────────────────────── */
-.cap-full,
-.cap-high,
-.cap-mid,
-.cap-low,
-.cap-warn-high,
-.cap-warn-low { background-color: transparent; color: inherit; }
+/* ── Flag cell: pill-shaped indicator wrapping the flag icon ───── */
+.flag-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    padding: 0 8px;
+    color: var(--slds-g-color-on-surface-2, #3e3e3e);
+}
+.flag-pill lightning-icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #3e3e3e);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #3e3e3e);
+    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #3e3e3e);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #3e3e3e);
+    --slds-c-icon-color-background: transparent;
+    --sds-c-icon-color-background: transparent;
+    --slds-c-icon-radius-border: 0;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* ── Capacity cell: two lightning-badge instances ────────── */
+.capacity-badges {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+}
+.capacity-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: var(--slds-g-font-size-2, 0.75rem);
+    font-weight: var(--slds-g-font-weight-5, 500);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+.capacity-badge_primary {
+    background-color: var(--slds-g-color-success-container-1, #acf3e4);
+    color: var(--slds-g-color-palette-teal-40, #056764);
+}
+.capacity-badge_interruptible {
+    background-color: var(--slds-g-color-info-container-1, #cfe5fc);
+    color: var(--slds-g-color-palette-blue-40, #0176d3);
+}
+
+/* SLDS-style tooltip on badge hover (mimics lightning-helptext popover).
+   Trigger area is the entire badge; appears above, fades in. */
+.capacity-badge[data-tooltip]:hover::after,
+.capacity-badge[data-tooltip]:focus-visible::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--slds-g-color-neutral-base-10, #181818);
+    color: var(--slds-g-color-on-accent-1, #ffffff);
+    font-size: var(--slds-g-font-size-2, 0.75rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 1.25;
+    padding: 4px 8px;
+    border-radius: var(--slds-g-radius-border-1, 4px);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 9000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16);
+}
+.capacity-badge[data-tooltip]:hover::before,
+.capacity-badge[data-tooltip]:focus-visible::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--slds-g-color-neutral-base-10, #181818);
+    pointer-events: none;
+    z-index: 9000;
+}
 
 /* ── Channels column: icon row ───────────────────────────── */
 .channel-icons {
@@ -113,9 +253,18 @@ th:hover .col-chevron {
     color: var(--slds-g-color-on-surface-2, #3e3e3c);
 }
 
-/* ── Row hover — suppress border bleed onto row below ───── */
+/* ── Row hover — neutral-base-95 fill, only on the hovered row ───── */
 .rep-row:hover td {
-    border-bottom-color: transparent !important;
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    box-shadow: none !important;
+}
+/* Pin every border on the hovered row AND the next-sibling row to the standard
+   neutral-base-90 so SLDS hover state doesn't bleed darker lines (horizontal
+   on the row below, vertical between cells of the hovered row). */
+.rep-row:hover td,
+.rep-row:hover + tr td,
+.rep-row:hover + tr th {
+    border-color: var(--slds-g-color-neutral-base-90, #e5e5e5) !important;
     box-shadow: none !important;
 }
 
@@ -125,75 +274,215 @@ th:hover .col-chevron {
 }
 .work-items-title-cell {
     padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-1, 0.25rem) !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
 }
 .work-items-title {
     font-size: var(--slds-g-font-size-2, 0.75rem);
     font-weight: var(--slds-g-font-weight-6, 600);
     color: var(--slds-g-color-on-surface-3, #706e6b);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
     padding-left: 2.5rem;
 }
 
-/* ── Work item rows ─────────────────────────────────────── */
+/* ── Work item rows: grid aligned to table columns ──────── */
 .work-item-row {
     background-color: var(--slds-g-color-surface-2, #f3f3f3);
 }
 .work-item-cell {
-    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem) !important;
+    /* No padding so the card fills the cell width; the card itself owns its
+       outer border + radius. Suppress inherited table cell horizontal borders
+       so only the card outline shows inside the accordion. */
+    padding: 0 !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
 }
-.work-item-content {
+.wi-grid {
+    display: grid;
+    /* checkbox | name | status | flag | remainder — card spans cols 1-3 */
+    grid-template-columns: var(--wi-checkbox-col-width) var(--wi-name-col-width) var(--wi-status-col-width) var(--wi-flag-col-width) 1fr;
+    align-items: stretch;
+    width: 100%;
+}
+.wi-grid__card {
+    grid-column: 2 / span 2;
+}
+.wi-grid__flag {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    flex-wrap: nowrap;
-    position: relative;
+    justify-content: center;
+    grid-column: 4;
+}
+
+/* ── Work item card (Figma node 19572:57806) ────────────── */
+.wi-card {
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    border: 1px solid var(--slds-g-color-neutral-base-90, #e5e5e5);
+    border-radius: 12px;
+    padding: var(--slds-g-spacing-3, 0.75rem);
+    margin-bottom: var(--slds-g-spacing-2, 0.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-1, 0.25rem);
     width: 100%;
-    padding-left: 2.5rem;
-    gap: 24px;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+    min-width: 0;
 }
-.wi-description {
+.work-item-row:last-child .wi-card {
+    margin-bottom: 0;
+}
+/* Direct flex children must opt out of the default min-width:auto so long
+   text/badges inside can shrink-to-fit and trigger truncation. */
+.wi-card > * {
+    min-width: 0;
+    max-width: 100%;
+}
+
+/* Top region: channel icon + stacked head (customer/priority + meta) */
+.wi-card__main {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+}
+.wi-card__icon {
+    /* Optical alignment: icon nudges down 4px to sit on the customer baseline */
+    padding-top: var(--slds-g-spacing-1, 0.25rem);
+    flex-shrink: 0;
+}
+.wi-card__icon-inner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 2px;
+    background: var(--slds-g-color-surface-2, #f3f3f3);
+    overflow: hidden;
+}
+.wi-card__icon-inner lightning-icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #2e2e2e);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #2e2e2e);
+    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #2e2e2e);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #2e2e2e);
+    fill: var(--slds-g-color-on-surface-2, #2e2e2e);
+}
+.wi-card__head {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+.wi-card__head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    width: 100%;
+}
+
+/* Customer name — semibold, base scale */
+.wi-customer {
+    font-size: 13px;       /* --font-scale-base */
+    line-height: 18px;
+    font-weight: var(--slds-g-font-weight-6, 600);
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
     white-space: nowrap;
-    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
-    font-size: var(--slds-g-font-size-3, 0.875rem);
-    flex: 0 0 auto;
-    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.wi-description:hover {
+
+/* Meta row: #caseNumber · status */
+.wi-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;       /* --font-scale-neg-1 */
+    line-height: 17px;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+}
+.wi-case {
+    color: var(--slds-g-color-accent-2, #0250d9);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+}
+.wi-status {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+.wi-meta-sep {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--slds-g-color-on-surface-1, #5c5c5c);
+    flex-shrink: 0;
+}
+/* Subject — link-styled (no click handler in this iteration) */
+.wi-subject-link {
+    display: block;
+    font-size: 13px;
+    line-height: 18px;
+    color: var(--slds-g-color-accent-2, #0250d9);
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+.wi-subject-link:hover {
     text-decoration: underline;
 }
-/* Change 4: right-aligned group */
-.wi-right {
+
+/* Light "queue name" badge — white surface, 1px gray border */
+.wi-card__queue {
     display: flex;
     align-items: center;
-    gap: var(--slds-g-spacing-2, 0.5rem);
-    flex-shrink: 0;
+    min-width: 0;
+    max-width: 100%;
 }
-.wi-channel-icon {
-    color: var(--slds-g-color-on-surface-2, #3e3e3c);
-}
-.wi-flag-btn {
-    position: absolute;
-    /* checkbox(40) + name(168) + status(140) + flag(68) + work-summary(148) + channels(90) + login(80) + state(80) + capacity(128) = 942px */
-    left: 942px;
-    flex-shrink: 0;
-}
-.wi-flag-inner-btn {
+.wi-queue-badge {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
-    padding: 3px 10px;
-    background: none;
-    border: 1.5px solid var(--slds-g-color-palette-electric-blue-40, #0250d9);
-    border-radius: 999px;
-    cursor: pointer;
+    background: var(--slds-g-color-surface-1, #ffffff);
+    border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+    border-radius: var(--slds-g-radius-border-1, 4px);
+    padding: 0 4px;
+    font-size: 12px;
+    line-height: 17px;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-.wi-flag-inner-btn lightning-icon {
-    --sds-c-icon-color-foreground: var(--slds-g-color-palette-electric-blue-40, #0250d9);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-electric-blue-40, #0250d9);
-}
-.wi-down-icon {
+
+/* Priority badge in the top-right of the head row */
+.wi-priority {
     display: inline-flex;
-    transform: scale(0.6);
-    transform-origin: center;
+    align-items: center;
+    padding: 0 4px;
+    border-radius: var(--slds-g-radius-border-1, 4px);
+    font-size: 12px;
+    line-height: 17px;
+    font-weight: var(--slds-g-font-weight-4, 400);
+    flex-shrink: 0;
+}
+.wi-priority_high {
+    background-color: var(--slds-g-color-error-container-1, #feded8);
+    color: var(--slds-g-color-error-1, #ba0517);
+}
+.wi-priority_medium {
+    background-color: var(--slds-g-color-warning-container-1, #f9e3b6);
+    color: var(--slds-g-color-warning-1, #8c4b02);
+}
+.wi-priority_low {
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
 }

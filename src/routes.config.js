@@ -21,11 +21,11 @@ export const routes = [
     navLabel: 'Service Reps',
   },
   {
-    path: '/service-reps-inline-drawer',
-    component: 'page-service-reps-inline-drawer',
-    title: 'Service Reps — Inline Drawer',
-    navPage: 'service-reps-inline-drawer',
-    navLabel: 'Reps (Inline Drawer)',
+    path: '/service-reps-accordion',
+    component: 'page-service-reps-accordion',
+    title: 'Service Reps — Accordion',
+    navPage: 'service-reps-accordion',
+    navLabel: 'Reps (Accordion)',
   },
   {
     path: '/icons',

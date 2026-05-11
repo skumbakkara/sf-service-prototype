@@ -15,6 +15,34 @@
     overflow: hidden;
 }
 
+/* ── Card title: Titles/font-scale-3/Regular + Blue 15 ───── */
+.slds-card__header .slds-text-heading_medium {
+    color: var(--slds-g-color-palette-blue-15, #032d60);
+    font-size: var(--slds-g-font-scale-3, 1.25rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: var(--slds-g-font-lineheight-3, 1.4);
+    font-family: var(--slds-g-font-family-display, var(--slds-g-font-family-sans, inherit));
+}
+
+/* ── Card subtext color (Neutral 40) ───────────────── */
+.slds-card__header .slds-text-body_small {
+    color: var(--slds-g-color-palette-neutral-40, #5c5c5c);
+}
+
+/* ── Card title icon fill (Blue 50) ─────────────────── */
+.slds-card__header lightning-icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-blue-50, #1b96ff);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-50, #1b96ff);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-blue-50, #1b96ff);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-50, #1b96ff);
+    fill: var(--slds-g-color-palette-blue-50, #1b96ff);
+}
+
+/* ── Tighten gap between card header and stats/search row by 8px ───── */
+.slds-card__header.slds-p-around_medium {
+    padding-bottom: calc(var(--slds-g-spacing-4, 1rem) - 8px);
+}
+
 /* ── Search input sizing ────────────────────────────── */
 .search-input {
     width: 200px;

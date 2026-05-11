@@ -15,7 +15,7 @@
                         <div class="slds-card__header slds-p-around_medium slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
                             <div class="slds-grid slds-grid_vertical-align-center">
                                 <lightning-icon
-                                    icon-name="standard:service_crew"
+                                    icon-name="utility:questions_and_answers"
                                     size="medium"
                                     class="slds-m-right_small">
                                 </lightning-icon>
@@ -26,8 +26,8 @@
                             </div>
                             <div class="slds-grid slds-grid_vertical-align-center">
                                 <lightning-button-group>
-                                    <lightning-button label="Accordion" variant="brand"></lightning-button>
-                                    <lightning-button label="Inline Drawer" variant="neutral" onclick={handleInlineDrawerToggle}></lightning-button>
+                                    <lightning-button label="Action 1" variant="neutral"></lightning-button>
+                                    <lightning-button label="Action 2" variant="neutral"></lightning-button>
                                 </lightning-button-group>
                             </div>
                         </div>
@@ -43,8 +43,14 @@
                                     placeholder="Search..."
                                     class="search-input slds-m-right_x-small">
                                 </lightning-input>
-                                <lightning-button-icon icon-name="utility:filter" variant="neutral" class="slds-m-right_xx-small"></lightning-button-icon>
-                                <lightning-button-icon icon-name="utility:chevrondown" variant="neutral"></lightning-button-icon>
+                                <lightning-button-group>
+                                    <lightning-button-icon icon-name="utility:filterList" variant="border-filled" alternative-text="Filter" title="Filter"></lightning-button-icon>
+                                    <lightning-button-menu icon-name="utility:down" variant="border-filled" alternative-text="Filter options" menu-alignment="right">
+                                        <lightning-menu-item value="all" label="All reps"></lightning-menu-item>
+                                        <lightning-menu-item value="online" label="Online only"></lightning-menu-item>
+                                        <lightning-menu-item value="flagged" label="Flagged"></lightning-menu-item>
+                                    </lightning-button-menu>
+                                </lightning-button-group>
                             </div>
                         </div>
 
