@@ -9,14 +9,27 @@
        - flag track aligns the work-item flag pill with the Flag column */
     --wi-checkbox-col-width: 40px;  /* Checkbox column width */
     --wi-name-col-width: 240px;     /* Service Rep Name column width */
-    --wi-status-col-width: 140px;   /* Status column width */
-    --wi-flag-col-width: 68px;      /* Flag column width */
+    --wi-status-col-width: 150px;   /* Status column width */
+    --wi-flag-col-width: 120px;     /* Flag column width */
 }
 
 /* ── Change 1: align table edges with card header padding ── */
+/* Scroll-container for the table:
+   - overflow-x preserves the existing horizontal scroll for wide content
+   - overflow-y + max-height bounds the vertical extent so the body of the
+     table scrolls (rather than the whole page) — required for both the
+     sticky thead and the infinite-scroll handler in serviceRepsTable.js. */
 .table-container {
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: 60vh;
     padding: 0 var(--slds-g-spacing-4, 1rem);
+}
+
+/* Fixed table layout so the inline column widths are honored strictly —
+   the column never grows on hover when the sort chevron appears. */
+.slds-table {
+    table-layout: fixed;
 }
 
 /* ── Table borders use SLDS 2 Neutral Base 90 ───────────── */
@@ -37,6 +50,27 @@ thead tr th:last-child {
     border-top-right-radius: var(--slds-g-radius-border-2, 0.5rem);
 }
 
+/* Suppress SLDS's default sticky-header drop shadow under the thead row */
+.slds-table thead,
+.slds-table thead tr {
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+/* Pin column headers while the body scrolls. position: sticky targets the
+   nearest scrolling ancestor (.table-container). Background fills the cell
+   so rows beneath don't bleed through; the inset box-shadow replaces the
+   collapsed border-bottom (which can disappear under sticky positioning)
+   without re-introducing the SLDS sticky drop shadow above. */
+.slds-table thead th,
+.slds-table_header-fixed_container .slds-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: inset 0 -1px 0 var(--slds-g-color-neutral-base-90, #e5e5e5) !important;
+    filter: none !important;
+}
+
 /* ── Checkbox column fixed width + vertical centering ───── */
 .slds-cell_shrink {
     width: 40px !important;
@@ -49,6 +83,9 @@ thead tr th:last-child {
 .rep-row > td {
     padding-top: calc(var(--slds-g-spacing-2, 0.5rem) + 2px);
     padding-bottom: calc(var(--slds-g-spacing-2, 0.5rem) + 2px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     vertical-align: middle;
 }
 
@@ -59,19 +96,25 @@ thead tr th:last-child {
 .th-action-inner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    /* 8px gap between header label and chevron — only takes effect when
+       the chevron is rendered (on hover), since chevron is display:none otherwise. */
+    gap: var(--slds-g-spacing-2, 0.5rem);
     width: 100%;
+    min-width: 0;
+}
+.th-action-inner .slds-truncate {
+    min-width: 0;
+    flex: 1 1 auto;
 }
 .col-chevron {
+    /* Hidden by default — header text takes the full column width.
+       On hover the chevron renders and the label truncates if needed. */
+    display: none;
     flex-shrink: 0;
-    opacity: 0;
-    transition: opacity 0.15s;
     --sds-c-icon-color-foreground: var(--slds-g-color-palette-electric-blue-40, #0250d9);
     --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-electric-blue-40, #0250d9);
 }
-th:hover .col-chevron {
-    opacity: 1;
-}
+th:hover .col-chevron { display: inline-flex; }
 
 /* ── Rep name cell ──────────────────────────────────────── */
 .rep-name-td {
@@ -104,11 +147,11 @@ th:hover .col-chevron {
     color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
 }
 .toggle-btn lightning-icon {
-    --slds-c-icon-color-foreground: var(--slds-g-color-palette-blue-40, #0176d3);
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-40, #0176d3);
-    --sds-c-icon-color-foreground: var(--slds-g-color-palette-blue-40, #0176d3);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-40, #0176d3);
-    fill: var(--slds-g-color-palette-blue-40, #0176d3);
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-blue-40, #0250d9);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-40, #0250d9);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-blue-40, #0250d9);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-40, #0250d9);
+    fill: var(--slds-g-color-palette-blue-40, #0250d9);
 }
 .toggle-spacer {
     display: inline-block;
@@ -206,18 +249,19 @@ th:hover .col-chevron {
 }
 .capacity-badge_interruptible {
     background-color: var(--slds-g-color-info-container-1, #cfe5fc);
-    color: var(--slds-g-color-palette-blue-40, #0176d3);
+    color: var(--slds-g-color-palette-blue-40, #0250d9);
 }
 
-/* SLDS-style tooltip on badge hover (mimics lightning-helptext popover).
-   Trigger area is the entire badge; appears above, fades in. */
-.capacity-badge[data-tooltip]:hover::after,
-.capacity-badge[data-tooltip]:focus-visible::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
+/* Fixed-position tooltip for capacity badges. position: fixed escapes the
+   table-container's overflow-x clip and the .slds-card's overflow: hidden
+   clip — z-index alone cannot escape a clipping ancestor. The element is
+   positioned via JS (see handleTooltipShow in serviceRepsTable.js); the
+   transform centers it horizontally and pulls it above the badge. */
+.cap-tooltip {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translate(-50%, calc(-100% - 8px));
     background-color: var(--slds-g-color-neutral-base-10, #181818);
     color: var(--slds-g-color-on-accent-1, #ffffff);
     font-size: var(--slds-g-font-size-2, 0.75rem);
@@ -227,20 +271,23 @@ th:hover .col-chevron {
     border-radius: var(--slds-g-radius-border-1, 4px);
     white-space: nowrap;
     pointer-events: none;
-    z-index: 9000;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 9999;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16);
 }
-.capacity-badge[data-tooltip]:hover::before,
-.capacity-badge[data-tooltip]:focus-visible::before {
+.cap-tooltip.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+.cap-tooltip::after {
     content: '';
     position: absolute;
-    bottom: calc(100% + 4px);
+    top: 100%;
     left: 50%;
     transform: translateX(-50%);
     border: 4px solid transparent;
     border-top-color: var(--slds-g-color-neutral-base-10, #181818);
-    pointer-events: none;
-    z-index: 9000;
 }
 
 /* ── Channels column: icon row ───────────────────────────── */
@@ -310,7 +357,7 @@ th:hover .col-chevron {
 .wi-grid__flag {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     grid-column: 4;
 }
 

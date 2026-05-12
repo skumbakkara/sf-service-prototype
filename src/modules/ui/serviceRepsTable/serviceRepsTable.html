@@ -1,4 +1,8 @@
 <template>
+    <!-- Capacity-badge tooltip rendered outside the scrollable/clipping
+         table-container so it can paint over any ancestor with overflow set.
+         Positioned via JS with position: fixed (see serviceRepsTable.js). -->
+    <div class="cap-tooltip" role="tooltip" aria-hidden="true"></div>
     <div class="table-container">
         <table class="slds-table slds-table_bordered slds-table_col-bordered">
             <thead>
@@ -55,7 +59,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="slds-text-align_center">
+                        <td class="slds-text-align_left">
                             <template if:true={row.hasFlagIcon}>
                                 <span class="flag-pill" role="img" aria-label="Flagged" title="Flagged">
                                     <lightning-icon icon-name="utility:priority" size="xx-small"></lightning-icon>
@@ -75,8 +79,14 @@
                         <td class="slds-text-align_right">{row.state}</td>
                         <td class="capacity-cell">
                             <div class="capacity-badges">
-                                <span class="capacity-badge capacity-badge_primary" data-tooltip="Primary capacity">{row.capacityPLabel}</span>
-                                <span class="capacity-badge capacity-badge_interruptible" data-tooltip="Interruptible capacity">{row.capacityILabel}</span>
+                                <span class="capacity-badge capacity-badge_primary" data-tooltip="Primary capacity"
+                                    onmouseenter={handleTooltipShow} onmouseleave={handleTooltipHide}
+                                    onfocus={handleTooltipShow} onblur={handleTooltipHide}
+                                    tabindex="0">{row.capacityPLabel}</span>
+                                <span class="capacity-badge capacity-badge_interruptible" data-tooltip="Interruptible capacity"
+                                    onmouseenter={handleTooltipShow} onmouseleave={handleTooltipHide}
+                                    onfocus={handleTooltipShow} onblur={handleTooltipHide}
+                                    tabindex="0">{row.capacityILabel}</span>
                             </div>
                         </td>
                         <td class="slds-text-align_right">{row.accept}</td>

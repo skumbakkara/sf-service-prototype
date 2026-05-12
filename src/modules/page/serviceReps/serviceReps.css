@@ -47,3 +47,51 @@
 .search-input {
     width: 200px;
 }
+
+/* ── In-Progress Work tab: page header ──────────────── */
+.ipt-page-header {
+    border-bottom: 0;
+    box-shadow: none;
+}
+.ipt-header-icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+}
+.ipt-title {
+    color: var(--slds-g-color-palette-blue-15, #032d60);
+    font-size: var(--slds-g-font-scale-5, 1.75rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 2.1875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ipt-meta {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 14px;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+.ipt-meta-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+.ipt-search {
+    width: 275px;
+}
+/* Equal 8px visual gap between Search and the two button groups in the
+   In-Progress controls row. Using flex `gap` instead of per-element margin
+   so the spacing is consistent regardless of each child's host padding.
+   The `> *` margin reset prevents any default lightning-button-group margin
+   from stacking with the parent's gap. */
+.ipt-controls {
+    gap: var(--slds-g-spacing-2, 0.5rem);
+}
+.ipt-controls > * {
+    margin: 0 !important;
+}

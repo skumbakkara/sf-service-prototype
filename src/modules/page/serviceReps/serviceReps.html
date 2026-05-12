@@ -60,7 +60,84 @@
                     </div>
                 </lightning-tab>
 
-                <lightning-tab label="In-Progress Work" value="in-progress"></lightning-tab>
+                <lightning-tab label="In-Progress Work" value="in-progress">
+                    <!-- Card -->
+                    <div class="slds-card slds-m-top_medium">
+
+                        <!-- Card header (mirrors Service Reps tab structure) -->
+                        <div class="slds-card__header slds-p-around_medium slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <lightning-icon
+                                    icon-name="standard:work_order_item"
+                                    size="medium"
+                                    class="slds-m-right_small">
+                                </lightning-icon>
+                                <div>
+                                    <h2 class="slds-text-heading_medium">In-Progress Work Summary</h2>
+                                    <p class="slds-text-body_small slds-text-color_weak">An overview of all in-progress work items being handled</p>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-grid_vertical-align-center">
+                                <lightning-button-group>
+                                    <lightning-button label="Reassign All Work" variant="neutral"></lightning-button>
+                                    <lightning-button-menu icon-name="utility:down" variant="border" alternative-text="More options" menu-alignment="right">
+                                        <lightning-menu-item value="reassign" label="Reassign All Work"></lightning-menu-item>
+                                    </lightning-button-menu>
+                                </lightning-button-group>
+                                <lightning-button-icon
+                                    icon-name="utility:settings"
+                                    variant="border-filled"
+                                    alternative-text="Settings"
+                                    title="Settings"
+                                    class="slds-m-left_x-small">
+                                </lightning-button-icon>
+                            </div>
+                        </div>
+
+                        <!-- Stats + search bar -->
+                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-horizontal_medium slds-p-bottom_small">
+                            <p class="slds-text-body_small slds-text-color_weak">{inProgressCount} Work Items &bull; Live Updates</p>
+                            <div class="slds-grid slds-grid_vertical-align-center ipt-controls">
+                                <lightning-input
+                                    type="search"
+                                    label="Search"
+                                    variant="label-hidden"
+                                    placeholder="Search..."
+                                    class="search-input">
+                                </lightning-input>
+                                <lightning-button-group>
+                                    <lightning-button-icon
+                                        icon-name="utility:agent_astro"
+                                        variant={aiFilterVariant}
+                                        alternative-text="Show only AI-agent work items"
+                                        title="Show only AI-agent work items"
+                                        onclick={handleAiFilterToggle}>
+                                    </lightning-button-icon>
+                                    <lightning-button-icon
+                                        icon-name="utility:questions_and_answers"
+                                        variant={humanFilterVariant}
+                                        alternative-text="Show only human-rep work items"
+                                        title="Show only human-rep work items"
+                                        onclick={handleHumanFilterToggle}>
+                                    </lightning-button-icon>
+                                </lightning-button-group>
+                                <lightning-button-group>
+                                    <lightning-button-icon icon-name="utility:filterList" variant="border-filled" alternative-text="Filter" title="Filter"></lightning-button-icon>
+                                    <lightning-button-menu icon-name="utility:down" variant="border-filled" alternative-text="More filter options" menu-alignment="right">
+                                        <lightning-menu-item value="all" label="All work items"></lightning-menu-item>
+                                        <lightning-menu-item value="flagged" label="Flagged only"></lightning-menu-item>
+                                        <lightning-menu-item value="agent" label="AI Agent only"></lightning-menu-item>
+                                        <lightning-menu-item value="human" label="Human only"></lightning-menu-item>
+                                    </lightning-button-menu>
+                                </lightning-button-group>
+                            </div>
+                        </div>
+
+                        <!-- Table -->
+                        <ui-in-progress-table data={inProgressItems}></ui-in-progress-table>
+
+                    </div>
+                </lightning-tab>
 
                 <lightning-tab label="Backlog" value="backlog"></lightning-tab>
 

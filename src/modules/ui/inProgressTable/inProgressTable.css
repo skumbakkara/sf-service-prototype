@@ -1,0 +1,344 @@
+:host {
+    display: block;
+}
+
+/* Scroll-container for the table:
+   - overflow-x preserves the existing horizontal scroll for wide content
+   - overflow-y + max-height bounds the vertical extent so the body of the
+     table scrolls (rather than the whole page) — required for both the
+     sticky thead and the infinite-scroll handler in inProgressTable.js. */
+.ipt-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 60vh;
+    padding: 0 var(--slds-g-spacing-4, 1rem);
+}
+
+/* ── Table borders ───────────────────────────────────────────── */
+.slds-table,
+.slds-table thead th,
+.slds-table tbody td,
+.slds-table tbody th {
+    border-color: var(--slds-g-color-neutral-base-90, #e5e5e5);
+}
+
+/* Fixed table layout so the inline column widths are honored strictly —
+   the column never grows on hover when the sort chevron appears. */
+.slds-table {
+    table-layout: fixed;
+}
+
+/* ── Header corner radius ────────────────────────────────────── */
+thead tr th:first-child { border-top-left-radius: var(--slds-g-radius-border-2, 0.5rem); }
+thead tr th:last-child  { border-top-right-radius: var(--slds-g-radius-border-2, 0.5rem); }
+
+/* Suppress SLDS's default sticky-header drop shadow under the thead row */
+.slds-table thead,
+.slds-table thead tr {
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+/* Pin column headers while the body scrolls. position: sticky targets the
+   nearest scrolling ancestor (.ipt-container). Background fills the cell
+   so rows beneath don't bleed through; the inset box-shadow replaces the
+   collapsed border-bottom (which can disappear under sticky positioning)
+   without re-introducing the SLDS sticky drop shadow above. */
+.slds-table thead th,
+.slds-table_header-fixed_container .slds-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: inset 0 -1px 0 var(--slds-g-color-neutral-base-90, #e5e5e5) !important;
+    filter: none !important;
+}
+
+/* ── Checkbox column ─────────────────────────────────────────── */
+.slds-cell_shrink {
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    vertical-align: middle;
+}
+
+/* ── Row cells ───────────────────────────────────────────────── */
+.ipt-row > td {
+    padding-top: calc(var(--slds-g-spacing-2, 0.5rem) + 2px);
+    padding-bottom: calc(var(--slds-g-spacing-2, 0.5rem) + 2px);
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Column header sort ──────────────────────────────────────── */
+.slds-is-sortable { cursor: pointer; }
+.th-action-inner {
+    display: flex;
+    align-items: center;
+    /* 8px gap between header label and chevron — only takes effect when
+       the chevron is rendered (on hover), since chevron is display:none otherwise. */
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    width: 100%;
+    min-width: 0;
+}
+.th-action-inner .slds-truncate {
+    min-width: 0;
+    flex: 1 1 auto;
+}
+.col-chevron {
+    /* Hidden by default — header text takes the full column width.
+       On hover the chevron renders and the label truncates if needed. */
+    display: none;
+    flex-shrink: 0;
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+}
+th:hover .col-chevron { display: inline-flex; }
+
+/* ── Row hover ───────────────────────────────────────────────── */
+.ipt-row:hover td {
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    box-shadow: none !important;
+}
+.ipt-row:hover td,
+.ipt-row:hover + tr td {
+    border-color: var(--slds-g-color-neutral-base-90, #e5e5e5) !important;
+    box-shadow: none !important;
+}
+
+/* ── Channel cell ────────────────────────────────────────────── */
+.ipt-td-channel { white-space: nowrap; }
+.channel-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.channel-icon {
+    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #3e3e3c);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #3e3e3c);
+}
+
+/* ── Details cell: subject + case number on a single row ─────── */
+.ipt-td-details { max-width: 360px; }
+.ipt-details {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    min-width: 0;
+    white-space: nowrap;
+}
+.ipt-subject {
+    font-size: 13px;
+    font-weight: var(--slds-g-font-weight-5, 500);
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    cursor: pointer;
+}
+.ipt-subject:hover { text-decoration: underline; }
+.ipt-case {
+    font-size: 12px;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    flex-shrink: 0;
+}
+
+/* ── Route By cell: optional leading utility icon ─────────────── */
+.ipt-route {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+    white-space: nowrap;
+    min-width: 0;
+}
+.ipt-route-icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #2e2e2e);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #2e2e2e);
+    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #2e2e2e);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #2e2e2e);
+    flex-shrink: 0;
+}
+
+/* ── Assigned To cell (SLDS 2 cell pattern: avatar/badge + name) ─ */
+.ipt-agent {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    white-space: nowrap;
+    text-align: left;
+    min-width: 0;
+}
+.ipt-agent-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+/* Avatar takes a fixed 24x24 footprint via lightning-avatar size="x-small" */
+.ipt-agent-avatar {
+    flex-shrink: 0;
+}
+/* AI badge: same 24x24 footprint as the avatar so all rows align */
+.ipt-agent-ai-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--slds-g-color-palette-blue-95, #eaf5fe);
+    flex-shrink: 0;
+}
+.ipt-agent-ai-icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-blue-40, #0250d9);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-40, #0250d9);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-blue-40, #0250d9);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-40, #0250d9);
+    fill: var(--slds-g-color-palette-blue-40, #0250d9);
+}
+
+/* ── Flag cell ───────────────────────────────────────────────── */
+.ipt-flag-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.5rem;
+    padding: 0 6px;
+}
+.ipt-flag-btn lightning-icon {
+    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #3e3e3e);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #3e3e3e);
+}
+
+/* ── Action cell: Monitor button ─────────────────────────────── */
+.ipt-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: var(--slds-g-font-weight-6, 600);
+    color: var(--slds-g-color-accent-2, #0250d9);
+    white-space: nowrap;
+}
+.ipt-action-btn:hover { text-decoration: underline; }
+.ipt-action-icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-accent-2, #0250d9);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-accent-2, #0250d9);
+    --sds-c-icon-color-foreground: var(--slds-g-color-accent-2, #0250d9);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-accent-2, #0250d9);
+    fill: var(--slds-g-color-accent-2, #0250d9);
+    flex-shrink: 0;
+}
+
+/* ── Sentiment cell: emoji-only, color-coded per bucket ───────── */
+.ipt-sentiment_good {
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-green-50, #2e844a);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-green-50, #2e844a);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-green-50, #2e844a);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-green-50, #2e844a);
+    fill: var(--slds-g-color-palette-green-50, #2e844a);
+}
+.ipt-sentiment_average {
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-yellow-70, #fcc003);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-yellow-70, #fcc003);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-yellow-70, #fcc003);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-yellow-70, #fcc003);
+    fill: var(--slds-g-color-palette-yellow-70, #fcc003);
+}
+.ipt-sentiment_bad {
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-red-40, #ba0517);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-red-40, #ba0517);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-red-40, #ba0517);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-red-40, #ba0517);
+    fill: var(--slds-g-color-palette-red-40, #ba0517);
+}
+
+/* ── INTR checkmark ──────────────────────────────────────────── */
+.ipt-intr-check {
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-green-30, #14524b);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-green-30, #14524b);
+}
+
+/* ── Priority badge (per Figma: rounded-rect chip, 12px label) ─ */
+.ipt-priority {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--slds-g-spacing-1, 4px) var(--slds-g-spacing-2, 8px);
+    border-radius: var(--slds-g-radius-border-1, 4px);
+    font-size: var(--slds-g-font-scale-neg-1, 12px);
+    line-height: 17px;
+    font-weight: var(--slds-g-font-weight-4, 400);
+    white-space: nowrap;
+}
+.ipt-priority_low {
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+.ipt-priority_medium {
+    background-color: var(--slds-g-color-warning-container-1, #f9e3b6);
+    color: var(--slds-g-color-on-warning-1, #8c4b02);
+}
+.ipt-priority_high {
+    background-color: var(--slds-g-color-error-container-1, #fddde3);
+    color: var(--slds-g-color-on-error-1, #b60554);
+}
+/* Critical: no native SLDS token for "critical" — use solid red-40 on white
+   to elevate above High while staying inside the error family. */
+.ipt-priority_critical {
+    background-color: var(--slds-g-color-palette-red-40, #ba0517);
+    color: var(--slds-g-color-palette-neutral-100, #ffffff);
+    font-weight: var(--slds-g-font-weight-6, 590);
+}
+
+/* ── Status pill (per Figma: 16px utility icon + 13px label) ──── */
+.ipt-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-2, 8px);
+    font-size: 13px;
+    line-height: 18px;
+    white-space: nowrap;
+}
+.ipt-status .ipt-status-icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+}
+.ipt-status_working {
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+    fill: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+.ipt-status_pending {
+    color: var(--slds-g-color-on-warning-1, #8c4b02);
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-warning-1, #8c4b02);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-warning-1, #8c4b02);
+    --sds-c-icon-color-foreground: var(--slds-g-color-on-warning-1, #8c4b02);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-warning-1, #8c4b02);
+    fill: var(--slds-g-color-on-warning-1, #8c4b02);
+}
+.ipt-status_active {
+    color: var(--slds-g-color-on-success-1, #056764);
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-success-1, #056764);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-success-1, #056764);
+    --sds-c-icon-color-foreground: var(--slds-g-color-on-success-1, #056764);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-success-1, #056764);
+    fill: var(--slds-g-color-on-success-1, #056764);
+}
+.ipt-status_waiting {
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+    fill: var(--slds-g-color-on-surface-1, #5c5c5c);
+}

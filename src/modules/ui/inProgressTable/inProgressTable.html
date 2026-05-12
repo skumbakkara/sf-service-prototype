@@ -1,0 +1,138 @@
+<template>
+    <div class="ipt-container">
+        <table class="slds-table slds-table_bordered slds-table_col-bordered">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th scope="col" class="slds-cell_shrink">
+                        <div class="slds-text-align_center">
+                            <input type="checkbox" class="hdr-checkbox" checked={allSelected} onchange={handleSelectAll} />
+                        </div>
+                    </th>
+                    <template for:each={columnHeaders} for:item="col">
+                        <th key={col.fieldName} scope="col" style={col.style} class={col.thClass} data-field={col.fieldName} onclick={handleSort}>
+                            <div class="slds-th__action th-action-inner">
+                                <span class="slds-truncate">{col.label}</span>
+                                <template if:true={col.sortable}>
+                                    <lightning-icon icon-name="utility:chevrondown" size="xx-small" class="col-chevron"></lightning-icon>
+                                </template>
+                            </div>
+                        </th>
+                    </template>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={tableRows} for:item="row">
+                    <tr key={row.id} class="slds-hint-parent ipt-row">
+                        <!-- Checkbox -->
+                        <td class="slds-cell_shrink">
+                            <div class="slds-text-align_center">
+                                <input type="checkbox" class="row-checkbox" checked={row.isSelected} data-id={row.id} onchange={handleRowSelect} />
+                            </div>
+                        </td>
+                        <!-- Channel -->
+                        <td class="ipt-td-channel">
+                            <div class="channel-icon-wrap">
+                                <lightning-icon icon-name={row.channelIcon} size="xx-small" title={row.channelLabel} class="channel-icon"></lightning-icon>
+                            </div>
+                        </td>
+                        <!-- Details (subject + case number) -->
+                        <td class="ipt-td-details">
+                            <div class="ipt-details">
+                                <span class="ipt-subject">{row.subject}</span>
+                                <span class="ipt-case">{row.caseNumberDisplay}</span>
+                            </div>
+                        </td>
+                        <!-- Status: utility icon + colored label -->
+                        <td>
+                            <div class={row.statusClass}>
+                                <lightning-icon icon-name={row.statusIcon} size="xx-small" class="ipt-status-icon"></lightning-icon>
+                                <span class="ipt-status-label">{row.statusLabel}</span>
+                            </div>
+                        </td>
+                        <!-- Priority: badge (Low / Medium / High / Critical) — empty cell when no priority -->
+                        <td>
+                            <template if:true={row.hasPriority}>
+                                <span class={row.priorityClass}>{row.priorityLabel}</span>
+                            </template>
+                        </td>
+                        <!-- Assigned To: SLDS 2 cell pattern — avatar (human) or AI badge -->
+                        <td class="slds-text-align_left">
+                            <div class="ipt-agent">
+                                <template if:true={row.isAiAgent}>
+                                    <span class="ipt-agent-ai-badge" title="AI agent">
+                                        <lightning-icon icon-name="utility:agent_astro" size="xx-small" class="ipt-agent-ai-icon"></lightning-icon>
+                                    </span>
+                                </template>
+                                <template if:false={row.isAiAgent}>
+                                    <lightning-avatar
+                                        size="x-small"
+                                        variant="circle"
+                                        src={row.assignedToAvatarUrl}
+                                        initials={row.assignedToInitials}
+                                        fallback-icon-name="standard:user"
+                                        alternative-text={row.assignedTo}
+                                        class="ipt-agent-avatar">
+                                    </lightning-avatar>
+                                </template>
+                                <span class="ipt-agent-name">{row.assignedTo}</span>
+                            </div>
+                        </td>
+                        <!-- Flag -->
+                        <td class="slds-text-align_left">
+                            <template if:true={row.hasFlag}>
+                                <lightning-button-menu
+                                    icon-name="utility:priority"
+                                    icon-size="medium"
+                                    variant="border-filled"
+                                    alternative-text="Flag actions"
+                                    title="Flag actions"
+                                    menu-alignment="right"
+                                    class="ipt-flag-button">
+                                    <lightning-menu-item value="resolve"  label="Resolve flag"></lightning-menu-item>
+                                    <lightning-menu-item value="reassign" label="Reassign work"></lightning-menu-item>
+                                    <lightning-menu-item value="escalate" label="Escalate"></lightning-menu-item>
+                                </lightning-button-menu>
+                            </template>
+                        </td>
+                        <!-- Route By -->
+                        <td>
+                            <div class="ipt-route">
+                                <template if:true={row.routeByIcon}>
+                                    <lightning-icon icon-name={row.routeByIcon} size="xx-small" class="ipt-route-icon"></lightning-icon>
+                                </template>
+                                <span>{row.routeBy}</span>
+                            </div>
+                        </td>
+                        <!-- Action -->
+                        <td>
+                            <button class="ipt-action-btn" type="button">
+                                <lightning-icon icon-name="utility:preview" size="xx-small" class="ipt-action-icon"></lightning-icon>
+                                <span>Monitor</span>
+                            </button>
+                        </td>
+                        <!-- User Sentiment -->
+                        <td class="slds-text-align_center">
+                            <lightning-icon icon-name={row.sentimentIcon} size="x-small" class={row.sentimentClass} title={row.sentimentLabel} alternative-text={row.sentimentLabel}></lightning-icon>
+                        </td>
+                        <!-- Work Size -->
+                        <td class="slds-text-align_right">{row.workSize}</td>
+                        <!-- INTR -->
+                        <td class="slds-text-align_center">
+                            <template if:true={row.isInterruptible}>
+                                <lightning-icon icon-name="utility:check" size="xx-small" class="ipt-intr-check"></lightning-icon>
+                            </template>
+                        </td>
+                        <!-- Handle Time -->
+                        <td class="slds-text-align_right">{row.handleTime}</td>
+                        <!-- Assigned Time -->
+                        <td class="slds-text-align_right">{row.assignedTime}</td>
+                        <!-- Speed To Answer -->
+                        <td class="slds-text-align_right">{row.speedToAnswer}</td>
+                        <!-- Accepted Time -->
+                        <td class="slds-text-align_right">{row.acceptedTime}</td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</template>
