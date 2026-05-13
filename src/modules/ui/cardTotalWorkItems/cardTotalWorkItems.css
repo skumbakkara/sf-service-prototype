@@ -1,0 +1,26 @@
+/* `height: 100%` lets this card composition fill its grid cell. SLDS 2
+   has no sizing hook for a full-height fill. */
+:host {
+    display: block;
+    height: 100%;
+}
+
+/* Figma footer (node 19716:41042 → I19716:41042;480:1992):
+   bold electric-blue-40 numbers, regular on-surface-1 labels, no separator.
+   17/12 = 1.4167 has no SLDS hook between line-height-1 (1) and line-height-2 (1.25). */
+.ctwi-footer {
+    display: inline;
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    line-height: 1.4167;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
+.ctwi-num {
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    font-weight: var(--slds-g-font-weight-6, 600);
+}
+
+.ctwi-label {
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    font-weight: var(--slds-g-font-weight-4, 400);
+}

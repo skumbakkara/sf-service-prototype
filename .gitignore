@@ -24,3 +24,6 @@ src/build/generated/
 
 # Logs
 *.log
+
+# Local design references / screenshots used during development
+.tmp/

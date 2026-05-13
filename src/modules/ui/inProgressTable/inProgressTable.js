@@ -21,32 +21,35 @@ const PRIORITY_CONFIG = {
     Critical: { label: 'Critical', cssClass: 'ipt-priority ipt-priority_critical' },
 };
 
-// Status config (per Figma): 16px utility icon + colored label
+// Status config: only three states — Working (in-progress, neutral),
+// New (just assigned, info-blue), Escalated (needs attention, error-red).
 const STATUS_CONFIG = {
-    Working: { label: 'Working', icon: 'utility:setup',     cssClass: 'ipt-status ipt-status_working' },
-    Pending: { label: 'Pending', icon: 'utility:clock',     cssClass: 'ipt-status ipt-status_pending' },
-    Active:  { label: 'Active',  icon: 'utility:check',     cssClass: 'ipt-status ipt-status_active'  },
-    Waiting: { label: 'Waiting', icon: 'utility:hourglass', cssClass: 'ipt-status ipt-status_waiting' },
+    Working:   { label: 'Working',   icon: 'utility:setup',    cssClass: 'ipt-status ipt-status_working'   },
+    New:       { label: 'New',       icon: 'utility:new',      cssClass: 'ipt-status ipt-status_new'       },
+    Escalated: { label: 'Escalated', icon: 'utility:priority', cssClass: 'ipt-status ipt-status_escalated' },
 };
 
 // Column order: Status pulled forward next to Details; Flag pulled forward next to Assigned To.
-// Minimum column width is 150px; content-heavy columns get a wider allocation.
+// Widths sized to actual cell content. Icon-only columns floor at 80px; text
+// columns are sized so the header label fits without truncation when not hovered
+// (the chevron is display:none until :hover and table-layout:fixed prevents
+// hover expansion). Details + Assigned Time are content-heavy and stay wider.
 const COLUMN_DEFS = [
-    { label: 'Channel',        fieldName: 'channelLabel',   sortable: false, width: 120  },
-    { label: 'Details',        fieldName: 'subject',        sortable: true,  width: 360  },
-    { label: 'Status',         fieldName: 'status',         sortable: true,  width: 150  },
-    { label: 'Priority',       fieldName: 'priority',       sortable: true,  width: 150  },
+    { label: 'Channel',        fieldName: 'channelLabel',   sortable: false, width: 100  },
+    { label: 'Details',        fieldName: 'subject',        sortable: true,  width: 560  },
+    { label: 'Status',         fieldName: 'status',         sortable: true,  width: 110  },
+    { label: 'Priority',       fieldName: 'priority',       sortable: true,  width: 110  },
     { label: 'Assigned To',    fieldName: 'assignedTo',     sortable: true,  width: 170  },
-    { label: 'Flag',           fieldName: 'hasFlag',        sortable: false, width: 120  },
+    { label: 'Flag',           fieldName: 'hasFlag',        sortable: false, width: 80   },
     { label: 'Route By',       fieldName: 'routeBy',        sortable: true,  width: 160  },
-    { label: 'Action',         fieldName: 'action',         sortable: false, width: 150  },
+    { label: 'Action',         fieldName: 'action',         sortable: false, width: 110  },
     { label: 'User Sentiment', fieldName: 'sentiment',      sortable: true,  width: 150  },
-    { label: 'Work Size',      fieldName: 'workSize',       sortable: true,  width: 150  },
-    { label: 'INTR',           fieldName: 'isInterruptible',sortable: false, width: 150  },
-    { label: 'Handle Time',    fieldName: 'handleTime',     sortable: true,  width: 150  },
-    { label: 'Assigned Time',  fieldName: 'assignedTime',   sortable: true,  width: 150  },
-    { label: 'Speed To Answer',fieldName: 'speedToAnswer',  sortable: true,  width: 150  },
-    { label: 'Accepted Time',  fieldName: 'acceptedTime',   sortable: true,  width: 150  },
+    { label: 'Work Size',      fieldName: 'workSize',       sortable: true,  width: 110  },
+    { label: 'INTR',           fieldName: 'isInterruptible',sortable: false, width: 80   },
+    { label: 'Handle Time',    fieldName: 'handleTime',     sortable: true,  width: 130  },
+    { label: 'Assigned Time',  fieldName: 'assignedTime',   sortable: true,  width: 180  },
+    { label: 'Speed To Answer',fieldName: 'speedToAnswer',  sortable: true,  width: 160  },
+    { label: 'Accepted Time',  fieldName: 'acceptedTime',   sortable: true,  width: 180  },
 ];
 
 // Infinite-scroll bottom threshold in pixels — when the user scrolls within
@@ -60,9 +63,24 @@ export default class InProgressTable extends LightningElement {
     _isLoading = false;
     _scrollAttached = false;
 
+    // Comma-separated list of column fieldNames to hide. Kebab-case attribute:
+    // `hide-columns="status,assignedTo,hasFlag"`. Empty string => show all.
+    @api hideColumns = '';
+
     @track sortedBy;
     @track sortedDirection = 'asc';
     @track selectedIds = new Set();
+
+    get _hiddenFieldSet() {
+        const raw = this.hideColumns;
+        if (!raw || typeof raw !== 'string') return new Set();
+        const out = new Set();
+        for (const part of raw.split(',')) {
+            const name = part.trim();
+            if (name) out.add(name);
+        }
+        return out;
+    }
 
     @api
     get data() { return this._data; }
@@ -96,12 +114,33 @@ export default class InProgressTable extends LightningElement {
     }
 
     get columnHeaders() {
-        return COLUMN_DEFS.map(col => ({
-            ...col,
-            style: `width:${col.width}px;min-width:${col.width}px;`,
-            thClass: col.sortable ? 'slds-is-sortable' : '',
-        }));
+        const hidden = this._hiddenFieldSet;
+        return COLUMN_DEFS
+            .filter(col => !hidden.has(col.fieldName))
+            .map(col => ({
+                ...col,
+                style: `width:${col.width}px;min-width:${col.width}px;`,
+                thClass: col.sortable ? 'slds-is-sortable' : '',
+            }));
     }
+
+    // Per-column visibility getters used by the row template to drop body
+    // <td>s for hidden columns. Field names mirror COLUMN_DEFS entries.
+    get showChannel()       { return !this._hiddenFieldSet.has('channelLabel'); }
+    get showDetails()       { return !this._hiddenFieldSet.has('subject'); }
+    get showStatus()        { return !this._hiddenFieldSet.has('status'); }
+    get showPriority()      { return !this._hiddenFieldSet.has('priority'); }
+    get showAssignedTo()    { return !this._hiddenFieldSet.has('assignedTo'); }
+    get showFlag()          { return !this._hiddenFieldSet.has('hasFlag'); }
+    get showRouteBy()       { return !this._hiddenFieldSet.has('routeBy'); }
+    get showAction()        { return !this._hiddenFieldSet.has('action'); }
+    get showSentiment()     { return !this._hiddenFieldSet.has('sentiment'); }
+    get showWorkSize()      { return !this._hiddenFieldSet.has('workSize'); }
+    get showInterruptible() { return !this._hiddenFieldSet.has('isInterruptible'); }
+    get showHandleTime()    { return !this._hiddenFieldSet.has('handleTime'); }
+    get showAssignedTime()  { return !this._hiddenFieldSet.has('assignedTime'); }
+    get showSpeedToAnswer() { return !this._hiddenFieldSet.has('speedToAnswer'); }
+    get showAcceptedTime()  { return !this._hiddenFieldSet.has('acceptedTime'); }
 
     get allSelected() {
         const total = this.expandedData.length;
@@ -114,12 +153,22 @@ export default class InProgressTable extends LightningElement {
             const sentimentCfg = SENTIMENT_CONFIG[sentimentKey] ?? SENTIMENT_CONFIG.neutral;
             const priorityCfg  = PRIORITY_CONFIG[item.priority] ?? null;
             const statusCfg    = STATUS_CONFIG[item.status]     ?? STATUS_CONFIG.Working;
+            // Details cell renders as a single hyperlink composed of:
+            //   subject | case# | status | <priority> Priority
+            // Parts are dropped when missing so e.g. items without a priority
+            // collapse to "Subject | 12345 | Working" without a trailing pipe.
+            const detailsParts = [];
+            if (item.subject)        detailsParts.push(item.subject);
+            if (item.caseNumber)     detailsParts.push(String(item.caseNumber));
+            if (statusCfg?.label)    detailsParts.push(statusCfg.label);
+            if (priorityCfg?.label)  detailsParts.push(`${priorityCfg.label} Priority`);
             return {
                 id: String(item.id),
                 channelIcon: CHANNEL_ICONS[item.channel] ?? 'utility:record',
                 channelLabel: CHANNEL_LABELS[item.channel] ?? item.channel,
                 subject: item.subject,
                 caseNumberDisplay: `#${item.caseNumber}`,
+                detailsLink: detailsParts.join(' | '),
                 priority: item.priority,
                 priorityLabel: priorityCfg?.label ?? '',
                 priorityClass: priorityCfg?.cssClass ?? '',
@@ -135,7 +184,8 @@ export default class InProgressTable extends LightningElement {
                     .join('')
                     .toUpperCase(),
                 routeBy: item.routeBy,
-                routeByIcon: item.routeByIcon || null,
+                routeByIcon: item.routeByIcon
+                    || (item.routeBy === 'Direct to Agent' ? 'utility:forward' : null),
                 hasFlag: item.hasFlag,
                 sentimentIcon: sentimentCfg.icon,
                 sentimentLabel: sentimentCfg.label,

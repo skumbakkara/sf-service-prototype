@@ -1,0 +1,95 @@
+<template>
+    <div class="bkt-container">
+        <table class="slds-table slds-table_bordered slds-table_col-bordered bkt-table">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th scope="col" class="bkt-cell-checkbox">
+                        <div class="slds-text-align_center">
+                            <input type="checkbox" class="hdr-checkbox" checked={allSelected} onchange={handleSelectAll} />
+                        </div>
+                    </th>
+                    <template for:each={columnHeaders} for:item="col">
+                        <th key={col.fieldName} scope="col" style={col.style} class={col.thClass} data-field={col.fieldName} onclick={handleSort}>
+                            <div class="slds-th__action th-action-inner">
+                                <span class="bkt-th-label">{col.label}</span>
+                                <template if:true={col.sortable}>
+                                    <lightning-icon icon-name="utility:chevrondown" size="xx-small" class="col-chevron"></lightning-icon>
+                                </template>
+                            </div>
+                        </th>
+                    </template>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={tableRows} for:item="row">
+                    <tr key={row.id} class="slds-hint-parent bkt-row">
+                        <!-- Checkbox -->
+                        <td class="bkt-cell-checkbox">
+                            <div class="slds-text-align_center">
+                                <input type="checkbox" class="row-checkbox" checked={row.isSelected} data-id={row.id} onchange={handleRowSelect} />
+                            </div>
+                        </td>
+                        <!-- Priority (plain integer, right-aligned) -->
+                        <td class="slds-text-align_right">{row.priorityRank}</td>
+                        <!-- Customer Name -->
+                        <td class="slds-text-align_left">{row.customerName}</td>
+                        <!-- Conversation Summary: blue-link composed of subject | status | priority -->
+                        <td class="bkt-td-summary">
+                            <span class="bkt-summary" title={row.summaryDisplay}>{row.summaryDisplay}</span>
+                        </td>
+                        <!-- Route By: human → avatar + name; queue/skill → icon + blue link -->
+                        <td>
+                            <div class="bkt-route">
+                                <template if:true={row.isHumanRoute}>
+                                    <lightning-avatar
+                                        size="x-small"
+                                        variant="circle"
+                                        src={row.routeByAvatarUrl}
+                                        initials={row.routeByInitials}
+                                        fallback-icon-name="standard:user"
+                                        alternative-text={row.routeByDisplay}
+                                        class="bkt-route-avatar">
+                                    </lightning-avatar>
+                                    <span class="bkt-route-name">{row.routeByDisplay}</span>
+                                </template>
+                                <template if:false={row.isHumanRoute}>
+                                    <lightning-icon
+                                        icon-name={row.routeIconName}
+                                        size="xx-small"
+                                        alternative-text="Route to"
+                                        class="bkt-route-arrow">
+                                    </lightning-icon>
+                                    <span class="bkt-route-link">{row.routeByDisplay}</span>
+                                </template>
+                            </div>
+                        </td>
+                        <!-- Channels: icon only -->
+                        <td class="bkt-td-channel">
+                            <div class="bkt-channel-icon-wrap">
+                                <lightning-icon icon-name={row.channelIcon} size="xx-small" title={row.channelLabel} alternative-text={row.channelLabel} class="bkt-channel-icon"></lightning-icon>
+                            </div>
+                        </td>
+                        <!-- User Sentiment -->
+                        <td class="slds-text-align_center">
+                            <lightning-icon icon-name={row.sentimentIcon} size="x-small" class={row.sentimentClass} title={row.sentimentLabel} alternative-text={row.sentimentLabel}></lightning-icon>
+                        </td>
+                        <!-- Work Size -->
+                        <td class="slds-text-align_right">{row.workSize}</td>
+                        <!-- INTR -->
+                        <td class="slds-text-align_center">
+                            <template if:true={row.isInterruptible}>
+                                <lightning-icon icon-name="utility:check" size="xx-small" alternative-text="Interruptible" class="bkt-intr-check"></lightning-icon>
+                            </template>
+                        </td>
+                        <!-- Wait Time -->
+                        <td class="slds-text-align_right">{row.waitTime}</td>
+                        <!-- Requested Time -->
+                        <td class="slds-text-align_right">{row.requestedTime}</td>
+                        <!-- Accept By -->
+                        <td class="slds-text-align_right">{row.acceptBy}</td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+</template>

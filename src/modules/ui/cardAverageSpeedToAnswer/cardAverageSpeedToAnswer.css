@@ -1,0 +1,38 @@
+/* `height: 100%` lets this card composition fill its grid cell. SLDS 2
+   has no sizing hook for a full-height fill. */
+:host {
+    display: block;
+    height: 100%;
+}
+
+/* Figma footer (node 19734:27994 _Parts / PoP Change / Salesforce):
+   regular electric-blue-40 / accent-2 delta, regular on-surface-1 trailing
+   label. 17/12 = 1.4167 has no SLDS hook between line-height-1 (1) and
+   line-height-2 (1.25). */
+.casta-footer {
+    display: inline;
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    line-height: 1.4167;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
+.casta-num {
+    color: var(--slds-g-color-accent-2, #0250d9);
+    font-weight: var(--slds-g-font-weight-4, 400);
+}
+
+.casta-label {
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    font-weight: var(--slds-g-font-weight-4, 400);
+}
+
+/* Push the line chart down so it visually anchors to the card's bottom
+   edge, matching the Figma layout where the chart occupies the lower
+   half of the card (node 19734:27995, top edge at y=152 of a 312-tall
+   card). `flex: 1` consumes the remaining card body height; the chart's
+   own internal `chart-height` then sets the SVG drawing height. */
+.casta-chart {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: block;
+}

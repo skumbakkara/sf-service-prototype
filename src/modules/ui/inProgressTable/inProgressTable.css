@@ -119,31 +119,22 @@ th:hover .col-chevron { display: inline-flex; }
     --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #3e3e3c);
 }
 
-/* ── Details cell: subject + case number on a single row ─────── */
-.ipt-td-details { max-width: 360px; }
-.ipt-details {
-    display: flex;
-    flex-direction: row;
-    align-items: baseline;
-    gap: var(--slds-g-spacing-2, 0.5rem);
-    min-width: 0;
-    white-space: nowrap;
-}
-.ipt-subject {
-    font-size: 13px;
+/* ── Details cell: single link composed of subject | case# | status | priority ─ */
+.ipt-td-details { max-width: 560px; }
+.ipt-details-link {
+    display: inline-block;
+    max-width: 100%;
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
     font-weight: var(--slds-g-font-weight-5, 500);
-    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    color: var(--slds-g-color-accent-2, #0250d9);
+    text-decoration: none;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 0;
-    cursor: pointer;
+    white-space: nowrap;
+    vertical-align: middle;
 }
-.ipt-subject:hover { text-decoration: underline; }
-.ipt-case {
-    font-size: 12px;
-    color: var(--slds-g-color-on-surface-1, #5c5c5c);
-    flex-shrink: 0;
-}
+.ipt-details-link:hover,
+.ipt-details-link:focus { text-decoration: underline; }
 
 /* ── Route By cell: optional leading utility icon ─────────────── */
 .ipt-route {
@@ -152,12 +143,13 @@ th:hover .col-chevron { display: inline-flex; }
     gap: var(--slds-g-spacing-1, 0.25rem);
     white-space: nowrap;
     min-width: 0;
+    color: var(--slds-g-color-palette-neutral-40, #5c5c5c);
 }
 .ipt-route-icon {
-    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #2e2e2e);
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #2e2e2e);
-    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #2e2e2e);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #2e2e2e);
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-neutral-40, #5c5c5c);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-neutral-40, #5c5c5c);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-neutral-40, #5c5c5c);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-neutral-40, #5c5c5c);
     flex-shrink: 0;
 }
 
@@ -200,6 +192,21 @@ th:hover .col-chevron { display: inline-flex; }
 }
 
 /* ── Flag cell ───────────────────────────────────────────────── */
+/* Allow the lightning-button-menu popover to escape this cell. The body-cell
+   `overflow: hidden` truncation rule on `.ipt-row > td` would otherwise clip
+   the absolutely-positioned dropdown to the cell bounds. The high z-index on
+   the cell + button-menu host pulls the entire stacking context above the
+   later-painted column-divider borders from `slds-table_col-bordered`, which
+   would otherwise render on top of the popover. */
+.ipt-row > td.ipt-flag-td {
+    overflow: visible;
+    position: relative;
+    z-index: 10;
+}
+.ipt-row > td.ipt-flag-td .ipt-flag-button {
+    position: relative;
+    z-index: 9999;
+}
 .ipt-flag-btn {
     display: inline-flex;
     align-items: center;
@@ -296,49 +303,18 @@ th:hover .col-chevron { display: inline-flex; }
     font-weight: var(--slds-g-font-weight-6, 590);
 }
 
-/* ── Status pill (per Figma: 16px utility icon + 13px label) ──── */
+/* ── Status label (text only, no icon) ──────────────────────── */
 .ipt-status {
     display: inline-flex;
     align-items: center;
-    gap: var(--slds-g-spacing-2, 8px);
     font-size: 13px;
     line-height: 18px;
     white-space: nowrap;
 }
-.ipt-status .ipt-status-icon {
-    flex-shrink: 0;
-    width: 16px;
-    height: 16px;
-}
-.ipt-status_working {
+.ipt-status_working,
+.ipt-status_new {
     color: var(--slds-g-color-on-surface-1, #5c5c5c);
-    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
-    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
-    fill: var(--slds-g-color-on-surface-1, #5c5c5c);
 }
-.ipt-status_pending {
-    color: var(--slds-g-color-on-warning-1, #8c4b02);
-    --slds-c-icon-color-foreground: var(--slds-g-color-on-warning-1, #8c4b02);
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-warning-1, #8c4b02);
-    --sds-c-icon-color-foreground: var(--slds-g-color-on-warning-1, #8c4b02);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-warning-1, #8c4b02);
-    fill: var(--slds-g-color-on-warning-1, #8c4b02);
-}
-.ipt-status_active {
-    color: var(--slds-g-color-on-success-1, #056764);
-    --slds-c-icon-color-foreground: var(--slds-g-color-on-success-1, #056764);
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-success-1, #056764);
-    --sds-c-icon-color-foreground: var(--slds-g-color-on-success-1, #056764);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-success-1, #056764);
-    fill: var(--slds-g-color-on-success-1, #056764);
-}
-.ipt-status_waiting {
-    color: var(--slds-g-color-on-surface-1, #5c5c5c);
-    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
-    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
-    fill: var(--slds-g-color-on-surface-1, #5c5c5c);
+.ipt-status_escalated {
+    color: var(--slds-g-color-palette-red-40, #ba0517);
 }

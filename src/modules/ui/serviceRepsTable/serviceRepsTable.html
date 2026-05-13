@@ -105,40 +105,33 @@
                         <template for:each={row.workItems} for:item="wi">
                             <tr key={wi.id} class="work-item-row">
                                 <td colspan="14" class="work-item-cell">
-                                    <div class="wi-grid">
-                                        <div class="wi-grid__card">
-                                            <article class="wi-card">
-                                                <div class="wi-card__main">
-                                                    <div class="wi-card__icon">
-                                                        <span class="wi-card__icon-inner">
-                                                            <lightning-icon icon-name={wi.channelIcon} size="xx-small" title={wi.channelLabel}></lightning-icon>
-                                                        </span>
-                                                    </div>
-                                                    <div class="wi-card__head">
-                                                        <div class="wi-card__head-row">
-                                                            <span class="wi-customer">{wi.customer}</span>
-                                                            <span class={wi.priorityClass}>{wi.priorityLabel}</span>
-                                                        </div>
-                                                        <div class="wi-meta">
-                                                            <span class="wi-case">{wi.caseNumberDisplay}</span>
-                                                            <span class="wi-meta-sep" aria-hidden="true"></span>
-                                                            <span class="wi-status">{wi.statusLabel}</span>
-                                                        </div>
-                                                    </div>
+                                    <div class="wi-row">
+                                        <article class="wi-card">
+                                            <span class="wi-rule" aria-hidden="true"></span>
+                                            <div class="wi-content">
+                                                <div class="wi-top-row">
+                                                    <span class="wi-customer">{wi.customerLabel}</span>
+                                                    <a href="javascript:void(0)" class="wi-summary-link" title={wi.summaryLink}>{wi.summaryLink}</a>
                                                 </div>
-                                                <span class="wi-subject-link">{wi.subject}</span>
-                                                <div class="wi-card__queue">
-                                                    <span class="wi-queue-badge">{wi.queue}</span>
+                                                <div class="wi-meta-row">
+                                                    <lightning-icon icon-name={wi.channelIcon} size="xx-small" alternative-text={wi.channelLabel} class="wi-channel-icon"></lightning-icon>
+                                                    <span class="wi-meta-dot" aria-hidden="true"></span>
+                                                    <span class="wi-meta-text">{wi.workLoadText}</span>
+                                                    <span class="wi-meta-dot" aria-hidden="true"></span>
+                                                    <span class="wi-meta-text">{wi.queueText}</span>
                                                 </div>
-                                            </article>
-                                        </div>
-                                        <div class="wi-grid__flag">
+                                            </div>
                                             <template if:true={wi.hasFlagIcon}>
-                                                <span class="flag-pill" role="img" aria-label="Flagged" title="Flagged">
-                                                    <lightning-icon icon-name="utility:priority" size="xx-small"></lightning-icon>
-                                                </span>
+                                                <lightning-button-icon
+                                                    icon-name="utility:priority"
+                                                    variant="border-filled"
+                                                    size="medium"
+                                                    alternative-text="Flag work item"
+                                                    title="Flag"
+                                                    class="wi-flag-btn">
+                                                </lightning-button-icon>
                                             </template>
-                                        </div>
+                                        </article>
                                     </div>
                                 </td>
                             </tr>

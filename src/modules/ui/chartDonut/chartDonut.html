@@ -1,0 +1,42 @@
+<template>
+    <div class="cd-wrap">
+        <svg
+            class="cd-svg"
+            viewBox={viewBox}
+            style={svgStyle}
+            role="img"
+            aria-label={ariaLabel}
+            focusable="false">
+            <g transform={rotateAttr}>
+                <template for:each={segmentArcs} for:item="seg">
+                    <circle
+                        key={seg.id}
+                        class="cd-segment"
+                        cx={center}
+                        cy={center}
+                        r={radius}
+                        fill="none"
+                        stroke-width={strokeWidth}
+                        stroke-dasharray={seg.dashArray}
+                        stroke-dashoffset={seg.dashOffset}
+                        style={seg.colorStyle}>
+                    </circle>
+                </template>
+            </g>
+        </svg>
+
+        <div class="cd-legend-wrap">
+            <template if:true={hasLegendTitle}>
+                <div class="cd-legend-title">{legendTitle}</div>
+            </template>
+            <ul class="cd-legend" role="list">
+                <template for:each={legendItems} for:item="item">
+                    <li key={item.id} class="cd-legend-item">
+                        <span class="cd-legend-dot" style={item.dotStyle} aria-hidden="true"></span>
+                        <span class="cd-legend-label">{item.label}</span>
+                    </li>
+                </template>
+            </ul>
+        </div>
+    </div>
+</template>

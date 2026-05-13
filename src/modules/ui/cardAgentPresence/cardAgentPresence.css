@@ -1,0 +1,6 @@
+/* `height: 100%` lets this card composition fill its grid cell. SLDS 2
+   has no sizing hook for a full-height fill. */
+:host {
+    display: block;
+    height: 100%;
+}

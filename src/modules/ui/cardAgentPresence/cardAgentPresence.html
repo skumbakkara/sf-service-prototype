@@ -1,0 +1,13 @@
+<template>
+    <ui-kpi-card
+        title="Agent Presence Statuses"
+        caption="Current"
+        menu-items={menuItems}>
+        <ui-chart-donut
+            segments={segments}
+            segment-gap="2"
+            legend-title="Presence Status"
+            aria-label="Agent presence statuses">
+        </ui-chart-donut>
+    </ui-kpi-card>
+</template>

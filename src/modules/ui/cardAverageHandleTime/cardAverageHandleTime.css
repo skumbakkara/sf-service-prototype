@@ -1,0 +1,27 @@
+/* `height: 100%` lets this card composition fill its grid cell. SLDS 2
+   has no sizing hook for a full-height fill. */
+:host {
+    display: block;
+    height: 100%;
+}
+
+/* Figma footer (node 19712:40098):
+   regular electric-blue-40 delta (palette token equals --slds-g-color-accent-2 = #0250d9),
+   regular on-surface-1 trailing label.
+   17/12 = 1.4167 has no SLDS hook between line-height-1 (1) and line-height-2 (1.25). */
+.caht-footer {
+    display: inline;
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    line-height: 1.4167;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
+.caht-num {
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    font-weight: var(--slds-g-font-weight-4, 400);
+}
+
+.caht-label {
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    font-weight: var(--slds-g-font-weight-4, 400);
+}

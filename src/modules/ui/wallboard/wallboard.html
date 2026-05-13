@@ -1,0 +1,49 @@
+<template>
+    <section class="wb-root">
+        <header class="wb-page-header">
+            <div class="wb-page-header-left">
+                <lightning-icon
+                    icon-name="standard:metrics"
+                    size="medium"
+                    alternative-text="Wallboard"
+                    class="wb-page-icon">
+                </lightning-icon>
+                <h1 class="wb-page-title">Omni-Channel Wallboard</h1>
+            </div>
+            <div class="wb-page-header-right">
+                <lightning-button-group>
+                    <lightning-button-icon
+                        icon-name="utility:filter"
+                        variant="border-filled"
+                        alternative-text="Filter wallboard"
+                        title="Filter wallboard">
+                    </lightning-button-icon>
+                    <lightning-button-icon
+                        icon-name="utility:settings"
+                        variant="border-filled"
+                        alternative-text="Wallboard settings"
+                        title="Wallboard settings">
+                    </lightning-button-icon>
+                </lightning-button-group>
+            </div>
+        </header>
+
+        <div class="wb-grid">
+            <ui-card-total-work-items class="wb-cell"></ui-card-total-work-items>
+            <ui-card-raised-flags class="wb-cell"></ui-card-raised-flags>
+            <ui-card-average-handle-time class="wb-cell"></ui-card-average-handle-time>
+            <!-- TODO Phase 2: Agent Capacity Status (horizontal bar) -->
+            <div class="wb-grid-placeholder"></div>
+            <ui-card-average-speed-to-answer class="wb-cell"></ui-card-average-speed-to-answer>
+            <ui-card-agent-presence class="wb-cell"></ui-card-agent-presence>
+            <!-- TODO Phase 2: Agent Capacity (vertical bar) -->
+            <div class="wb-grid-placeholder"></div>
+            <!-- TODO Phase 2: Average + Longest Wait Time (stacked compact value cards) -->
+            <div class="wb-grid-placeholder"></div>
+            <!-- TODO Phase 2: Agent Work Status (horizontal bar) -->
+            <div class="wb-grid-placeholder"></div>
+            <!-- TODO Phase 2: Agent Presence Statuses (large donut) -->
+            <div class="wb-grid-placeholder"></div>
+        </div>
+    </section>
+</template>

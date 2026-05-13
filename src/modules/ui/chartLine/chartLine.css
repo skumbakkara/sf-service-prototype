@@ -1,0 +1,136 @@
+/* `height: 100%` lets the chart fill the parent card body. SLDS 2 has no
+   sizing hook for a full-height fill. */
+:host {
+    display: block;
+    height: 100%;
+}
+
+/* Figma node 19734:27995 (Expected Range Chart): Y-axis labels sit to the
+   left of the chart, separated by an 8px gap (--slds-g-spacing-2). The
+   chart column stretches to fill the remaining width. */
+.cl-root {
+    display: flex;
+    align-items: stretch;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    height: 100%;
+    min-height: 0;
+}
+
+/* Y-axis labels stack top→bottom and right-align so the right edge of the
+   text sits flush with the chart edge. The first label aligns to the top
+   of the chart, the last to the bottom — matching Figma's
+   `justify-between` placement. */
+.cl-y-axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex: 0 0 auto;
+    /* Reserve the same vertical space the chart column uses for its own
+       baseline + x-axis below the SVG, so the bottom y-label aligns with
+       the bottom edge of the chart area, not the bottom of the column. */
+    padding-bottom: calc(var(--slds-g-spacing-3, 0.75rem) + var(--slds-g-font-line-height-3, 1.375) * var(--slds-g-font-scale-base, 0.8125rem));
+}
+
+.cl-chart-col {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Chart area is the SVG canvas. Position is relative so the absolutely
+   positioned trend dot can be placed via CSS custom properties on its
+   `style` attribute. */
+.cl-chart-area {
+    position: relative;
+    width: 100%;
+    flex: 0 0 auto;
+}
+
+.cl-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Line chart stroke. Color flows in via the per-instance custom property
+   --cl-line-color set on the path's `style` attribute (same dynamic-CSS
+   pattern as ui-chart-donut's per-segment colors). */
+.cl-line {
+    stroke: var(--cl-line-color, var(--slds-g-color-accent-2, #0250d9));
+    stroke-width: var(--slds-g-sizing-border-2, 2px);
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Range band fill. Uses the same color family as the line, dimmed to a
+   light tint so the line still reads as the foreground signal. SLDS 2
+   has no opacity hook, so we apply the literal here — value chosen to
+   match the Figma "Range" rendering on node 19734:27995. */
+.cl-band {
+    fill: var(--cl-band-color, var(--slds-g-color-accent-2, #0250d9));
+    fill-opacity: 0.12;
+    stroke: none;
+}
+
+/* Endpoint trend dot. Rendered as an HTML span (not an SVG <circle>) so
+   the SVG's preserveAspectRatio="none" cannot squash it into an ellipse.
+   The dot is positioned via `--cl-dot-x/y` custom properties bound on the
+   element's `style` attribute. `border-radius: 50%` is required to draw a
+   perfect circle (no SLDS hook represents 50%); literal is intentional. */
+.cl-dot {
+    position: absolute;
+    width: var(--slds-g-sizing-3, 0.5rem);
+    height: var(--slds-g-sizing-3, 0.5rem);
+    border-radius: 50%;
+    background-color: var(--cl-line-color, var(--slds-g-color-accent-2, #0250d9));
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+/* Axis baseline: a horizontal rule across the chart's bottom edge with
+   tiny vertical stubs at the left/right corners, mirroring the Figma
+   "AxisBaseline" frame (border-b + border-l + border-r on a 1px-min
+   container). Implemented in pure CSS so nothing competes with the
+   stretchable SVG above. */
+.cl-baseline {
+    position: relative;
+    height: var(--slds-g-spacing-1, 0.25rem);
+    border-bottom: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
+}
+
+.cl-baseline::before,
+.cl-baseline::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: var(--slds-g-sizing-border-1, 1px);
+    height: 100%;
+    background-color: var(--slds-g-color-border-1, #c9c9c9);
+}
+
+.cl-baseline::before { left: 0; }
+.cl-baseline::after  { right: 0; }
+
+/* X-axis label row. Padding-top of 12px (--slds-g-spacing-3) matches Figma
+   node 19734:27995 (`pt-[var(----slds-g-spacing-3,12px)]`). Labels are
+   space-distributed left→right with `justify-content: space-between`. */
+.cl-x-axis {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-top: var(--slds-g-spacing-3, 0.75rem);
+}
+
+/* Axis label typography. Per the user instruction, this matches the
+   donut chart's legend item typography (chartDonut.css `.cd-legend-item`):
+   font-scale-base (13px), line-height-3 (1.375), on-surface-2. */
+.cl-axis-label {
+    font-family: var(--slds-g-font-family-base, 'SF Pro Text', system-ui, sans-serif);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: var(--slds-g-font-line-height-3, 1.375);
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    white-space: nowrap;
+}

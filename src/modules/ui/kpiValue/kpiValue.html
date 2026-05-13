@@ -1,0 +1,11 @@
+<template>
+    <div class="kv-root">
+        <p class="kv-value">{value}</p>
+        <template if:true={hasDelta}>
+            <p class={deltaClass}>{delta}</p>
+        </template>
+        <div class="kv-footer">
+            <slot name="footer">{footer}</slot>
+        </div>
+    </div>
+</template>

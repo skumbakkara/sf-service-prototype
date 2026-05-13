@@ -1,0 +1,200 @@
+:host {
+    display: block;
+}
+
+/* Scroll container for the table:
+   - overflow-x preserves the horizontal scroll for the wide column layout
+   - overflow-y + max-height bounds the vertical extent so the table body
+     scrolls (rather than the whole page). This is required for both the
+     sticky thead and the infinite-scroll handler in backlogTable.js. */
+.bkt-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 60vh;
+    padding: 0 var(--slds-g-spacing-4, 1rem);
+}
+
+/* ── Table borders (scoped to .bkt-table — same element as .slds-table) ── */
+.bkt-container .bkt-table,
+.bkt-container .bkt-table thead th,
+.bkt-container .bkt-table tbody td,
+.bkt-container .bkt-table tbody th {
+    border-color: var(--slds-g-color-neutral-base-90, #e5e5e5);
+}
+
+/* Fixed table layout so the inline column widths are honored strictly —
+   columns never grow on hover when the sort chevron appears. */
+.bkt-container .bkt-table {
+    table-layout: fixed;
+}
+
+/* ── Header corner radius ────────────────────────────────────── */
+.bkt-container thead tr th:first-child { border-top-left-radius: var(--slds-g-radius-border-2, 0.5rem); }
+.bkt-container thead tr th:last-child  { border-top-right-radius: var(--slds-g-radius-border-2, 0.5rem); }
+
+/* Suppress the default sticky-header drop shadow under the thead row. */
+.bkt-container .bkt-table thead,
+.bkt-container .bkt-table thead tr {
+    box-shadow: none;
+    filter: none;
+}
+
+/* Pin column headers while the body scrolls. position: sticky targets the
+   nearest scrolling ancestor (.bkt-container). Background fills the cell
+   so rows beneath don't bleed through; the inset box-shadow replaces the
+   collapsed border-bottom (which can disappear under sticky positioning). */
+.bkt-container .bkt-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: inset 0 -1px 0 var(--slds-g-color-neutral-base-90, #e5e5e5);
+    filter: none;
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+/* ── Checkbox column (custom class — avoids slds-cell_shrink + !important) ─ */
+.bkt-container .bkt-cell-checkbox {
+    /* No SLDS hook exists for a checkbox column; intentional 40px lock-in. */
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    vertical-align: middle;
+}
+
+/* ── Row cells ───────────────────────────────────────────────── */
+.bkt-container .bkt-row > td {
+    padding-top: calc(var(--slds-g-spacing-2, 0.5rem) + 2px);
+    padding-bottom: calc(var(--slds-g-spacing-2, 0.5rem) + 2px);
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--slds-g-font-scale-base, 13px);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
+/* ── Column header sort (scoped custom class .bkt-sortable) ──── */
+.bkt-container .bkt-sortable { cursor: pointer; }
+.bkt-container .th-action-inner {
+    display: flex;
+    align-items: center;
+    /* 8px gap between header label and chevron — only takes effect when the
+       chevron renders (on hover); hidden by default. */
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    /* Header label needs to fill the th's content box; no SLDS hook for 100%. */
+    width: 100%;
+    min-width: 0;
+}
+.bkt-container .bkt-th-label {
+    /* Same single-line truncation as slds-truncate, but without overriding
+       that SLDS class. */
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    flex: 1 1 auto;
+}
+.bkt-container .col-chevron {
+    /* Hidden by default — header text takes the full column width. On hover
+       the chevron renders and the label truncates if needed. */
+    display: none;
+    flex-shrink: 0;
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+}
+.bkt-container th:hover .col-chevron { display: inline-flex; }
+
+/* ── Row hover ───────────────────────────────────────────────── */
+.bkt-container .bkt-row:hover td {
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    box-shadow: none;
+}
+.bkt-container .bkt-row:hover td,
+.bkt-container .bkt-row:hover + tr td {
+    border-color: var(--slds-g-color-neutral-base-90, #e5e5e5);
+    box-shadow: none;
+}
+
+/* ── Conversation Summary cell ───────────────────────────────── */
+.bkt-td-summary {
+    /* Pin the cell to the column width from COLUMN_DEFS; no SLDS hook for 530px. */
+    max-width: 530px;
+}
+.bkt-summary {
+    display: inline;
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    font-size: var(--slds-g-font-scale-base, 13px);
+    cursor: pointer;
+}
+.bkt-summary:hover { text-decoration: underline; }
+
+/* ── Route By cell ───────────────────────────────────────────── */
+.bkt-route {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    white-space: nowrap;
+    min-width: 0;
+}
+/* Variant (a): queue/skill icon + on-surface text (matches the human variant
+   tone so all Route By rows read uniformly). */
+.bkt-route-arrow {
+    flex-shrink: 0;
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+    fill: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+.bkt-route-link {
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    font-size: var(--slds-g-font-scale-base, 13px);
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+.bkt-route-link:hover { text-decoration: underline; }
+/* Variant (b): avatar + plain text name */
+.bkt-route-avatar { flex-shrink: 0; }
+.bkt-route-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    font-size: var(--slds-g-font-scale-base, 13px);
+}
+
+/* ── Channels cell: icon only, neutral fill (mirrors inProgressTable) ── */
+.bkt-td-channel { white-space: nowrap; }
+.bkt-channel-icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bkt-channel-icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
+/* ── Sentiment cell: emoji-only, color-coded per bucket ───────── */
+.bkt-sentiment_good {
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-green-50, #2e844a);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-green-50, #2e844a);
+    fill: var(--slds-g-color-palette-green-50, #2e844a);
+}
+.bkt-sentiment_average {
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-yellow-70, #fcc003);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-yellow-70, #fcc003);
+    fill: var(--slds-g-color-palette-yellow-70, #fcc003);
+}
+.bkt-sentiment_bad {
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-red-40, #ba0517);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-red-40, #ba0517);
+    fill: var(--slds-g-color-palette-red-40, #ba0517);
+}
+
+/* ── INTR checkmark ──────────────────────────────────────────── */
+.bkt-intr-check {
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+}

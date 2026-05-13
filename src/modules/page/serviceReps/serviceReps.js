@@ -1,48 +1,48 @@
 import { LightningElement, track } from 'lwc';
 
 const IN_PROGRESS_ITEMS = [
-    { id: 'ip-01', channel: 'cases', subject: 'Technical Assistance Bot',           caseNumber: '100783405', priority: 'Medium',   status: 'Working', assignedTo: 'Bay Assist Agent', isAgent: true,  routeBy: 'Direct to Agent', hasFlag: false, sentiment: 'neutral',   workSize: 5, isInterruptible: true,  handleTime: '4 m',    assignedTime: '22 Oct, 2025', speedToAnswer: '1:07',  acceptedTime: '22 Oct, 2025' },
-    { id: 'ip-02', channel: 'chat',  subject: 'Technical Assistance Bot',           caseNumber: '100783406', priority: 'High',     status: 'Pending', assignedTo: 'Dana Bose',       isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/women/44.jpg', routeBy: 'Skills-Based', routeByIcon: 'utility:skill', hasFlag: false, sentiment: 'good',      workSize: 2, isInterruptible: false, handleTime: '9 m',    assignedTime: '21 Sep, 2025', speedToAnswer: '0:44',  acceptedTime: '21 Sep, 2025' },
-    { id: 'ip-03', channel: 'cases', subject: 'Product Recommendation Assistant',   caseNumber: '100783409', priority: '',         status: 'Active',  assignedTo: 'Fiona Patel', isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/women/68.jpg', routeBy: 'Product Knowled...', routeByIcon: 'utility:skill', hasFlag: false, sentiment: 'excellent', workSize: 8, isInterruptible: true,  handleTime: '1 m',    assignedTime: '17 Sep, 2025', speedToAnswer: '0:17',  acceptedTime: '17 Sep, 2025' },
-    { id: 'ip-04', channel: 'call',  subject: 'Order Status Inquiry',               caseNumber: '100783412', priority: '',         status: 'Waiting', assignedTo: 'Sofia Yang',     isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/women/12.jpg', routeBy: 'SF Proactive Sup...', routeByIcon: 'utility:work_queue', hasFlag: true,  sentiment: 'neutral',   workSize: 3, isInterruptible: false, handleTime: '3 h',    assignedTime: '15 Sep, 2025', speedToAnswer: '1:10',  acceptedTime: '15 Sep, 2025' },
-    { id: 'ip-05', channel: 'cases', subject: 'Subscription Management Support',    caseNumber: '100783415', priority: 'Medium',   status: 'Working', assignedTo: 'Tech Agentforce', isAgent: true,  routeBy: 'Direct to Agent', hasFlag: false, sentiment: 'good',      workSize: 6, isInterruptible: true,  handleTime: '3 m',    assignedTime: '9 Sep, 2025',  speedToAnswer: '—',     acceptedTime: '—' },
-    { id: 'ip-06', channel: 'chat',  subject: 'Delivery Issue Resolution',          caseNumber: '100783418', priority: 'High',     status: 'Pending', assignedTo: 'Matthew Fox',    isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg', routeBy: 'Most Available', routeByIcon: 'utility:skill', hasFlag: false, sentiment: 'bad',       workSize: 4, isInterruptible: false, handleTime: '44 m',   assignedTime: '4 Sep, 2025',  speedToAnswer: '0:22',  acceptedTime: '4 Sep, 2025' },
-    { id: 'ip-07', channel: 'email', subject: 'Customer Upgrade Chart',             caseNumber: '100783421', priority: 'Medium',   status: 'Working', assignedTo: 'Social Media Ma...', isAgent: true, routeBy: 'Direct to Agent', hasFlag: false, sentiment: 'neutral',   workSize: 1, isInterruptible: true,  handleTime: '10 m',   assignedTime: '25 Aug, 2025', speedToAnswer: '1:02',  acceptedTime: '25 Aug, 2025' },
-    { id: 'ip-08', channel: 'cases', subject: 'Agent Registration Form',            caseNumber: '100783424', priority: '',         status: 'Waiting', assignedTo: 'Grace Agent',    isAgent: true,  routeBy: 'Direct to Agent', hasFlag: true,  sentiment: 'excellent', workSize: 9, isInterruptible: false, handleTime: '7 m',    assignedTime: '21 Aug, 2025', speedToAnswer: '0:31',  acceptedTime: '21 Aug, 2025' },
-    { id: 'ip-09', channel: 'chat',  subject: 'Feedback Collection Chat',           caseNumber: '100783427', priority: '',         status: 'Active',  assignedTo: 'Aisha Khan',     isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/women/63.jpg', routeBy: 'Round Robin', routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'good',      workSize: 2, isInterruptible: true,  handleTime: '14 m',   assignedTime: '17 Aug, 2025', speedToAnswer: '0:55',  acceptedTime: '17 Aug, 2025' },
-    { id: 'ip-10', channel: 'call',  subject: 'Feedback Collection Chat',           caseNumber: '100783430', priority: 'High',     status: 'Pending', assignedTo: 'Ethan Brooks',   isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/men/45.jpg', routeBy: 'Most Idle', routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'terrible',  workSize: 7, isInterruptible: false, handleTime: '5 m',    assignedTime: '11 Aug, 2025', speedToAnswer: '1:20',  acceptedTime: '11 Aug, 2025' },
-    { id: 'ip-11', channel: 'cases', subject: 'Feedback Collection Omni',           caseNumber: '100783433', priority: 'Medium',   status: 'Working', assignedTo: 'Marcus Cole',    isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/men/76.jpg', routeBy: 'Skills-Based', routeByIcon: 'utility:skill', hasFlag: false, sentiment: 'neutral',   workSize: 3, isInterruptible: true,  handleTime: '2 m',    assignedTime: '5 Aug, 2025',  speedToAnswer: '0:08',  acceptedTime: '5 Aug, 2025' },
-    { id: 'ip-12', channel: 'cases', subject: 'Refund processing delay investigation', caseNumber: '100783436', priority: 'High',     status: 'Pending', assignedTo: 'Liam Anderson',  isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=12', routeBy: 'Skills-Based',  routeByIcon: 'utility:skill',      hasFlag: false, sentiment: 'bad',       workSize: 5, isInterruptible: false, handleTime: '12 m',   assignedTime: '3 Aug, 2025',  speedToAnswer: '0:38',  acceptedTime: '3 Aug, 2025' },
-    { id: 'ip-13', channel: 'chat',  subject: 'Knowledge Base AI Assist',             caseNumber: '100783439', priority: '',         status: 'Active',  assignedTo: 'Knowledge Bot',  isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'good',      workSize: 1, isInterruptible: true,  handleTime: '2 m',    assignedTime: '1 Aug, 2025',  speedToAnswer: '0:05',  acceptedTime: '1 Aug, 2025' },
-    { id: 'ip-14', channel: 'email', subject: 'Warranty claim review request',         caseNumber: '100783442', priority: 'Medium',   status: 'Working', assignedTo: 'Olivia Bennett', isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=14', routeBy: 'Most Available', routeByIcon: 'utility:skill',      hasFlag: true,  sentiment: 'neutral',   workSize: 4, isInterruptible: true,  handleTime: '8 m',    assignedTime: '30 Jul, 2025', speedToAnswer: '1:02',  acceptedTime: '30 Jul, 2025' },
-    { id: 'ip-15', channel: 'call',  subject: 'Account merge request',                 caseNumber: '100783445', priority: 'Critical', status: 'Pending', assignedTo: 'Routing Agent',  isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: true,  sentiment: 'terrible',  workSize: 9, isInterruptible: false, handleTime: '23 m',   assignedTime: '28 Jul, 2025', speedToAnswer: '0:11',  acceptedTime: '28 Jul, 2025' },
-    { id: 'ip-16', channel: 'chat',  subject: 'Shipping address change after dispatch',caseNumber: '100783448', priority: '',         status: 'Waiting', assignedTo: 'Noah Carter',    isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=16', routeBy: 'Round Robin',    routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'neutral',   workSize: 2, isInterruptible: true,  handleTime: '6 m',    assignedTime: '25 Jul, 2025', speedToAnswer: '0:27',  acceptedTime: '25 Jul, 2025' },
-    { id: 'ip-17', channel: 'cases', subject: 'Product activation key not received',   caseNumber: '100783451', priority: 'Low',      status: 'Working', assignedTo: 'Activation Bot', isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'good',      workSize: 1, isInterruptible: true,  handleTime: '1 m',    assignedTime: '23 Jul, 2025', speedToAnswer: '0:03',  acceptedTime: '23 Jul, 2025' },
-    { id: 'ip-18', channel: 'messaging', subject: 'Two-factor reset locked account',   caseNumber: '100783454', priority: 'High',     status: 'Pending', assignedTo: 'Ava Thompson',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=18', routeBy: 'Skills-Based',   routeByIcon: 'utility:skill',      hasFlag: false, sentiment: 'bad',       workSize: 6, isInterruptible: false, handleTime: '15 m',   assignedTime: '21 Jul, 2025', speedToAnswer: '0:51',  acceptedTime: '21 Jul, 2025' },
-    { id: 'ip-19', channel: 'cases', subject: 'Subscription renewal pricing question', caseNumber: '100783457', priority: 'Medium',   status: 'Active',  assignedTo: 'Renewal Agent',  isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'neutral',   workSize: 3, isInterruptible: true,  handleTime: '4 m',    assignedTime: '18 Jul, 2025', speedToAnswer: '0:14',  acceptedTime: '18 Jul, 2025' },
-    { id: 'ip-20', channel: 'email', subject: 'Bulk order export failing on download', caseNumber: '100783460', priority: '',         status: 'Working', assignedTo: 'Ethan Walker',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=20', routeBy: 'Most Idle',      routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'good',      workSize: 4, isInterruptible: true,  handleTime: '9 m',    assignedTime: '15 Jul, 2025', speedToAnswer: '1:18',  acceptedTime: '15 Jul, 2025' },
-    { id: 'ip-21', channel: 'call',  subject: 'VIP escalation — outage impact review', caseNumber: '100783463', priority: 'Critical', status: 'Working', assignedTo: 'Mia Robinson',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=22', routeBy: 'Skills-Based',   routeByIcon: 'utility:skill',      hasFlag: true,  sentiment: 'terrible',  workSize: 8, isInterruptible: false, handleTime: '1 h',    assignedTime: '12 Jul, 2025', speedToAnswer: '0:09',  acceptedTime: '12 Jul, 2025' },
-    { id: 'ip-22', channel: 'chat',  subject: 'Tier upgrade preview eligibility',      caseNumber: '100783466', priority: 'Low',      status: 'Waiting', assignedTo: 'Upgrade Bot',    isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'good',      workSize: 2, isInterruptible: true,  handleTime: '3 m',    assignedTime: '10 Jul, 2025', speedToAnswer: '0:06',  acceptedTime: '10 Jul, 2025' },
-    { id: 'ip-23', channel: 'cases', subject: 'Replacement device tracking number',    caseNumber: '100783469', priority: '',         status: 'Pending', assignedTo: 'Logistics Bot',  isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'neutral',   workSize: 3, isInterruptible: true,  handleTime: '5 m',    assignedTime: '8 Jul, 2025',  speedToAnswer: '0:02',  acceptedTime: '8 Jul, 2025' },
-    { id: 'ip-24', channel: 'cases', subject: 'GDPR data export request',              caseNumber: '100783472', priority: 'High',     status: 'Pending', assignedTo: 'Isabella Reed',  isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=24', routeBy: 'Skills-Based',   routeByIcon: 'utility:skill',      hasFlag: true,  sentiment: 'bad',       workSize: 7, isInterruptible: false, handleTime: '32 m',   assignedTime: '5 Jul, 2025',  speedToAnswer: '0:44',  acceptedTime: '5 Jul, 2025' },
-    { id: 'ip-25', channel: 'chat',  subject: 'Live chat handoff to specialist',       caseNumber: '100783475', priority: 'Medium',   status: 'Working', assignedTo: 'Lucas Bailey',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=26', routeBy: 'Most Available', routeByIcon: 'utility:skill',      hasFlag: false, sentiment: 'neutral',   workSize: 4, isInterruptible: true,  handleTime: '11 m',   assignedTime: '3 Jul, 2025',  speedToAnswer: '0:19',  acceptedTime: '3 Jul, 2025' },
-    { id: 'ip-26', channel: 'email', subject: 'Compliance disclosure follow-up',       caseNumber: '100783478', priority: 'Low',      status: 'Active',  assignedTo: 'Charlotte Ross', isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=28', routeBy: 'Queue-based',    routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'good',      workSize: 2, isInterruptible: true,  handleTime: '7 m',    assignedTime: '1 Jul, 2025',  speedToAnswer: '0:33',  acceptedTime: '1 Jul, 2025' },
-    { id: 'ip-27', channel: 'call',  subject: 'Repeat billing complaint — third call', caseNumber: '100783481', priority: 'High',     status: 'Working', assignedTo: 'Triage Agent',   isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: true,  sentiment: 'terrible',  workSize: 6, isInterruptible: false, handleTime: '18 m',   assignedTime: '28 Jun, 2025', speedToAnswer: '0:07',  acceptedTime: '28 Jun, 2025' },
-    { id: 'ip-28', channel: 'cases', subject: 'Promo code stacking eligibility check', caseNumber: '100783484', priority: '',         status: 'Working', assignedTo: 'Henry Morgan',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=30', routeBy: 'Round Robin',    routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'neutral',   workSize: 1, isInterruptible: true,  handleTime: '2 m',    assignedTime: '25 Jun, 2025', speedToAnswer: '0:24',  acceptedTime: '25 Jun, 2025' },
-    { id: 'ip-29', channel: 'chat',  subject: 'Onboarding tour assistance',            caseNumber: '100783487', priority: 'Medium',   status: 'Active',  assignedTo: 'Onboarding Bot', isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'excellent', workSize: 3, isInterruptible: true,  handleTime: '4 m',    assignedTime: '22 Jun, 2025', speedToAnswer: '0:08',  acceptedTime: '22 Jun, 2025' },
-    { id: 'ip-30', channel: 'cases', subject: 'Cancellation reconsideration outreach', caseNumber: '100783490', priority: 'Medium',   status: 'Pending', assignedTo: 'Emma Sullivan',  isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=32', routeBy: 'Skills-Based',   routeByIcon: 'utility:skill',      hasFlag: false, sentiment: 'good',      workSize: 5, isInterruptible: true,  handleTime: '13 m',   assignedTime: '19 Jun, 2025', speedToAnswer: '0:47',  acceptedTime: '19 Jun, 2025' },
-    { id: 'ip-31', channel: 'messaging', subject: 'Mobile app crash on payment screen',caseNumber: '100783493', priority: 'High',     status: 'Working', assignedTo: 'Mason Hughes',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=33', routeBy: 'Most Available', routeByIcon: 'utility:skill',      hasFlag: true,  sentiment: 'bad',       workSize: 7, isInterruptible: false, handleTime: '21 m',   assignedTime: '16 Jun, 2025', speedToAnswer: '0:15',  acceptedTime: '16 Jun, 2025' },
+    { id: 'ip-01', channel: 'cases', subject: 'Technical Assistance Bot',           caseNumber: '100783405', priority: 'Medium',   status: 'Working', assignedTo: 'Bay Assist Agent', isAgent: true,  routeBy: 'Direct to Agent', hasFlag: false, sentiment: 'neutral',   workSize: 5, isInterruptible: true,  handleTime: '4 m',    assignedTime: '22 Oct, 2025, 11:40 PM', speedToAnswer: '1 m 7 s',  acceptedTime: '22 Oct, 2025, 11:41 PM' },
+    { id: 'ip-02', channel: 'chat',  subject: 'Technical Assistance Bot',           caseNumber: '100783406', priority: 'High',     status: 'New'    , assignedTo: 'Dana Bose',       isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/women/44.jpg', routeBy: 'Skills-Based', routeByIcon: 'utility:skill', hasFlag: false, sentiment: 'good',      workSize: 2, isInterruptible: false, handleTime: '9 m',    assignedTime: '21 Sep, 2025, 9:15 AM', speedToAnswer: '44 s',  acceptedTime: '21 Sep, 2025, 9:16 AM' },
+    { id: 'ip-03', channel: 'cases', subject: 'Product Recommendation Assistant',   caseNumber: '100783409', priority: '',         status: 'Working',  assignedTo: 'Fiona Patel', isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/women/68.jpg', routeBy: 'Product Knowled...', routeByIcon: 'utility:skill', hasFlag: false, sentiment: 'excellent', workSize: 8, isInterruptible: true,  handleTime: '1 m',    assignedTime: '17 Sep, 2025, 2:48 PM', speedToAnswer: '17 s',  acceptedTime: '17 Sep, 2025, 2:49 PM' },
+    { id: 'ip-04', channel: 'call',  subject: 'Order Status Inquiry',               caseNumber: '100783412', priority: '',         status: 'Escalated', assignedTo: 'Sofia Yang',     isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/women/12.jpg', routeBy: 'SF Proactive Sup...', routeByIcon: 'utility:work_queue', hasFlag: true,  sentiment: 'neutral',   workSize: 3, isInterruptible: false, handleTime: '3 h',    assignedTime: '15 Sep, 2025, 4:22 PM', speedToAnswer: '1 m 10 s',  acceptedTime: '15 Sep, 2025, 4:23 PM' },
+    { id: 'ip-05', channel: 'cases', subject: 'Subscription Management Support',    caseNumber: '100783415', priority: 'Medium',   status: 'Working', assignedTo: 'Tech Agentforce', isAgent: true,  routeBy: 'Direct to Agent', hasFlag: false, sentiment: 'good',      workSize: 6, isInterruptible: true,  handleTime: '3 m',    assignedTime: '9 Sep, 2025, 10:05 AM',  speedToAnswer: '—',     acceptedTime: '—' },
+    { id: 'ip-06', channel: 'chat',  subject: 'Delivery Issue Resolution',          caseNumber: '100783418', priority: 'High',     status: 'New'    , assignedTo: 'Matthew Fox',    isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/men/32.jpg', routeBy: 'Most Available', routeByIcon: 'utility:skill', hasFlag: false, sentiment: 'bad',       workSize: 4, isInterruptible: false, handleTime: '44 m',   assignedTime: '4 Sep, 2025, 1:33 PM',  speedToAnswer: '22 s',  acceptedTime: '4 Sep, 2025, 1:34 PM' },
+    { id: 'ip-07', channel: 'email', subject: 'Customer Upgrade Chart',             caseNumber: '100783421', priority: 'Medium',   status: 'Working', assignedTo: 'Social Media Ma...', isAgent: true, routeBy: 'Direct to Agent', hasFlag: false, sentiment: 'neutral',   workSize: 1, isInterruptible: true,  handleTime: '10 m',   assignedTime: '25 Aug, 2025, 8:12 AM', speedToAnswer: '1 m 2 s',  acceptedTime: '25 Aug, 2025, 8:13 AM' },
+    { id: 'ip-08', channel: 'cases', subject: 'Agent Registration Form',            caseNumber: '100783424', priority: '',         status: 'Escalated', assignedTo: 'Grace Agent',    isAgent: true,  routeBy: 'Direct to Agent', hasFlag: true,  sentiment: 'excellent', workSize: 9, isInterruptible: false, handleTime: '7 m',    assignedTime: '21 Aug, 2025, 6:50 PM', speedToAnswer: '31 s',  acceptedTime: '21 Aug, 2025, 6:51 PM' },
+    { id: 'ip-09', channel: 'chat',  subject: 'Feedback Collection Chat',           caseNumber: '100783427', priority: '',         status: 'Working',  assignedTo: 'Aisha Khan',     isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/women/63.jpg', routeBy: 'Round Robin', routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'good',      workSize: 2, isInterruptible: true,  handleTime: '14 m',   assignedTime: '17 Aug, 2025, 11:25 AM', speedToAnswer: '55 s',  acceptedTime: '17 Aug, 2025, 11:26 AM' },
+    { id: 'ip-10', channel: 'call',  subject: 'Feedback Collection Chat',           caseNumber: '100783430', priority: 'High',     status: 'New'    , assignedTo: 'Ethan Brooks',   isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/men/45.jpg', routeBy: 'Most Idle', routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'terrible',  workSize: 7, isInterruptible: false, handleTime: '5 m',    assignedTime: '11 Aug, 2025, 3:45 PM', speedToAnswer: '1 m 20 s',  acceptedTime: '11 Aug, 2025, 3:46 PM' },
+    { id: 'ip-11', channel: 'cases', subject: 'Feedback Collection Omni',           caseNumber: '100783433', priority: 'Medium',   status: 'Working', assignedTo: 'Marcus Cole',    isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/men/76.jpg', routeBy: 'Skills-Based', routeByIcon: 'utility:skill', hasFlag: false, sentiment: 'neutral',   workSize: 3, isInterruptible: true,  handleTime: '2 m',    assignedTime: '5 Aug, 2025, 7:18 AM',  speedToAnswer: '8 s',  acceptedTime: '5 Aug, 2025, 7:19 AM' },
+    { id: 'ip-12', channel: 'cases', subject: 'Refund processing delay investigation', caseNumber: '100783436', priority: 'High',     status: 'New'    , assignedTo: 'Liam Anderson',  isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=12', routeBy: 'Skills-Based',  routeByIcon: 'utility:skill',      hasFlag: false, sentiment: 'bad',       workSize: 5, isInterruptible: false, handleTime: '12 m',   assignedTime: '3 Aug, 2025, 5:09 PM',  speedToAnswer: '38 s',  acceptedTime: '3 Aug, 2025, 5:10 PM' },
+    { id: 'ip-13', channel: 'chat',  subject: 'Knowledge Base AI Assist',             caseNumber: '100783439', priority: '',         status: 'Working',  assignedTo: 'Knowledge Bot',  isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'good',      workSize: 1, isInterruptible: true,  handleTime: '2 m',    assignedTime: '1 Aug, 2025, 12:30 PM',  speedToAnswer: '5 s',  acceptedTime: '1 Aug, 2025, 12:31 PM' },
+    { id: 'ip-14', channel: 'email', subject: 'Warranty claim review request',         caseNumber: '100783442', priority: 'Medium',   status: 'Working', assignedTo: 'Olivia Bennett', isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=14', routeBy: 'Most Available', routeByIcon: 'utility:skill',      hasFlag: true,  sentiment: 'neutral',   workSize: 4, isInterruptible: true,  handleTime: '8 m',    assignedTime: '30 Jul, 2025, 9:55 AM', speedToAnswer: '1 m 2 s',  acceptedTime: '30 Jul, 2025, 9:56 AM' },
+    { id: 'ip-15', channel: 'call',  subject: 'Account merge request',                 caseNumber: '100783445', priority: ''        , status: 'New'    , assignedTo: 'Routing Agent',  isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: true,  sentiment: 'terrible',  workSize: 9, isInterruptible: false, handleTime: '23 m',   assignedTime: '28 Jul, 2025, 10:42 PM', speedToAnswer: '11 s',  acceptedTime: '28 Jul, 2025, 10:43 PM' },
+    { id: 'ip-16', channel: 'chat',  subject: 'Shipping address change after dispatch',caseNumber: '100783448', priority: '',         status: 'Escalated', assignedTo: 'Noah Carter',    isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=16', routeBy: 'Round Robin',    routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'neutral',   workSize: 2, isInterruptible: true,  handleTime: '6 m',    assignedTime: '25 Jul, 2025, 2:17 PM', speedToAnswer: '27 s',  acceptedTime: '25 Jul, 2025, 2:18 PM' },
+    { id: 'ip-17', channel: 'cases', subject: 'Product activation key not received',   caseNumber: '100783451', priority: ''   ,      status: 'Working', assignedTo: 'Activation Bot', isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'good',      workSize: 1, isInterruptible: true,  handleTime: '1 m',    assignedTime: '23 Jul, 2025, 8:33 AM', speedToAnswer: '3 s',  acceptedTime: '23 Jul, 2025, 8:34 AM' },
+    { id: 'ip-18', channel: 'messaging', subject: 'Two-factor reset locked account',   caseNumber: '100783454', priority: 'High',     status: 'New'    , assignedTo: 'Ava Thompson',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=18', routeBy: 'Skills-Based',   routeByIcon: 'utility:skill',      hasFlag: false, sentiment: 'bad',       workSize: 6, isInterruptible: false, handleTime: '15 m',   assignedTime: '21 Jul, 2025, 4:01 PM', speedToAnswer: '51 s',  acceptedTime: '21 Jul, 2025, 4:02 PM' },
+    { id: 'ip-19', channel: 'cases', subject: 'Subscription renewal pricing question', caseNumber: '100783457', priority: 'Medium',   status: 'Working',  assignedTo: 'Renewal Agent',  isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'neutral',   workSize: 3, isInterruptible: true,  handleTime: '4 m',    assignedTime: '18 Jul, 2025, 11:48 AM', speedToAnswer: '14 s',  acceptedTime: '18 Jul, 2025, 11:49 AM' },
+    { id: 'ip-20', channel: 'email', subject: 'Bulk order export failing on download', caseNumber: '100783460', priority: '',         status: 'Working', assignedTo: 'Ethan Walker',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=20', routeBy: 'Most Idle',      routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'good',      workSize: 4, isInterruptible: true,  handleTime: '9 m',    assignedTime: '15 Jul, 2025, 6:24 PM', speedToAnswer: '1 m 18 s',  acceptedTime: '15 Jul, 2025, 6:25 PM' },
+    { id: 'ip-21', channel: 'call',  subject: 'VIP escalation — outage impact review', caseNumber: '100783463', priority: ''        , status: 'Working', assignedTo: 'Mia Robinson',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=22', routeBy: 'Skills-Based',   routeByIcon: 'utility:skill',      hasFlag: true,  sentiment: 'terrible',  workSize: 8, isInterruptible: false, handleTime: '1 h',    assignedTime: '12 Jul, 2025, 1:11 AM', speedToAnswer: '9 s',  acceptedTime: '12 Jul, 2025, 1:12 AM' },
+    { id: 'ip-22', channel: 'chat',  subject: 'Tier upgrade preview eligibility',      caseNumber: '100783466', priority: ''   ,      status: 'Escalated', assignedTo: 'Upgrade Bot',    isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'good',      workSize: 2, isInterruptible: true,  handleTime: '3 m',    assignedTime: '10 Jul, 2025, 9:39 PM', speedToAnswer: '6 s',  acceptedTime: '10 Jul, 2025, 9:40 PM' },
+    { id: 'ip-23', channel: 'cases', subject: 'Replacement device tracking number',    caseNumber: '100783469', priority: '',         status: 'New'    , assignedTo: 'Logistics Bot',  isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'neutral',   workSize: 3, isInterruptible: true,  handleTime: '5 m',    assignedTime: '8 Jul, 2025, 3:56 PM',  speedToAnswer: '2 s',  acceptedTime: '8 Jul, 2025, 3:57 PM' },
+    { id: 'ip-24', channel: 'cases', subject: 'GDPR data export request',              caseNumber: '100783472', priority: 'High',     status: 'New'    , assignedTo: 'Isabella Reed',  isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=24', routeBy: 'Skills-Based',   routeByIcon: 'utility:skill',      hasFlag: true,  sentiment: 'bad',       workSize: 7, isInterruptible: false, handleTime: '32 m',   assignedTime: '5 Jul, 2025, 7:29 AM',  speedToAnswer: '44 s',  acceptedTime: '5 Jul, 2025, 7:30 AM' },
+    { id: 'ip-25', channel: 'chat',  subject: 'Live chat handoff to specialist',       caseNumber: '100783475', priority: 'Medium',   status: 'Working', assignedTo: 'Lucas Bailey',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=26', routeBy: 'Most Available', routeByIcon: 'utility:skill',      hasFlag: false, sentiment: 'neutral',   workSize: 4, isInterruptible: true,  handleTime: '11 m',   assignedTime: '3 Jul, 2025, 12:14 PM',  speedToAnswer: '19 s',  acceptedTime: '3 Jul, 2025, 12:15 PM' },
+    { id: 'ip-26', channel: 'email', subject: 'Compliance disclosure follow-up',       caseNumber: '100783478', priority: ''   ,      status: 'Working',  assignedTo: 'Charlotte Ross', isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=28', routeBy: 'Queue-based',    routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'good',      workSize: 2, isInterruptible: true,  handleTime: '7 m',    assignedTime: '1 Jul, 2025, 5:38 PM',  speedToAnswer: '33 s',  acceptedTime: '1 Jul, 2025, 5:39 PM' },
+    { id: 'ip-27', channel: 'call',  subject: 'Repeat billing complaint — third call', caseNumber: '100783481', priority: 'High',     status: 'Working', assignedTo: 'Triage Agent',   isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: true,  sentiment: 'terrible',  workSize: 6, isInterruptible: false, handleTime: '18 m',   assignedTime: '28 Jun, 2025, 10:53 AM', speedToAnswer: '7 s',  acceptedTime: '28 Jun, 2025, 10:54 AM' },
+    { id: 'ip-28', channel: 'cases', subject: 'Promo code stacking eligibility check', caseNumber: '100783484', priority: '',         status: 'Working', assignedTo: 'Henry Morgan',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=30', routeBy: 'Round Robin',    routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'neutral',   workSize: 1, isInterruptible: true,  handleTime: '2 m',    assignedTime: '25 Jun, 2025, 4:27 PM', speedToAnswer: '24 s',  acceptedTime: '25 Jun, 2025, 4:28 PM' },
+    { id: 'ip-29', channel: 'chat',  subject: 'Onboarding tour assistance',            caseNumber: '100783487', priority: 'Medium',   status: 'Working',  assignedTo: 'Onboarding Bot', isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'excellent', workSize: 3, isInterruptible: true,  handleTime: '4 m',    assignedTime: '22 Jun, 2025, 8:46 AM', speedToAnswer: '8 s',  acceptedTime: '22 Jun, 2025, 8:47 AM' },
+    { id: 'ip-30', channel: 'cases', subject: 'Cancellation reconsideration outreach', caseNumber: '100783490', priority: 'Medium',   status: 'New'    , assignedTo: 'Emma Sullivan',  isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=32', routeBy: 'Skills-Based',   routeByIcon: 'utility:skill',      hasFlag: false, sentiment: 'good',      workSize: 5, isInterruptible: true,  handleTime: '13 m',   assignedTime: '19 Jun, 2025, 2:31 PM', speedToAnswer: '47 s',  acceptedTime: '19 Jun, 2025, 2:32 PM' },
+    { id: 'ip-31', channel: 'messaging', subject: 'Mobile app crash on payment screen',caseNumber: '100783493', priority: 'High',     status: 'Working', assignedTo: 'Mason Hughes',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=33', routeBy: 'Most Available', routeByIcon: 'utility:skill',      hasFlag: true,  sentiment: 'bad',       workSize: 7, isInterruptible: false, handleTime: '21 m',   assignedTime: '16 Jun, 2025, 9:08 PM', speedToAnswer: '15 s',  acceptedTime: '16 Jun, 2025, 9:09 PM' },
 ];
 
 const WORK_ITEMS = [
-    { id: 'wi-a', customer: 'Sarah Mitchell', subject: 'Billing dispute on recent invoice — overcharge on plan upgrade',  caseNumber: '100847321', status: 'Working', priority: 'Medium', channel: 'cases', queue: 'Billing', hasFlag: false },
-    { id: 'wi-b', customer: 'James Okafor',   subject: 'Unable to access account after password reset loop',                caseNumber: '100912456', status: 'Pending', priority: 'High',   channel: 'cases', queue: 'Billing', hasFlag: true  },
-    { id: 'wi-c', customer: 'Priya Nair',     subject: 'Refund request for duplicate transaction on 14 Apr',                caseNumber: '100863017', status: 'Working', priority: 'Medium', channel: 'cases', queue: 'Billing', hasFlag: false },
-    { id: 'wi-d', customer: 'Carlos Reyes',   subject: 'Live chat: card declined at checkout, needs payment method update', caseNumber: '100779834', status: 'Active',  priority: 'Low',    channel: 'chat',  queue: 'Billing', hasFlag: true  },
-    { id: 'wi-e', customer: 'Hannah Brooks',  subject: 'Subscription auto-renewed despite cancellation email',               caseNumber: '101023881', status: 'Pending', priority: 'High',   channel: 'cases', queue: 'Renewals', hasFlag: false },
-    { id: 'wi-f', customer: 'Ahmed Hassan',   subject: 'Voice call: device repeatedly disconnects from wifi',                caseNumber: '101145672', status: 'Working', priority: 'Medium', channel: 'call',  queue: 'Tech',    hasFlag: false },
-    { id: 'wi-g', customer: 'Lena Park',      subject: 'Loyalty points missing after qualifying purchase',                   caseNumber: '101207334', status: 'Active',  priority: 'Low',    channel: 'cases', queue: 'Loyalty', hasFlag: false },
-    { id: 'wi-h', customer: 'Diego Alvarez',  subject: 'Bulk return shipment status — awaiting carrier confirmation',        caseNumber: '101289005', status: 'Waiting', priority: 'Medium', channel: 'cases', queue: 'Returns', hasFlag: true  },
+    { id: 'wi-a', customer: 'Sarah Mitchell', subject: 'Billing dispute on recent invoice — overcharge on plan upgrade',  caseNumber: '100847321', status: 'Working', priority: 'Medium', channel: 'cases', queue: 'Billing',  workLoad: 5, hasFlag: false },
+    { id: 'wi-b', customer: 'James Okafor',   subject: 'Unable to access account after password reset loop',                caseNumber: '100912456', status: 'New'    , priority: 'High',   channel: 'cases', queue: 'Billing',  workLoad: 7, hasFlag: true  },
+    { id: 'wi-c', customer: 'Priya Nair',     subject: 'Refund request for duplicate transaction on 14 Apr',                caseNumber: '100863017', status: 'Working', priority: 'Medium', channel: 'cases', queue: 'Billing',  workLoad: 3, hasFlag: false },
+    { id: 'wi-d', customer: 'Carlos Reyes',   subject: 'Live chat: card declined at checkout, needs payment method update', caseNumber: '100779834', status: 'Working',  priority: ''   ,    channel: 'chat',  queue: 'Billing',  workLoad: 2, hasFlag: true  },
+    { id: 'wi-e', customer: 'Hannah Brooks',  subject: 'Subscription auto-renewed despite cancellation email',               caseNumber: '101023881', status: 'New'    , priority: 'High',   channel: 'cases', queue: 'Renewals', workLoad: 6, hasFlag: false },
+    { id: 'wi-f', customer: 'Ahmed Hassan',   subject: 'Voice call: device repeatedly disconnects from wifi',                caseNumber: '101145672', status: 'Working', priority: 'Medium', channel: 'call',  queue: 'Tech',     workLoad: 4, hasFlag: false },
+    { id: 'wi-g', customer: 'Lena Park',      subject: 'Loyalty points missing after qualifying purchase',                   caseNumber: '101207334', status: 'Working',  priority: ''   ,    channel: 'cases', queue: 'Loyalty',  workLoad: 1, hasFlag: false },
+    { id: 'wi-h', customer: 'Diego Alvarez',  subject: 'Bulk return shipment status — awaiting carrier confirmation',        caseNumber: '101289005', status: 'Escalated', priority: 'Medium', channel: 'cases', queue: 'Returns',  workLoad: 8, hasFlag: true  },
 ];
 
 const REPS_DATA = [
@@ -94,6 +94,115 @@ export default class ServiceReps extends LightningElement {
 
     get inProgressCount() {
         return this.inProgressItems.length;
+    }
+
+    // Backlog tab — same source + AI/Human filter, mapped into the
+    // backlog-table row shape. Customer names + accept-by times are
+    // synthesized from a fixed list so the column reads naturally for the
+    // demo while the rest of the row passes through from the source item.
+    get backlogItems() {
+        const PRIORITY_RANK = { Critical: 1, High: 1, Medium: 2, Low: 3 };
+        const CUSTOMER_NAMES = [
+            'Savannah Nguyen', 'Dianne Russell', 'Cody Fisher', 'Courtney Henry',
+            'Leslie Alexander', 'Arlene McCoy', 'Bessie Cooper', 'Jacob Jones',
+            'Darlene Robertson', 'Wade Warren', 'Floyd Miles', 'Albert Flores',
+        ];
+        const ACCEPT_BY = [
+            '6:20 am', '7:30 am', '7:30 am', '7:30 am', '5:40 am', '6:45 am',
+            '5:40 am', '5:45 am', '7:30 am', '5:55 am', '5:45 am', '5:40 am',
+        ];
+        // Short, subject-line-style conversation summaries for the Backlog
+        // table. Each is kept ≤ ~45 chars so the composed
+        //   "summary | status | <priority> Priority"
+        // string fits inside the 530px Conversation Summary column without
+        // truncating. Cycled by source index so behavior is stable across
+        // renders / infinite-scroll clones.
+        const CONVERSATION_SUMMARIES = [
+            'Refund request — damaged shipment',
+            'Auto-renewal failed — expired card',
+            'Account locked after failed logins',
+            'Pricing inquiry — enterprise tier',
+            'Order undelivered after 10 days',
+            'Return policy on opened software',
+            'Login redirect loop after SSO change',
+            'April invoice overcharge — $42.50',
+            'Workspace access lost after admin change',
+            'Mobile app crashing on launch',
+            'Plan upgrade — Pro to Business',
+            'Two-factor SMS not arriving in EU',
+            'Bulk export hitting 60s timeout',
+            'GDPR data deletion request',
+            'Duplicate contacts in Salesforce sync',
+            'API rate limit blocking nightly sync',
+            'Cancellation request — moving away',
+            'Discount code BLACKFRIDAY24 broken',
+            'Resend invoice — flagged as spam',
+            'Session ends after 5 min idle',
+            'Custom report missing forecast field',
+            'Cannot share dashboard externally',
+            'Webhook deliveries failing — 504s',
+            'Add-on purchase email never arrived',
+            'Trial extension request',
+            'Org merge — parent-child migration',
+            'Okta SSO returning invalid_grant',
+            'Bulk-edit support for line items',
+            'Notification prefs reset each session',
+            'Password reset link expires too fast',
+            'Account compromise — login from BR',
+            'Storage quota near limit',
+        ];
+        // AI-routed rows never display "Direct to Agent" in the Backlog —
+        // instead they cycle through a realistic mix of queue and skill
+        // destinations. Human-routed rows show the assigned rep's name with
+        // their avatar (kind: 'human').
+        const AI_ROUTE_TARGETS = [
+            { kind: 'queue', name: 'Product Support' },
+            { kind: 'skill', name: 'Account Manager' },
+            { kind: 'queue', name: 'Voicebot Support' },
+            { kind: 'skill', name: 'Technical Support' },
+            { kind: 'skill', name: 'Sentiment Analysis' },
+            { kind: 'queue', name: 'Predictive Support' },
+            { kind: 'queue', name: 'Social Media Inquiries' },
+        ];
+        const source = this.inProgressItems;
+        let aiCounter = 0;
+        return source.map((item, index) => {
+            let routeKind;
+            let routeDisplay;
+            if (item.isAgent) {
+                const target = AI_ROUTE_TARGETS[aiCounter % AI_ROUTE_TARGETS.length];
+                aiCounter += 1;
+                routeKind = target.kind;
+                routeDisplay = target.name;
+            } else {
+                routeKind = 'human';
+                routeDisplay = item.assignedTo ?? '';
+            }
+            return {
+                id: item.id,
+                priorityRank: PRIORITY_RANK[item.priority] ?? 3,
+                customerName: CUSTOMER_NAMES[index % CUSTOMER_NAMES.length],
+                subject: CONVERSATION_SUMMARIES[index % CONVERSATION_SUMMARIES.length],
+                channel: item.channel,
+                routeKind,
+                routeDisplay,
+                isAgent: item.isAgent,
+                assignedTo: item.assignedTo,
+                avatarUrl: item.avatarUrl,
+                sentiment: item.sentiment,
+                workSize: item.workSize,
+                isInterruptible: item.isInterruptible,
+                status: item.status,
+                priority: item.priority,
+                waitTime: item.handleTime,
+                requestedTime: item.assignedTime,
+                acceptBy: ACCEPT_BY[index % ACCEPT_BY.length],
+            };
+        });
+    }
+
+    get backlogCount() {
+        return this.backlogItems.length;
     }
 
     get aiFilterVariant() {

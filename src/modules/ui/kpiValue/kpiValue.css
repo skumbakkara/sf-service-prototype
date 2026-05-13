@@ -1,0 +1,45 @@
+:host {
+    display: block;
+}
+
+.kv-root {
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+}
+
+/* Figma "Titles/font-scale-6/Regular": 32px, weight 4 (regular), 40px line-height,
+   color on-surface-2. Matches node 19716:41039. */
+.kv-value {
+    margin: 0;
+    font-size: var(--slds-g-font-scale-6, 2rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: var(--slds-g-font-line-height-2, 1.25);
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+}
+
+.kv-delta {
+    margin: 0;
+    font-size: var(--slds-g-font-scale-1, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+}
+
+.kv-delta-up {
+    color: var(--slds-g-color-palette-green-40, #2e844a);
+}
+
+.kv-delta-down {
+    color: var(--slds-g-color-palette-red-40, #ba0517);
+}
+
+.kv-delta-neutral {
+    color: var(--slds-g-color-on-surface-1, #181818);
+}
+
+/* Footer matches Figma "Body/font-scale-neg-1/Regular" (12px / 17px line-height).
+   17/12 = 1.4167 has no SLDS hook between line-height-1 (1) and line-height-2 (1.25). */
+.kv-footer {
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    line-height: 1.4167;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}

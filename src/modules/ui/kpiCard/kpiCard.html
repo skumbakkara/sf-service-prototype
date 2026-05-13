@@ -1,0 +1,54 @@
+<template>
+    <article class="kc-card">
+        <header class="kc-header">
+            <div class="kc-header-text">
+                <h3 class="kc-title">{title}</h3>
+                <template if:true={caption}>
+                    <p class="kc-caption">{caption}</p>
+                </template>
+                <template if:true={hasChips}>
+                    <ul class="kc-chips" role="list">
+                        <template for:each={filterChips} for:item="chip">
+                            <li key={chip.id} class="kc-chip-item">
+                                <span class="kc-chip">
+                                    <span class="kc-chip-label">{chip.label}</span>
+                                    <button
+                                        type="button"
+                                        class="kc-chip-remove"
+                                        aria-label="Remove filter">
+                                        <lightning-icon
+                                            icon-name="utility:close"
+                                            size="xx-small"
+                                            alternative-text="Remove filter">
+                                        </lightning-icon>
+                                    </button>
+                                </span>
+                            </li>
+                        </template>
+                    </ul>
+                </template>
+            </div>
+            <template if:true={hasMenu}>
+                <div class="kc-menu">
+                    <lightning-button-menu
+                        icon-name="utility:down"
+                        variant="border-filled"
+                        alternative-text="Card actions"
+                        menu-alignment="right">
+                        <template for:each={menuItems} for:item="item">
+                            <lightning-menu-item
+                                key={item.value}
+                                value={item.value}
+                                label={item.label}>
+                            </lightning-menu-item>
+                        </template>
+                    </lightning-button-menu>
+                </div>
+            </template>
+        </header>
+
+        <div class="kc-body">
+            <slot></slot>
+        </div>
+    </article>
+</template>

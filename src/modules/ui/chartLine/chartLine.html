@@ -1,0 +1,53 @@
+<template>
+    <div class="cl-root">
+        <template if:true={hasYLabels}>
+            <div class="cl-y-axis" aria-hidden="true">
+                <template for:each={yAxisLabels} for:item="lbl">
+                    <span key={lbl.id} class="cl-axis-label">{lbl.text}</span>
+                </template>
+            </div>
+        </template>
+
+        <div class="cl-chart-col">
+            <div class="cl-chart-area" style={chartAreaStyle}>
+                <svg
+                    class="cl-svg"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                    role="img"
+                    aria-label={ariaLabel}
+                    focusable="false">
+                    <template if:true={hasBand}>
+                        <path
+                            class="cl-band"
+                            d={bandPath}
+                            style={bandColorStyle}>
+                        </path>
+                    </template>
+                    <template if:true={hasLine}>
+                        <path
+                            class="cl-line"
+                            d={linePath}
+                            fill="none"
+                            vector-effect="non-scaling-stroke"
+                            style={lineColorStyle}>
+                        </path>
+                    </template>
+                </svg>
+                <template if:true={hasEndpoint}>
+                    <span class="cl-dot" style={dotStyle} aria-hidden="true"></span>
+                </template>
+            </div>
+
+            <div class="cl-baseline" aria-hidden="true"></div>
+
+            <template if:true={hasXLabels}>
+                <div class="cl-x-axis" aria-hidden="true">
+                    <template for:each={xAxisLabels} for:item="lbl">
+                        <span key={lbl.id} class="cl-axis-label">{lbl.text}</span>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

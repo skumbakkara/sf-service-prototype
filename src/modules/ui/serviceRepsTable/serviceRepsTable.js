@@ -9,22 +9,25 @@ const STATUS_ICON = {
 const CHANNEL_LABELS = { chat: 'Chat', call: 'Call', cases: 'Case' };
 const CHANNEL_ICONS  = { chat: 'utility:chat', call: 'utility:call', cases: 'utility:case' };
 
-// Minimum column width is 150px; Capacity is wider to fit the two badges + gap
-// without overflow, and the Service Rep Name column holds the full agent name.
+// Widths sized to actual cell content. Icon-only columns floor at 80px; text
+// columns fit the header label without truncation (chevron-on-hover is
+// display:none + table-layout:fixed). Queues/Skills get extra room for typical
+// "first1, first2, +N" strings; Service Rep Name accommodates the chevron and
+// names like "Savannah Nguyen".
 const COLUMN_DEFS = [
-    { label: 'Service Rep Name', fieldName: 'name',             sortable: true,  width: 240 },
-    { label: 'Status',           fieldName: 'statusLabel',      sortable: true,  width: 150 },
-    { label: 'Flag',             fieldName: 'flagLabel',        sortable: false, width: 120 },
-    { label: 'Work Summary',     fieldName: 'workSummary',      sortable: true,  width: 150 },
-    { label: 'Channels',         fieldName: 'channelsDisplay',  sortable: false, width: 150 },
-    { label: 'Login',            fieldName: 'login',            sortable: true,  width: 150 },
-    { label: 'State',            fieldName: 'state',            sortable: true,  width: 150 },
-    { label: 'Capacity',         fieldName: 'capacityP',        sortable: true,  width: 180 },
-    { label: 'Accept',           fieldName: 'accept',           sortable: true,  width: 150 },
-    { label: 'Workload',         fieldName: 'workload',         sortable: true,  width: 150 },
-    { label: 'ACW',              fieldName: 'acw',              sortable: true,  width: 150 },
-    { label: 'Queues',           fieldName: 'queuesDisplay',    sortable: false, width: 150 },
-    { label: 'Skills',           fieldName: 'skillsDisplay',    sortable: false, width: 150 },
+    { label: 'Service Rep Name', fieldName: 'name',             sortable: true,  width: 200 },
+    { label: 'Status',           fieldName: 'statusLabel',      sortable: true,  width: 130 },
+    { label: 'Flag',             fieldName: 'flagLabel',        sortable: false, width: 80  },
+    { label: 'Work Summary',     fieldName: 'workSummary',      sortable: true,  width: 140 },
+    { label: 'Channels',         fieldName: 'channelsDisplay',  sortable: false, width: 100 },
+    { label: 'Login',            fieldName: 'login',            sortable: true,  width: 90  },
+    { label: 'State',            fieldName: 'state',            sortable: true,  width: 90  },
+    { label: 'Capacity',         fieldName: 'capacityP',        sortable: true,  width: 150 },
+    { label: 'Accept',           fieldName: 'accept',           sortable: true,  width: 90  },
+    { label: 'Workload',         fieldName: 'workload',         sortable: true,  width: 100 },
+    { label: 'ACW',              fieldName: 'acw',              sortable: true,  width: 90  },
+    { label: 'Queues',           fieldName: 'queuesDisplay',    sortable: false, width: 180 },
+    { label: 'Skills',           fieldName: 'skillsDisplay',    sortable: false, width: 200 },
 ];
 
 // Infinite-scroll bottom threshold in pixels — when the user scrolls within
@@ -88,18 +91,17 @@ export default class ServiceRepsTable extends LightningElement {
         const rows = (this.expandedData ?? []).map((rep) => {
             const isExpanded = this.expandedIds.has(String(rep.id));
             const workItems = (rep.children ?? []).map((wi, wiIdx) => {
-                const priorityKey = String(wi.priority ?? '').toLowerCase();
+                // Compact card per Figma node 19738:44775. Top row composes
+                // "<customer> |" (semibold) + "<subject> | <caseNumber>" (link).
+                // Bottom row composes channel-icon · "Work load: N" · "Queue: <name>".
                 return {
                     id: `${rep.id}-wi-${wiIdx}`,
-                    customer: wi.customer,
-                    subject: wi.subject,
-                    caseNumberDisplay: `#${wi.caseNumber}`,
-                    statusLabel: wi.status,
-                    priorityLabel: wi.priority,
-                    priorityClass: `wi-priority wi-priority_${priorityKey}`,
+                    customerLabel: `${wi.customer} |`,
+                    summaryLink: `${wi.subject} | ${wi.caseNumber}`,
+                    workLoadText: `Work load: ${wi.workLoad ?? 0}`,
+                    queueText: `Queue: ${wi.queue}`,
                     channelIcon: CHANNEL_ICONS[wi.channel] ?? 'utility:record',
                     channelLabel: CHANNEL_LABELS[wi.channel] ?? wi.channel,
-                    queue: wi.queue,
                     hasFlagIcon: wi.hasFlag,
                 };
             });

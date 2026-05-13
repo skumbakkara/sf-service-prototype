@@ -1,0 +1,93 @@
+/* `height: 100%` on :host and .cd-wrap lets the donut + legend fill the
+   parent card body. SLDS 2 has no sizing hook for a full-height fill. */
+:host {
+    display: block;
+    height: 100%;
+}
+
+/* Figma node 19719:42839: donut and legend wrap sit side-by-side with a
+   10px gap. SLDS spacing scale has no 10px step — spacing-2 is 8px and
+   spacing-3 is 12px. We pick `--slds-g-spacing-3` (12px) as the closest
+   hook; the resulting 2px variance from Figma is intentional and
+   preferred over a hardcoded literal. */
+.cd-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-3, 0.75rem);
+    height: 100%;
+}
+
+.cd-svg {
+    flex: 0 0 auto;
+    display: block;
+}
+
+/* The per-segment stroke colour is supplied by a bound `style` expression on
+   each <circle>, declaring `--cd-segment-color: var(--slds-g-color-palette-…);`.
+   The blue-40 default is the fallback when no segment style runs. */
+.cd-segment {
+    stroke: var(--cd-segment-color, var(--slds-g-color-palette-blue-40, #0176d3));
+    transition: stroke-dashoffset 200ms ease-out;
+}
+
+/* Legend container that stacks an optional title above the list. Sits
+   next to the donut SVG inside .cd-wrap. */
+.cd-legend-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Figma "Body/font-scale-base/Semibold": 13px / 18px line-height,
+   semibold, on-surface-1 (#5c5c5c). */
+.cd-legend-title {
+    font-family: var(--slds-g-font-family-base, 'SF Pro Text', system-ui, sans-serif);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    line-height: var(--slds-g-font-line-height-3, 1.375);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
+.cd-legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Figma "Body/font-scale-base/Regular": 13px / 18px line-height,
+   regular weight, on-surface-2 (#2e2e2e). The 6px dot-to-label gap
+   falls between SLDS spacing-1 (4px) and spacing-2 (8px) — there is
+   no matching hook, so the literal 6px is intentional. */
+.cd-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    line-height: var(--slds-g-font-line-height-3, 1.375);
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+}
+
+/* Legend dot. Figma uses a 12px (0.75rem) circle — sized via the
+   `--slds-g-sizing-4` hook. `border-radius: 50%` is required to draw a
+   perfect circle (no SLDS radius hook represents a 50% value); the
+   literal is intentional. */
+.cd-legend-dot {
+    display: inline-block;
+    width: var(--slds-g-sizing-4, 0.75rem);
+    height: var(--slds-g-sizing-4, 0.75rem);
+    border-radius: 50%;
+    flex: 0 0 auto;
+}
+
+.cd-legend-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

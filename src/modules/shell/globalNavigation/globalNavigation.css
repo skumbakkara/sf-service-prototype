@@ -1,0 +1,19 @@
+:host {
+    display: contents;
+}
+
+/* Let the app-name region grow to fit the full title — SLDS's default
+   `.slds-context-bar__app-name` is a flex item that allows shrinking, and
+   the inner `.slds-truncate` clipped the text. Custom non-shrink classes
+   below keep the title fully visible without overriding `.slds-*` rules. */
+.gn-app-name {
+    flex-shrink: 0;
+    max-width: none;
+    min-width: 0;
+}
+.gn-app-title {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+}

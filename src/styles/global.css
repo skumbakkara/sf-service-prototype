@@ -1,3 +1,20 @@
+/* SLDS 2 Data Viz: chart/Category/Light/Color N
+   The official SLDS 2 Figma library exposes 5 categorical chart colors (used
+   for donut/pie/legend swatches). The npm CSS bundle has not promoted these
+   as global hooks yet, but every chart-category Figma token is a direct
+   alias of an existing palette hook (verified against the Figma variable
+   graph). We expose them under the project (`--ccs-`) namespace per SLDS
+   linter guidance — squatting `--slds-*` is not allowed. If/when Salesforce
+   ships official `--slds-g-color-chart-*` hooks, point these aliases at the
+   upstream tokens (or delete the wrapper and update consumers). */
+:root {
+    --ccs-g-color-chart-category-light-color-1: var(--slds-g-color-palette-electric-blue-60); /* #4992fe / #0250d9 */
+    --ccs-g-color-chart-category-light-color-2: var(--slds-g-color-palette-violet-50);        /* #ba01ff / #ba01ff */
+    --ccs-g-color-chart-category-light-color-3: var(--slds-g-color-palette-teal-60);          /* #06a59a / #056764 */
+    --ccs-g-color-chart-category-light-color-4: var(--slds-g-color-palette-indigo-40);        /* #3a49da / #7f8ced */
+    --ccs-g-color-chart-category-light-color-5: var(--slds-g-color-palette-red-60);           /* #fe5c4c / #ba0517 */
+}
+
 /* Global Header: Action Icons */
 .lightning-button-menu_custom .slds-button__icon {
     fill: light-dark(var(--slds-g-color-palette-neutral-60), var(--slds-g-color-palette-neutral-40));
