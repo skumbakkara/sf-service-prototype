@@ -9,6 +9,33 @@ const STATUS_ICON = {
 const CHANNEL_LABELS = { chat: 'Chat', call: 'Call', cases: 'Case' };
 const CHANNEL_ICONS  = { chat: 'utility:chat', call: 'utility:call', cases: 'utility:case' };
 
+// Maps each work-item channel to its `Work Summary` bucket. `chat` and
+// `messaging` both roll up to "Message(s)" since they share an inbox in
+// the demo. `cases` is the catch-all bucket so unknown channels still
+// produce a sensible count rather than silently disappearing.
+const WORK_SUMMARY_BUCKETS = [
+    { key: 'cases',   match: ['cases'],            singular: 'Case',    plural: 'Cases' },
+    { key: 'message', match: ['chat', 'messaging'], singular: 'Message', plural: 'Messages' },
+    { key: 'call',    match: ['call'],             singular: 'Call',    plural: 'Calls' },
+    { key: 'email',   match: ['email'],            singular: 'Email',   plural: 'Emails' },
+];
+
+function summarizeWorkItems(children) {
+    if (!Array.isArray(children) || children.length === 0) return '0 Cases';
+    const counts = Object.fromEntries(WORK_SUMMARY_BUCKETS.map(b => [b.key, 0]));
+    for (const wi of children) {
+        const bucket = WORK_SUMMARY_BUCKETS.find(b => b.match.includes(wi.channel))
+            ?? WORK_SUMMARY_BUCKETS[0]; // fall back to "Case" for unknown channels
+        counts[bucket.key] += 1;
+    }
+    const parts = [];
+    for (const b of WORK_SUMMARY_BUCKETS) {
+        const n = counts[b.key];
+        if (n > 0) parts.push(`${n} ${n === 1 ? b.singular : b.plural}`);
+    }
+    return parts.join(' ');
+}
+
 // Widths sized to actual cell content. Icon-only columns floor at 80px; text
 // columns fit the header label without truncation (chevron-on-hover is
 // display:none + table-layout:fixed). Queues/Skills get extra room for typical
@@ -17,9 +44,9 @@ const CHANNEL_ICONS  = { chat: 'utility:chat', call: 'utility:call', cases: 'uti
 const COLUMN_DEFS = [
     { label: 'Service Rep Name', fieldName: 'name',             sortable: true,  width: 200 },
     { label: 'Status',           fieldName: 'statusLabel',      sortable: true,  width: 130 },
-    { label: 'Flag',             fieldName: 'flagLabel',        sortable: false, width: 80  },
-    { label: 'Work Summary',     fieldName: 'workSummary',      sortable: true,  width: 140 },
     { label: 'Channels',         fieldName: 'channelsDisplay',  sortable: false, width: 100 },
+    { label: 'Work Summary',     fieldName: 'workSummary',      sortable: true,  width: 140 },
+    { label: 'Flag',             fieldName: 'flagLabel',        sortable: false, width: 80  },
     { label: 'Login',            fieldName: 'login',            sortable: true,  width: 90  },
     { label: 'State',            fieldName: 'state',            sortable: true,  width: 90  },
     { label: 'Capacity',         fieldName: 'capacityP',        sortable: true,  width: 150 },
@@ -113,7 +140,10 @@ export default class ServiceRepsTable extends LightningElement {
                 statusIcon: STATUS_ICON[rep.status] ?? 'utility:record',
                 statusCellClass: `status-cell status-cell_${rep.status}`,
                 hasFlagIcon: rep.hasFlag,
-                workSummary: rep.workSummary,
+                // Computed from `rep.children` (not the page-level `workSummary`
+                // string) so the column count is always in sync with the cards
+                // shown when the row is expanded.
+                workSummary: summarizeWorkItems(rep.children),
                 channelIcons: rep.channels.map(c => ({ icon: CHANNEL_ICONS[c] ?? 'utility:record', label: CHANNEL_LABELS[c] ?? c })),
                 channelsDisplay: rep.channels.map(c => CHANNEL_LABELS[c] ?? c).join(' · '),
                 login: rep.login,
@@ -129,6 +159,11 @@ export default class ServiceRepsTable extends LightningElement {
                 skillsDisplay: rep.skills.join(', '),
                 hasChildren: workItems.length > 0,
                 isExpanded,
+                // Add `rep-row_expanded` while the accordion is open so the
+                // parent row keeps the same neutral-base-95 fill as :hover —
+                // gives a clear visual link between the row and its expanded
+                // work-items panel.
+                repRowClass: `slds-hint-parent rep-row${isExpanded ? ' rep-row_expanded' : ''}`,
                 workItems,
                 isSelected: this.selectedIds.has(String(rep.id)),
             };

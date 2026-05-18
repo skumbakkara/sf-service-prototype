@@ -25,7 +25,7 @@
             <tbody>
                 <template for:each={tableRows} for:item="row">
                     <!-- Parent rep row -->
-                    <tr key={row.id} class="slds-hint-parent rep-row">
+                    <tr key={row.id} class={row.repRowClass}>
                         <td class="slds-cell_shrink">
                             <div class="slds-text-align_center">
                                 <input type="checkbox" class="row-checkbox" checked={row.isSelected} data-id={row.id} onchange={handleRowSelect} />
@@ -59,21 +59,22 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="slds-text-align_left">
-                            <template if:true={row.hasFlagIcon}>
-                                <span class="flag-pill" role="img" aria-label="Flagged" title="Flagged">
-                                    <lightning-icon icon-name="utility:priority" size="xx-small"></lightning-icon>
-                                </span>
-                            </template>
-                        </td>
-                        <td>{row.workSummary}</td>
-                        <!-- Change 1: icons instead of text in Channels column -->
+                        <!-- Channels (moved left of Work Summary). Icons replace text per design. -->
                         <td>
                             <div class="channel-icons">
                                 <template for:each={row.channelIcons} for:item="ch">
                                     <lightning-icon key={ch.icon} icon-name={ch.icon} size="xx-small" title={ch.label} class="channel-icon"></lightning-icon>
                                 </template>
                             </div>
+                        </td>
+                        <td>{row.workSummary}</td>
+                        <!-- Flag (moved right of Work Summary). -->
+                        <td class="slds-text-align_left">
+                            <template if:true={row.hasFlagIcon}>
+                                <span class="flag-pill" role="img" aria-label="Flagged" title="Flagged">
+                                    <lightning-icon icon-name="utility:priority" size="xx-small"></lightning-icon>
+                                </span>
+                            </template>
                         </td>
                         <td class="slds-text-align_right">{row.login}</td>
                         <td class="slds-text-align_right">{row.state}</td>

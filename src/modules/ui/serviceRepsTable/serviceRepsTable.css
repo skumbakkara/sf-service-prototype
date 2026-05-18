@@ -293,8 +293,11 @@ th:hover .col-chevron { display: inline-flex; }
     --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
 }
 
-/* ── Row hover — neutral-base-95 fill, only on the hovered row ───── */
-.rep-row:hover td {
+/* ── Row hover / expanded — neutral-base-95 fill ────────────────────
+   The expanded state mirrors :hover so the parent row visually anchors
+   its open accordion below. */
+.rep-row:hover td,
+.rep-row_expanded > td {
     background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
     box-shadow: none !important;
 }
@@ -303,14 +306,18 @@ th:hover .col-chevron { display: inline-flex; }
    on the row below, vertical between cells of the hovered row). */
 .rep-row:hover td,
 .rep-row:hover + tr td,
-.rep-row:hover + tr th {
+.rep-row:hover + tr th,
+.rep-row_expanded > td {
     border-color: var(--slds-g-color-neutral-base-90, #e5e5e5) !important;
     box-shadow: none !important;
 }
 
-/* ── Work Items title row ────────────────────────────────── */
+/* ── Work Items title row ──────────────────────────────────
+   Accordion fill #F9F9F9 sits one step lighter than
+   --slds-g-color-surface-2 (#f3f3f3); no SLDS hook represents
+   exactly #F9F9F9 so the literal is intentional. */
 .work-items-title-row {
-    background-color: var(--slds-g-color-surface-2, #f3f3f3);
+    background-color: #F9F9F9;
 }
 .work-items-title-cell {
     padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-1, 0.25rem) !important;
@@ -325,9 +332,11 @@ th:hover .col-chevron { display: inline-flex; }
     padding-left: 2.5rem;
 }
 
-/* ── Work item rows: grid aligned to table columns ──────── */
+/* ── Work item rows: grid aligned to table columns ────────
+   Same #F9F9F9 fill as the title row above so the accordion
+   reads as one continuous panel. */
 .work-item-row {
-    background-color: var(--slds-g-color-surface-2, #f3f3f3);
+    background-color: #F9F9F9;
 }
 .work-item-cell {
     /* No padding so the card fills the cell width; the card itself owns its
