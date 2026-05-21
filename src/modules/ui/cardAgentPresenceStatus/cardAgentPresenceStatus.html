@@ -1,0 +1,12 @@
+<template>
+    <ui-kpi-card title="Agent Presence Status" caption="Current" filter-groups={filterGroups}>
+        <ui-chart-bar
+            rows={rows}
+            tick-labels={tickLabels}
+            row-axis-label="Status ↓"
+            col-axis-label="No of reps ↓"
+            max-value="10"
+            aria-label="Agent presence status — number of reps per status">
+        </ui-chart-bar>
+    </ui-kpi-card>
+</template>

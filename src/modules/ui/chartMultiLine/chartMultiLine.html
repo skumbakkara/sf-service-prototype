@@ -1,0 +1,55 @@
+<template>
+    <div class="cml-root">
+        <div class="cml-chart-area">
+            <div class="cml-y-axis-wrap">
+                <span class="cml-y-axis-title" aria-hidden="true">{yAxisTitle}</span>
+                <div class="cml-y-axis" aria-hidden="true">
+                    <template for:each={yAxisLabels} for:item="lbl">
+                        <span key={lbl.id} class="cml-axis-label">{lbl.text}</span>
+                    </template>
+                </div>
+            </div>
+
+            <div class="cml-chart-col">
+                <div class="cml-svg-wrap">
+                    <svg
+                        class="cml-svg"
+                        viewBox="0 0 100 100"
+                        preserveAspectRatio="none"
+                        role="img"
+                        aria-label={ariaLabel}
+                        focusable="false">
+                        <template for:each={seriesPaths} for:item="s">
+                            <path
+                                key={s.id}
+                                class="cml-line"
+                                d={s.path}
+                                fill="none"
+                                vector-effect="non-scaling-stroke"
+                                style={s.colorStyle}>
+                            </path>
+                        </template>
+                    </svg>
+                </div>
+
+                <div class="cml-baseline" aria-hidden="true"></div>
+
+                <div class="cml-x-axis" aria-hidden="true">
+                    <template for:each={xAxisLabels} for:item="lbl">
+                        <span key={lbl.id} class="cml-axis-label">{lbl.text}</span>
+                    </template>
+                </div>
+                <div class="cml-x-axis-title" aria-hidden="true">{xAxisTitle}</div>
+            </div>
+        </div>
+
+        <ul class="cml-legend" role="list">
+            <template for:each={legendItems} for:item="item">
+                <li key={item.id} class="cml-legend-item">
+                    <span class="cml-legend-dot" style={item.dotStyle} aria-hidden="true"></span>
+                    <span class="cml-legend-label">{item.label}</span>
+                </li>
+            </template>
+        </ul>
+    </div>
+</template>

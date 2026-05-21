@@ -1,0 +1,30 @@
+<template>
+    <div class="cb-root" role="img" aria-label={ariaLabel}>
+        <div class="cb-grid">
+            <!-- Row label column -->
+            <div class="cb-labels-col">
+                <div class="cb-axis-header">{rowAxisLabel}</div>
+                <template for:each={computedRows} for:item="row">
+                    <div key={row.id} class="cb-row-label">{row.label}</div>
+                </template>
+            </div>
+
+            <!-- Bar + tick column -->
+            <div class="cb-bars-col">
+                <div class="cb-tick-row" aria-hidden="true">
+                    <template for:each={computedTicks} for:item="tick">
+                        <span key={tick.id} class="cb-tick">{tick.label}</span>
+                    </template>
+                </div>
+                <template for:each={computedRows} for:item="row">
+                    <div key={row.id} class="cb-bar-track">
+                        <div class="cb-bar" style={row.barStyle}></div>
+                    </div>
+                </template>
+                <template if:true={hasColAxisLabel}>
+                    <div class="cb-col-axis-label" aria-hidden="true">{colAxisLabel}</div>
+                </template>
+            </div>
+        </div>
+    </div>
+</template>

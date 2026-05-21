@@ -3,6 +3,38 @@ import { LightningElement, api, track } from 'lwc';
 const CHANNEL_ICONS  = { chat: 'utility:chat', call: 'utility:call', cases: 'utility:case', email: 'utility:email', messaging: 'utility:sms' };
 const CHANNEL_LABELS = { chat: 'Chat', call: 'Call', cases: 'Case', email: 'Email', messaging: 'Message' };
 
+// ── Filter helpers ──────────────────────────────────────────────────────────
+// Facet ids must mirror the panel component. Defined here too because the
+// table owns the canonical applied state and produces the chip row. Agent
+// Type isn't in this list — AI/Human filtering happens at the page level
+// via the toolbar toggles, which pre-filter the data we receive via `data`.
+const FACET_IDS = ['serviceRep', 'channels', 'queues', 'skills', 'sentiment', 'teams'];
+
+// Sentiment buckets — same mapping the panel uses. Duplicated rather than
+// imported so the table can stay self-contained for the demo.
+const SENTIMENT_BUCKET_MEMBERS = {
+    positive: new Set(['excellent', 'good']),
+    neutral:  new Set(['neutral']),
+    negative: new Set(['bad', 'terrible']),
+};
+
+const FACET_LABELS = {
+    serviceRep: 'Service Rep',
+    channels:   'Channels',
+    queues:     'Queue',
+    skills:     'Skill',
+    sentiment:  'Sentiment',
+    teams:      'Team',
+};
+
+const SENTIMENT_LABELS = {
+    positive: 'Positive', neutral: 'Neutral', negative: 'Negative',
+};
+
+function emptyFilters() {
+    return FACET_IDS.reduce((acc, id) => { acc[id] = []; return acc; }, {});
+}
+
 // Sentiment config: emoji icon + color class per level
 // All five raw sentiment values collapse to three buckets: good / average / bad
 const SENTIMENT_CONFIG = {
@@ -71,6 +103,33 @@ export default class InProgressTable extends LightningElement {
     @track sortedDirection = 'asc';
     @track selectedIds = new Set();
 
+    // ── Filter state ────────────────────────────────────────────────────────
+    // `_appliedFilters` is the canonical state shared with the inline drawer.
+    // Always a fully-populated object keyed by facet id (each value an array)
+    // so downstream consumers never need null checks.
+    @track _filterPanelOpen = false;
+    @track _appliedFilters = emptyFilters();
+
+    // Public methods called by the page's toolbar Filter button. The button
+    // calls `toggleFilterPanel()` so a second click closes the drawer. The
+    // page mirrors our open state for the funnel button's brand variant by
+    // listening for `panelchange` events we dispatch from `_setPanelOpen`.
+    @api
+    openFilterPanel() { this._setPanelOpen(true); }
+    @api
+    closeFilterPanel() { this._setPanelOpen(false); }
+    @api
+    toggleFilterPanel() { this._setPanelOpen(!this._filterPanelOpen); }
+
+    _setPanelOpen(next) {
+        const value = Boolean(next);
+        if (value === this._filterPanelOpen) return;
+        this._filterPanelOpen = value;
+        this.dispatchEvent(new CustomEvent('panelchange', {
+            detail: { open: value },
+        }));
+    }
+
     get _hiddenFieldSet() {
         const raw = this.hideColumns;
         if (!raw || typeof raw !== 'string') return new Set();
@@ -100,8 +159,86 @@ export default class InProgressTable extends LightningElement {
         if (container) container.scrollTop = 0;
     }
 
+    // ── Filtering ───────────────────────────────────────────────────────────
+    // The table now owns its own filter state, so `expandedData` flows from
+    // `filteredData` rather than `_data` directly. Pagination clones run off
+    // the filtered seed too, which matches the existing "restart at page 1
+    // on data swap" semantics — only here the trigger is a filter Apply.
+    get filteredData() {
+        const items = this._data ?? [];
+        const f = this._appliedFilters;
+        const hasAny = FACET_IDS.some(id => (f[id] ?? []).length > 0);
+        if (!hasAny) return items;
+        return items.filter(item => this._matchesFilters(item, f));
+    }
+
+    _matchesFilters(item, f) {
+        // Service Rep — direct match on assignedTo.
+        if (f.serviceRep.length > 0 && !f.serviceRep.includes(item.assignedTo)) return false;
+        // Channels — direct match on channel.
+        if (f.channels.length   > 0 && !f.channels.includes(item.channel))     return false;
+        // Queues — direct match on queue.
+        if (f.queues.length     > 0 && !f.queues.includes(item.queue))         return false;
+        // Teams — direct match on team.
+        if (f.teams.length      > 0 && !f.teams.includes(item.team))           return false;
+        // Skills — intersection (row matches if it has any of the requested skills).
+        if (f.skills.length > 0) {
+            const itemSkills = Array.isArray(item.skills) ? item.skills : [];
+            const hit = f.skills.some(s => itemSkills.includes(s));
+            if (!hit) return false;
+        }
+        // Sentiment — translate buckets back to raw values for the row check.
+        if (f.sentiment.length > 0) {
+            const matched = f.sentiment.some(bucket => {
+                const members = SENTIMENT_BUCKET_MEMBERS[bucket];
+                return members && members.has(String(item.sentiment ?? '').toLowerCase());
+            });
+            if (!matched) return false;
+        }
+        return true;
+    }
+
+    // ── Filter chip row (above the table) ──────────────────────────────────
+    // One chip per facet that has at least one selected value. Chip label is
+    // "Facet: First Value +Nmore" so the toolbar fits a lot of state in a
+    // narrow space — matches Figma stages 3-4. Each chip dispatches a single
+    // facet-clear when X'd; the panel's draft state will pick up the change
+    // the next time it opens.
+    get filterChips() {
+        const chips = [];
+        const f = this._appliedFilters;
+        for (const id of FACET_IDS) {
+            const values = f[id] ?? [];
+            if (values.length === 0) continue;
+            chips.push({
+                id,
+                label: `${FACET_LABELS[id]}: ${this._chipValueText(id, values)}`,
+                clearTitle: `Remove ${FACET_LABELS[id]} filter`,
+            });
+        }
+        return chips;
+    }
+
+    get hasFilterChips()   { return this.filterChips.length > 0; }
+    get filterCountLabel() {
+        const n = this.filterChips.length;
+        return `${n} ${n === 1 ? 'filter' : 'filters'} applied`;
+    }
+
+    _chipValueText(id, values) {
+        const first = this._displayValue(id, values[0]);
+        if (values.length === 1) return first;
+        return `${first} +${values.length - 1}more`;
+    }
+
+    _displayValue(id, value) {
+        if (id === 'sentiment') return SENTIMENT_LABELS[value] ?? value;
+        if (id === 'channels')  return CHANNEL_LABELS[value]   ?? value;
+        return value;
+    }
+
     get expandedData() {
-        const seed = this._data ?? [];
+        const seed = this.filteredData;
         if (seed.length === 0) return [];
         const out = seed.slice();
         for (let p = 1; p <= this._pageCount; p++) {
@@ -258,6 +395,55 @@ export default class InProgressTable extends LightningElement {
         const container = this.template.querySelector('.ipt-container');
         if (container) container.removeEventListener('scroll', this._onScroll);
         this._scrollAttached = false;
+    }
+
+    // ── Panel + chip event handlers ────────────────────────────────────────
+    // Expose `_filterPanelOpen` and `_appliedFilters` as plain getters so the
+    // template can bind to them without leading-underscore warnings.
+    get filterPanelOpen() { return this._filterPanelOpen; }
+    get appliedFilters()  { return this._appliedFilters; }
+    /**
+     * `.ipt-shell` is a flex row that contains the table-container and,
+     * when the drawer is open, the panel as a second column. The
+     * `_panel-open` variant trims the right padding so the drawer butts
+     * up against the card edge with only its own border-left separating
+     * it from the table area.
+     */
+    get shellClass() {
+        return `ipt-shell${this._filterPanelOpen ? ' ipt-shell_panel-open' : ''}`;
+    }
+
+    handleFilterPanelClose() {
+        // X icon in the inline drawer header. The drawer remains in the DOM
+        // until we flip `_filterPanelOpen` — same template guard the open()
+        // API call uses. Dispatches `panelchange` so the page's funnel
+        // button can drop its brand variant.
+        this._setPanelOpen(false);
+    }
+
+    handleFilterPanelApply(event) {
+        // Immediate-apply: the drawer fires this on every checkbox change
+        // and on Clear / Reset. The drawer stays open; we just refresh the
+        // filtered data, reset pagination, and clear the selection.
+        this._appliedFilters = event.detail?.filters ?? emptyFilters();
+        this._pageCount = 0;
+        this.selectedIds = new Set();
+        const container = this.template.querySelector('.ipt-container');
+        if (container) container.scrollTop = 0;
+    }
+
+    handleChipRemove(event) {
+        const id = event.currentTarget.dataset.facet;
+        if (!id) return;
+        this._appliedFilters = { ...this._appliedFilters, [id]: [] };
+        this._pageCount = 0;
+        this.selectedIds = new Set();
+    }
+
+    handleClearAllChips() {
+        this._appliedFilters = emptyFilters();
+        this._pageCount = 0;
+        this.selectedIds = new Set();
     }
 
     _onScroll = () => {

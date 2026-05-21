@@ -45,7 +45,7 @@ const COLUMN_DEFS = [
     { label: 'Service Rep Name', fieldName: 'name',             sortable: true,  width: 200 },
     { label: 'Status',           fieldName: 'statusLabel',      sortable: true,  width: 130 },
     { label: 'Channels',         fieldName: 'channelsDisplay',  sortable: false, width: 100 },
-    { label: 'Work Summary',     fieldName: 'workSummary',      sortable: true,  width: 140 },
+    { label: 'Work Summary',     fieldName: 'workSummary',      sortable: true,  width: 200 },
     { label: 'Flag',             fieldName: 'flagLabel',        sortable: false, width: 80  },
     { label: 'Login',            fieldName: 'login',            sortable: true,  width: 90  },
     { label: 'State',            fieldName: 'state',            sortable: true,  width: 90  },
@@ -61,6 +61,13 @@ const COLUMN_DEFS = [
 // this distance of the bottom of the scroll container, another page of clones
 // is appended.
 const SCROLL_THRESHOLD_PX = 120;
+
+// Cap how many work-item cards an expanded rep can show in the accordion.
+// Keeps the panel short enough that the table body remains scrollable and
+// the next rep stays in view. The Work Summary column count is derived
+// from the *capped* list (see tableRows below) so the header label and the
+// accordion always agree.
+const MAX_WORK_ITEMS_PER_REP = 3;
 
 export default class ServiceRepsTable extends LightningElement {
     _data = [];
@@ -117,7 +124,19 @@ export default class ServiceRepsTable extends LightningElement {
     get tableRows() {
         const rows = (this.expandedData ?? []).map((rep) => {
             const isExpanded = this.expandedIds.has(String(rep.id));
-            const workItems = (rep.children ?? []).map((wi, wiIdx) => {
+            // Cap children before *both* the accordion render and the
+            // Work Summary count so the two stay in lockstep.
+            const visibleChildren = (rep.children ?? []).slice(0, MAX_WORK_ITEMS_PER_REP);
+            const lastVisibleIdx = visibleChildren.length - 1;
+            const workItems = visibleChildren.map((wi, wiIdx) => {
+                // First / last position drives a CSS modifier class so the
+                // top and bottom of the entire accordion panel get the
+                // requested 8px breathing room (only the outermost cards
+                // pick up the extra padding; the cards between just butt
+                // against each other).
+                const isFirst = wiIdx === 0;
+                const isLast = wiIdx === lastVisibleIdx;
+                const positionClass = `${isFirst ? ' work-item-row_first' : ''}${isLast ? ' work-item-row_last' : ''}`;
                 // Compact card per Figma node 19738:44775. Top row composes
                 // "<customer> |" (semibold) + "<subject> | <caseNumber>" (link).
                 // Bottom row composes channel-icon · "Work load: N" · "Queue: <name>".
@@ -130,6 +149,7 @@ export default class ServiceRepsTable extends LightningElement {
                     channelIcon: CHANNEL_ICONS[wi.channel] ?? 'utility:record',
                     channelLabel: CHANNEL_LABELS[wi.channel] ?? wi.channel,
                     hasFlagIcon: wi.hasFlag,
+                    rowClass: `work-item-row${positionClass}`,
                 };
             });
             return {
@@ -140,10 +160,10 @@ export default class ServiceRepsTable extends LightningElement {
                 statusIcon: STATUS_ICON[rep.status] ?? 'utility:record',
                 statusCellClass: `status-cell status-cell_${rep.status}`,
                 hasFlagIcon: rep.hasFlag,
-                // Computed from `rep.children` (not the page-level `workSummary`
-                // string) so the column count is always in sync with the cards
-                // shown when the row is expanded.
-                workSummary: summarizeWorkItems(rep.children),
+                // Computed from the *capped* children list (not the page-level
+                // `workSummary` string) so the column count is always in sync
+                // with the cards shown when the row is expanded.
+                workSummary: summarizeWorkItems(visibleChildren),
                 channelIcons: rep.channels.map(c => ({ icon: CHANNEL_ICONS[c] ?? 'utility:record', label: CHANNEL_LABELS[c] ?? c })),
                 channelsDisplay: rep.channels.map(c => CHANNEL_LABELS[c] ?? c).join(' · '),
                 login: rep.login,

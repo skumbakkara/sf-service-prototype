@@ -9,10 +9,16 @@
    10px gap. SLDS spacing scale has no 10px step — spacing-2 is 8px and
    spacing-3 is 12px. We pick `--slds-g-spacing-3` (12px) as the closest
    hook; the resulting 2px variance from Figma is intentional and
-   preferred over a hardcoded literal. */
+   preferred over a hardcoded literal.
+   `justify-content: center` plus the `flex: 0 1 auto` on the legend wrap
+   below keeps the donut + legend group hugging its own content and
+   centered inside the parent card. Without these two together the legend
+   wrap grew to fill remaining width (flex: 1 1 auto), pushing the visual
+   group hard-left and leaving the right half of the card empty. */
 .cd-wrap {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: var(--slds-g-spacing-3, 0.75rem);
     height: 100%;
 }
@@ -31,12 +37,17 @@
 }
 
 /* Legend container that stacks an optional title above the list. Sits
-   next to the donut SVG inside .cd-wrap. */
+   next to the donut SVG inside .cd-wrap.
+   `flex: 0 1 auto` (was `1 1 auto`): no grow so the legend hugs its
+   widest label and the whole donut+legend group can be centered by the
+   parent's `justify-content: center`; still allows shrink so the
+   `text-overflow: ellipsis` on `.cd-legend-label` can engage if the card
+   ever narrows below the natural content width. */
 .cd-legend-wrap {
     display: flex;
     flex-direction: column;
     gap: var(--slds-g-spacing-2, 0.5rem);
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-width: 0;
 }
 

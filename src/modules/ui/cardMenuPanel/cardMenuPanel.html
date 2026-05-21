@@ -1,0 +1,126 @@
+<template>
+    <div class="cmp-backdrop" onclick={handleBackdropClick}></div>
+    <div class="cmp-panel" role="dialog" aria-label="Card settings" aria-modal="true" style={panelStyle}>
+
+        <!-- Section 1: Timeframe (only for average-value cards) -->
+        <template if:true={showTimeframe}>
+            <div class="cmp-section">
+                <p class="cmp-section-label">Timeframe</p>
+                <lightning-button-group>
+                    <template for:each={timeframeOptions} for:item="opt">
+                        <lightning-button
+                            key={opt.value}
+                            label={opt.label}
+                            variant={opt.variant}
+                            data-value={opt.value}
+                            onclick={handleTimeframeClick}>
+                        </lightning-button>
+                    </template>
+                </lightning-button-group>
+            </div>
+        </template>
+
+        <!-- Section 2: Filters -->
+        <div class="cmp-section cmp-section-filters">
+            <div class="cmp-filters-header">
+                <p class="cmp-section-label">Filters</p>
+                <template if:true={hasActivePills}>
+                    <button type="button" class="cmp-clear-all" onclick={handleClearAll}>Clear All</button>
+                </template>
+            </div>
+
+            <!-- Active filter pills -->
+            <template if:true={hasActivePills}>
+                <ul class="cmp-pills" role="list">
+                    <template for:each={activePills} for:item="pill">
+                        <li key={pill.id} class="cmp-pill-item">
+                            <lightning-pill
+                                label={pill.label}
+                                data-id={pill.id}
+                                onremove={handlePillRemove}>
+                            </lightning-pill>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+
+            <!-- Grouped combobox: filter group selector + search input -->
+            <div class="cmp-combobox-row">
+                <!-- Filter group picker -->
+                <div class="cmp-group-picker" role="combobox" aria-haspopup="listbox" aria-expanded={groupOpen} aria-label="Filter group">
+                    <button
+                        type="button"
+                        class="cmp-group-btn"
+                        aria-haspopup="listbox"
+                        aria-expanded={groupOpen}
+                        onclick={toggleGroupPicker}>
+                        <span class="cmp-group-btn-label">{selectedGroupLabel}</span>
+                        <lightning-icon icon-name="utility:down" size="xx-small" alternative-text="Open group picker"></lightning-icon>
+                    </button>
+                    <template if:true={groupOpen}>
+                        <ul class="cmp-group-dropdown" role="listbox" aria-label="Filter groups">
+                            <template for:each={computedFilterGroups} for:item="grp">
+                                <li
+                                    key={grp.value}
+                                    role="option"
+                                    class={grp.optionClass}
+                                    aria-selected={grp.checked}
+                                    data-value={grp.value}
+                                    onclick={handleGroupSelect}>
+                                    {grp.label}
+                                </li>
+                            </template>
+                        </ul>
+                    </template>
+                </div>
+
+                <!-- Search input -->
+                <div class="cmp-search-wrap">
+                    <input
+                        type="text"
+                        class="cmp-search-input"
+                        placeholder="Search..."
+                        aria-label="Search filter values"
+                        value={searchText}
+                        oninput={handleSearch} />
+                    <lightning-icon icon-name="utility:search" size="xx-small" alternative-text="Search" class="cmp-search-icon"></lightning-icon>
+                </div>
+            </div>
+
+            <!-- Filter values list / empty state -->
+            <template if:true={hasSelectedGroup}>
+                <ul class="cmp-filter-list" role="listbox" aria-label="Filter values" aria-multiselectable="true">
+                    <template for:each={filteredValues} for:item="item">
+                        <li
+                            key={item.id}
+                            role="option"
+                            class={item.itemClass}
+                            aria-selected={item.selected}
+                            data-id={item.id}
+                            onclick={handleValueToggle}>
+                            <template if:true={item.selected}>
+                                <lightning-icon icon-name="utility:check" size="xx-small" alternative-text="Selected" class="cmp-check-icon"></lightning-icon>
+                            </template>
+                            <template if:false={item.selected}>
+                                <span class="cmp-check-placeholder"></span>
+                            </template>
+                            <span class="cmp-item-label">{item.label}</span>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+            <template if:false={hasSelectedGroup}>
+                <div class="cmp-empty-state">
+                    <img src="./images/noresults-filter.svg" alt="" aria-hidden="true" class="cmp-empty-illustration" />
+                    <p class="cmp-empty-label">Select a filter group to view filter values</p>
+                </div>
+            </template>
+        </div>
+
+        <!-- Footer -->
+        <div class="cmp-footer">
+            <lightning-button variant="neutral" label="Cancel" onclick={handleCancel}></lightning-button>
+            <lightning-button variant="brand" label="Apply" onclick={handleApply}></lightning-button>
+        </div>
+    </div>
+</template>

@@ -1,0 +1,109 @@
+<template>
+    <!-- Inline drawer that lives inside the In-Progress card next to the
+         table. No backdrop, no fixed positioning. `role="complementary"`
+         (the implicit aside role) — this is NOT a dialog, so no aria-modal
+         and no focus trap. ESC is captured locally via onkeydown rather
+         than a global window listener. -->
+    <aside class="fp"
+           aria-labelledby="fp-title"
+           onkeydown={handleHeaderKeydown}>
+        <header class="fp-header">
+            <h2 id="fp-title" class="fp-title">Filters</h2>
+            <div class="fp-close">
+                <lightning-button-icon
+                    icon-name="utility:close"
+                    size="small"
+                    variant="bare"
+                    alternative-text="Close filters"
+                    title="Close"
+                    onclick={handleClose}>
+                </lightning-button-icon>
+            </div>
+        </header>
+
+        <div class="fp-body">
+            <template for:each={facetList} for:item="facet">
+                <section key={facet.id} class={facet.wrapperClass}>
+                    <!-- Collapsed-row trigger: a single button per facet
+                         showing label + selection-summary stacked. No
+                         chevron, no trash — matches the new mock. The
+                         whole row is the click target. -->
+                    <button
+                        type="button"
+                        class="fp-facet__row"
+                        data-facet={facet.id}
+                        aria-expanded={facet.isExpanded}
+                        onclick={handleFacetToggle}>
+                        <span class="fp-facet__label">{facet.label}</span>
+                        <span class="fp-facet__summary">{facet.summary}</span>
+                    </button>
+
+                    <template if:true={facet.isExpanded}>
+                        <div class="fp-facet__body">
+                            <template if:true={facet.isSearchable}>
+                                <div class="fp-facet__search">
+                                    <lightning-input
+                                        type="search"
+                                        variant="label-hidden"
+                                        label={facet.searchPlaceholder}
+                                        placeholder={facet.searchPlaceholder}
+                                        value={facet.searchTerm}
+                                        data-facet={facet.id}
+                                        onchange={handleFacetSearch}
+                                        oninput={handleFacetSearch}>
+                                    </lightning-input>
+                                </div>
+                            </template>
+
+                            <template if:true={facet.noResults}>
+                                <p class="fp-facet__empty">No matching options</p>
+                            </template>
+
+                            <ul class="fp-facet__options" role="group">
+                                <template for:each={facet.options} for:item="opt">
+                                    <li key={opt.key} class="fp-facet__option">
+                                        <lightning-input
+                                            type="checkbox"
+                                            label={opt.label}
+                                            checked={opt.checked}
+                                            data-facet={facet.id}
+                                            data-value={opt.value}
+                                            onchange={handleOptionChange}
+                                            class="fp-facet__checkbox">
+                                        </lightning-input>
+                                    </li>
+                                </template>
+                            </ul>
+
+                            <template if:true={facet.hasSelection}>
+                                <div class="fp-facet__actions">
+                                    <button
+                                        type="button"
+                                        class="fp-facet__clear-btn"
+                                        data-facet={facet.id}
+                                        onclick={handleFacetClear}>
+                                        Clear
+                                    </button>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </section>
+            </template>
+
+            <!-- Bottom-of-panel reset affordance. Only renders when there's
+                 something to reset; mirrors the "Clear all" in the chip row
+                 above the table so either path produces the same state. -->
+            <template if:true={hasAnySelection}>
+                <div class="fp-reset">
+                    <button
+                        type="button"
+                        class="fp-reset__btn"
+                        onclick={handleResetAll}>
+                        Reset filters
+                    </button>
+                </div>
+            </template>
+        </div>
+    </aside>
+</template>

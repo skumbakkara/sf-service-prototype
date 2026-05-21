@@ -96,19 +96,13 @@
                         <td>{row.queuesDisplay}</td>
                         <td>{row.skillsDisplay}</td>
                     </tr>
-                    <!-- Change 3: "Work Items" title row + child work item rows -->
+                    <!-- Expanded: stack of work-item cards (no title row). -->
                     <template if:true={row.isExpanded}>
-                        <tr key={row.id} class="work-items-title-row">
-                            <td colspan="14" class="work-items-title-cell">
-                                <span class="work-items-title">Work Summary</span>
-                            </td>
-                        </tr>
                         <template for:each={row.workItems} for:item="wi">
-                            <tr key={wi.id} class="work-item-row">
+                            <tr key={wi.id} class={wi.rowClass}>
                                 <td colspan="14" class="work-item-cell">
                                     <div class="wi-row">
                                         <article class="wi-card">
-                                            <span class="wi-rule" aria-hidden="true"></span>
                                             <div class="wi-content">
                                                 <div class="wi-top-row">
                                                     <span class="wi-customer">{wi.customerLabel}</span>

@@ -1,0 +1,273 @@
+/* Backdrop catches outside clicks without blocking the whole viewport */
+.cmp-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 8000;
+}
+
+/* Panel is fixed to the viewport — top/left are injected via inline style
+   from kpiCard.js using getBoundingClientRect() so the right edge of the
+   panel aligns with the right edge of the button, and it floats above all
+   cards without disturbing the card's layout or stacking context.
+   Width is also declared in kpiCard.js (KpiCard.PANEL_WIDTH) — keep in sync. */
+.cmp-panel {
+    position: fixed;
+    z-index: 8001;
+    width: 297px;
+    background: var(--slds-g-color-surface-container-1, #ffffff);
+    border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ── Sections ─────────────────────────────────────────────────────────── */
+
+.cmp-section {
+    padding: var(--slds-g-spacing-3, 0.75rem);
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.cmp-section-filters {
+    border-top: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.cmp-section-label {
+    margin: 0;
+    font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    line-height: 1.375;
+    color: var(--slds-g-color-on-surface-3, #001e5b);
+}
+
+/* ── Timeframe button group ───────────────────────────────────────────── */
+/* Styling handled entirely by lightning-button-group + lightning-button */
+
+/* ── Filters header ───────────────────────────────────────────────────── */
+
+.cmp-filters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cmp-clear-all {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    color: var(--slds-g-color-accent-2, #0250d9);
+}
+
+/* ── Active pills ─────────────────────────────────────────────────────── */
+
+.cmp-pills {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+}
+
+.cmp-pill-item {
+    display: inline-flex;
+}
+
+/* ── Grouped combobox row ─────────────────────────────────────────────── */
+
+.cmp-combobox-row {
+    display: flex;
+    align-items: stretch;
+    height: 32px;
+}
+
+/* Group picker — left half */
+.cmp-group-picker {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.cmp-group-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+    height: 32px;
+    padding: 0 var(--slds-g-spacing-2, 0.5rem);
+    background: var(--slds-g-color-surface-container-1, #ffffff);
+    border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-2, #5c5c5c);
+    border-right-width: 0;
+    border-radius: var(--slds-g-radius-border-2, 0.5rem) 0 0 var(--slds-g-radius-border-2, 0.5rem);
+    cursor: pointer;
+    font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    white-space: nowrap;
+}
+
+.cmp-group-btn-label {
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
+.cmp-group-dropdown {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    z-index: 8100;
+    min-width: 100%;
+    background: var(--slds-g-color-surface-container-1, #ffffff);
+    border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    list-style: none;
+    margin: 0;
+    padding: var(--slds-g-spacing-1, 0.25rem) 0;
+    max-height: 160px;
+    overflow-y: auto;
+}
+
+.cmp-group-option {
+    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+    font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    cursor: pointer;
+    white-space: nowrap;
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+}
+
+.cmp-group-option:hover {
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+.cmp-group-option--active {
+    color: var(--slds-g-color-accent-2, #0250d9);
+    font-weight: var(--slds-g-font-weight-6, 600);
+}
+
+/* Search input — right half */
+.cmp-search-wrap {
+    position: relative;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+}
+
+.cmp-search-input {
+    width: 100%;
+    height: 32px;
+    padding: 0 var(--slds-g-spacing-5, 1.5rem) 0 var(--slds-g-spacing-2, 0.5rem);
+    background: var(--slds-g-color-surface-container-1, #ffffff);
+    border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-2, #5c5c5c);
+    border-radius: 0 var(--slds-g-radius-border-2, 0.5rem) var(--slds-g-radius-border-2, 0.5rem) 0;
+    font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    box-sizing: border-box;
+}
+
+.cmp-search-input::placeholder {
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
+.cmp-search-input:focus {
+    outline: none;
+    border-color: var(--slds-g-color-accent-2, #0250d9);
+}
+
+.cmp-search-icon {
+    position: absolute;
+    right: var(--slds-g-spacing-2, 0.5rem);
+    pointer-events: none;
+}
+
+/* ── Filter value list ────────────────────────────────────────────────── */
+
+.cmp-filter-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.cmp-filter-item {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+    cursor: pointer;
+    font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+}
+
+.cmp-filter-item:hover {
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+.cmp-filter-item--selected {
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+}
+
+.cmp-check-placeholder {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+}
+
+.cmp-check-icon {
+    flex: 0 0 auto;
+    color: var(--slds-g-color-accent-2, #0250d9);
+}
+
+.cmp-item-label {
+    flex: 1 1 auto;
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────── */
+
+.cmp-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-3, 0.75rem);
+    gap: var(--slds-g-spacing-3, 0.75rem);
+}
+
+.cmp-empty-illustration {
+    width: 120px;
+    height: auto;
+}
+
+.cmp-empty-label {
+    margin: 0;
+    font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    text-align: center;
+    line-height: 1.4;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────── */
+
+.cmp-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+    border-top: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
+}

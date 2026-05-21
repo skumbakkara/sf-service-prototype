@@ -59,6 +59,26 @@
 
 .kc-menu {
     flex: 0 0 auto;
+    /* No position:relative needed — the panel uses position:fixed and is
+       placed via getBoundingClientRect(), not relative to this element. */
+}
+
+.kc-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: var(--slds-g-color-surface-container-1, #ffffff);
+    border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-2, #5c5c5c);
+    border-radius: var(--slds-g-radius-border-circle, 9999px);
+    cursor: pointer;
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+}
+
+.kc-menu-btn:hover {
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
 }
 
 .kc-chips {

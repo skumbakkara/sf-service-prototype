@@ -96,7 +96,12 @@
                             </div>
                         </div>
 
-                        <!-- Stats + search bar -->
+                        <!-- Stats + search bar. AI/Human quick-toggles sit
+                             alongside the search input as before — high-
+                             frequency filter, lives in the toolbar. The
+                             funnel icon opens the inline filter drawer
+                             inside the table card; its variant flips to
+                             `brand` while the drawer is open. -->
                         <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-horizontal_medium slds-p-bottom_small">
                             <p class="slds-text-body_small slds-text-color_weak">{inProgressCount} Work Items &bull; Live Updates</p>
                             <div class="slds-grid slds-grid_vertical-align-center ipt-controls">
@@ -124,19 +129,31 @@
                                     </lightning-button-icon>
                                 </lightning-button-group>
                                 <lightning-button-group>
-                                    <lightning-button-icon icon-name="utility:filterList" variant="border-filled" alternative-text="Filter" title="Filter"></lightning-button-icon>
+                                    <lightning-button-icon
+                                        icon-name="utility:filterList"
+                                        variant={filterPanelVariant}
+                                        alternative-text="Filter"
+                                        title="Filter"
+                                        onclick={handleToggleInProgressFilter}>
+                                    </lightning-button-icon>
                                     <lightning-button-menu icon-name="utility:down" variant="border-filled" alternative-text="More filter options" menu-alignment="right">
                                         <lightning-menu-item value="all" label="All work items"></lightning-menu-item>
                                         <lightning-menu-item value="flagged" label="Flagged only"></lightning-menu-item>
-                                        <lightning-menu-item value="agent" label="AI Agent only"></lightning-menu-item>
-                                        <lightning-menu-item value="human" label="Human only"></lightning-menu-item>
                                     </lightning-button-menu>
                                 </lightning-button-group>
                             </div>
                         </div>
 
-                        <!-- Table -->
-                        <ui-in-progress-table data={inProgressItems} hide-columns="status,priority"></ui-in-progress-table>
+                        <!-- Table — receives the (possibly AI/Human-filtered)
+                             list. The 6-facet drawer state + applied chips
+                             live inside the table component. `panelchange`
+                             tells the page when the drawer opens/closes so
+                             the funnel button can flip variant. -->
+                        <ui-in-progress-table
+                            data={inProgressItems}
+                            hide-columns="status,priority"
+                            onpanelchange={handleInProgressPanelChange}>
+                        </ui-in-progress-table>
 
                     </div>
                 </lightning-tab>

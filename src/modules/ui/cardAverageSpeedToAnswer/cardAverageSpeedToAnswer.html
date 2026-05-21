@@ -1,18 +1,15 @@
 <template>
-    <ui-kpi-card title="Average Speed to Answer" caption="Past 1 hour" menu-items={menuItems}>
-        <ui-kpi-value value="1m 18s">
-            <span slot="footer" class="casta-footer">
-                <span class="casta-num">+3%</span><span class="casta-label">&nbsp;period vs period</span>
-            </span>
-        </ui-kpi-value>
-        <ui-chart-line
+    <ui-kpi-card title="Average Speed to Answer" caption="Last 15m" filter-groups={filterGroups} show-timeframe>
+        <ui-kpi-value value="1m 18s"></ui-kpi-value>
+        <ui-chart-multi-line
             class="casta-chart"
             series={series}
-            band={band}
             y-labels={yLabels}
             x-labels={xLabels}
-            chart-height="120"
-            aria-label="Average speed to answer over the past hour">
-        </ui-chart-line>
+            y-axis-title="Avg Speed ↓"
+            x-axis-title="Minutes ↓"
+            chart-height="160"
+            aria-label="Average speed to answer by queue over the past 15 minutes">
+        </ui-chart-multi-line>
     </ui-kpi-card>
 </template>

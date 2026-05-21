@@ -30,19 +30,30 @@
             </div>
             <template if:true={hasMenu}>
                 <div class="kc-menu">
-                    <lightning-button-menu
-                        icon-name="utility:down"
-                        variant="border-filled"
-                        alternative-text="Card actions"
-                        menu-alignment="right">
-                        <template for:each={menuItems} for:item="item">
-                            <lightning-menu-item
-                                key={item.value}
-                                value={item.value}
-                                label={item.label}>
-                            </lightning-menu-item>
-                        </template>
-                    </lightning-button-menu>
+                    <button
+                        type="button"
+                        class="kc-menu-btn"
+                        aria-haspopup="dialog"
+                        aria-expanded={menuOpen}
+                        aria-label="Card settings"
+                        onclick={toggleMenu}>
+                        <lightning-icon
+                            icon-name="utility:down"
+                            size="xx-small"
+                            alternative-text="Card settings">
+                        </lightning-icon>
+                    </button>
+                    <template if:true={menuOpen}>
+                        <ui-card-menu-panel
+                            active-timeframe={activeTimeframe}
+                            filter-groups={filterGroups}
+                            selected-filters={selectedFilters}
+                            show-timeframe={showTimeframe}
+                            panel-style={panelStyle}
+                            onclose={closeMenu}
+                            onapply={handleApply}>
+                        </ui-card-menu-panel>
+                    </template>
                 </div>
             </template>
         </header>

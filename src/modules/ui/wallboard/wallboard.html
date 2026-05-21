@@ -28,22 +28,28 @@
             </div>
         </header>
 
-        <div class="wb-grid">
-            <ui-card-total-work-items class="wb-cell"></ui-card-total-work-items>
+        <!-- Row 1: 4 compact value cards (148px) -->
+        <div class="wb-grid wb-grid-row1">
             <ui-card-raised-flags class="wb-cell"></ui-card-raised-flags>
-            <ui-card-average-handle-time class="wb-cell"></ui-card-average-handle-time>
-            <!-- TODO Phase 2: Agent Capacity Status (horizontal bar) -->
-            <div class="wb-grid-placeholder"></div>
-            <ui-card-average-speed-to-answer class="wb-cell"></ui-card-average-speed-to-answer>
-            <ui-card-agent-presence class="wb-cell"></ui-card-agent-presence>
-            <!-- TODO Phase 2: Agent Capacity (vertical bar) -->
-            <div class="wb-grid-placeholder"></div>
-            <!-- TODO Phase 2: Average + Longest Wait Time (stacked compact value cards) -->
-            <div class="wb-grid-placeholder"></div>
-            <!-- TODO Phase 2: Agent Work Status (horizontal bar) -->
-            <div class="wb-grid-placeholder"></div>
-            <!-- TODO Phase 2: Agent Presence Statuses (large donut) -->
-            <div class="wb-grid-placeholder"></div>
+            <ui-card-sla-compliance class="wb-cell"></ui-card-sla-compliance>
+            <ui-card-longest-wait-time class="wb-cell"></ui-card-longest-wait-time>
+            <ui-card-average-wait-time class="wb-cell"></ui-card-average-wait-time>
+        </div>
+
+        <!-- Row 2: 2 chart cards (314px) — speed-to-answer spans left, work item status right -->
+        <div class="wb-grid wb-grid-row2">
+            <ui-card-average-speed-to-answer class="wb-cell wb-cell-span2"></ui-card-average-speed-to-answer>
+            <ui-card-work-item-status class="wb-cell wb-cell-span2"></ui-card-work-item-status>
+        </div>
+
+        <!-- Row 3: 3 chart cards (314px) — agent capacity, presence status, 2 stacked compact -->
+        <div class="wb-grid wb-grid-row3">
+            <ui-card-agent-capacity class="wb-cell"></ui-card-agent-capacity>
+            <ui-card-agent-presence-status class="wb-cell"></ui-card-agent-presence-status>
+            <div class="wb-cell wb-stacked-col">
+                <ui-card-average-active-work-time class="wb-cell wb-stacked-card"></ui-card-average-active-work-time>
+                <ui-card-after-conversation-time class="wb-cell wb-stacked-card"></ui-card-after-conversation-time>
+            </div>
         </div>
     </section>
 </template>

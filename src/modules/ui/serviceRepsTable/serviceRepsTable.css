@@ -312,31 +312,13 @@ th:hover .col-chevron { display: inline-flex; }
     box-shadow: none !important;
 }
 
-/* ── Work Items title row ──────────────────────────────────
-   Accordion fill #F9F9F9 sits one step lighter than
-   --slds-g-color-surface-2 (#f3f3f3); no SLDS hook represents
-   exactly #F9F9F9 so the literal is intentional. */
-.work-items-title-row {
-    background-color: #F9F9F9;
-}
-.work-items-title-cell {
-    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-1, 0.25rem) !important;
-    border-top: 0 !important;
-    border-bottom: 0 !important;
-}
-.work-items-title {
-    font-size: var(--slds-g-font-size-2, 0.75rem);
-    font-weight: var(--slds-g-font-weight-6, 600);
-    color: var(--slds-g-color-on-surface-3, #706e6b);
-    letter-spacing: 0.02em;
-    padding-left: 2.5rem;
-}
-
 /* ── Work item rows: grid aligned to table columns ────────
-   Same #F9F9F9 fill as the title row above so the accordion
-   reads as one continuous panel. */
+   Accordion fill is the SLDS 2 surface-1 token (light-dark(#fff, #242424)),
+   one step brighter than the rep-row_expanded fill above it (neutral-base-95
+   / #f3f3f3) so the open accordion reads as an elevated white panel sitting
+   inside the darker expanded parent row. */
 .work-item-row {
-    background-color: #F9F9F9;
+    background-color: var(--slds-g-color-surface-1, #ffffff);
 }
 .work-item-cell {
     /* No padding so the card fills the cell width; the card itself owns its
@@ -346,22 +328,92 @@ th:hover .col-chevron { display: inline-flex; }
     border-top: 0 !important;
     border-bottom: 0 !important;
 }
+/* 8px breathing room at the top and bottom of the entire accordion panel
+   (first card gets the top padding, last card gets the bottom). Cards in
+   between intentionally butt against each other so the panel reads as one
+   stack rather than a list of loose cards. */
+.work-item-row_first > .work-item-cell {
+    padding-top: var(--slds-g-spacing-2, 0.5rem) !important;
+}
+.work-item-row_last > .work-item-cell {
+    padding-bottom: var(--slds-g-spacing-2, 0.5rem) !important;
+    /* Anchor the bottom-edge shadow pseudo-element. The cell's box-shadow
+       was hosting the elevation earlier, but `--slds-g-shadow-1` (the value
+       behind `--slds-g-shadow-block-end-1`) carries a small upward-edge
+       layer that visibly bled across the last card. Painting the shadow on
+       a 1px pseudo-element pinned to the cell's bottom edge confines any
+       upward bleed to the 8px white padding strip below the last card,
+       keeping the cast strictly under the whole accordion. */
+    position: relative;
+}
+.work-item-row_last > .work-item-cell::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    pointer-events: none;
+    /* Drop shadow on the bottom border of the open accordion. SLDS 2
+       ships --slds-g-shadow-block-end-1 (block-end = downward variant of
+       elevation level 1, aliased to --slds-g-shadow-1) which maps 1:1 to
+       the Figma effect shadow/elevation/1-down. The fallback reproduces
+       the three-layer composition from slds2.cosmos.css with the
+       light-dark() rgba values flattened to their light-mode pairs so
+       the shadow still renders when the hook is unavailable. */
+    box-shadow: var(
+        --slds-g-shadow-block-end-1,
+        0 0 2px 0 rgba(0, 0, 0, 0.18),
+        0 2px 2px 0 rgba(0, 0, 0, 0.18),
+        0 -1px 2px 0 rgba(0, 0, 0, 0.10)
+    );
+}
+/* Defensive: work-item rows themselves never react to hover at the row
+   level — only the .wi-card inside reacts (brand-base-95 fill). Force
+   the surface-1 fill back on the hovered row even if a future ancestor
+   rule (or SLDS default) tries to tint it. */
+.work-item-row:hover,
+.work-item-row:hover > .work-item-cell {
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+}
+/* Pin border-color and clear box-shadow on the hovered work-item row AND
+   its next sibling row (typically the next rep-row). SLDS's default
+   `tbody tr:hover` paints a darker border on the hovered cell's bottom
+   AND on the next row's top — visible as a dark line below the last
+   work-item card. Background is intentionally NOT forced on the sibling
+   because the next row may be a rep-row (neutral-base-95 when expanded)
+   or another work-item-row (surface-1) — only the border/shadow bleed
+   needs neutralizing. This mirrors the .rep-row:hover + tr td/th rule
+   above. */
+.work-item-row:hover > .work-item-cell,
+.work-item-row:hover + tr > td,
+.work-item-row:hover + tr > th {
+    border-color: var(--slds-g-color-neutral-base-90, #e5e5e5) !important;
+    box-shadow: none !important;
+}
 /* ── Compact work-item card (Figma node 19738:44775) ───────────────────────
    Rendered inside each expanded `.work-item-row`. The card hugs content
-   width (multiple cards stack vertically per rep), sits 48px in from the
-   row's left edge to align under the rep name column, and exposes:
-     1. a 1×20 vertical rule on the left edge,
-     2. a content stack with two rows:
+   width (multiple cards stack vertically per rep), sits 56px in from the
+   row's left edge so the content column aligns under the rep name, and
+   exposes:
+     1. a content stack with two rows:
         - top:    "<customer> |" (semibold) + "<subject> | <case#>" (link)
         - bottom: channel icon · "Work load: N" · "Queue: <name>", separated
           by 4×4 gray dots,
-     3. an optional bordered priority button on the right when flagged.
+     2. an optional bordered priority button on the right when flagged
+        (also the only escalation indicator on the card now that the
+        left-edge rule has been removed).
    Typography mirrors ui-chart-donut's legend:
      base-row = font-scale-base (13px) / line-height-3 (1.375),
      meta-row = font-scale-neg-1 (12px). */
 .wi-row {
-    /* 48px indent matches Figma x=48 of the Card/work item frame. */
-    padding-left: var(--slds-g-spacing-7, 3rem);
+    /* 56px indent = 48px Figma indent + 8px additional nudge per design
+       refinement so the card sits clearly inside the rep row. Composed
+       from --slds-g-spacing-7 (3rem / 48px) + --slds-g-spacing-2
+       (0.5rem / 8px) since no single SLDS spacing hook represents 56px.
+       This value is held constant after the left-edge indicator rule
+       was removed — the card content shifts left into the space the
+       rule + gap used to occupy, intentional per design. */
+    padding-left: calc(var(--slds-g-spacing-7, 3rem) + var(--slds-g-spacing-2, 0.5rem));
     padding-right: var(--slds-g-spacing-4, 1rem);
 }
 .wi-card {
@@ -377,14 +429,6 @@ th:hover .col-chevron { display: inline-flex; }
     width: max-content;
     max-width: 100%;
     min-width: 0;
-}
-/* 1px × 20px vertical rule on the leading edge of every card. */
-.wi-rule {
-    display: inline-block;
-    flex-shrink: 0;
-    width: var(--slds-g-sizing-border-1, 1px);
-    height: var(--slds-g-sizing-5, 1.25rem);
-    background-color: var(--slds-g-color-border-1, #c9c9c9);
 }
 .wi-content {
     display: flex;
@@ -426,6 +470,25 @@ th:hover .col-chevron { display: inline-flex; }
 }
 .wi-summary-link:hover,
 .wi-summary-link:focus { text-decoration: underline; }
+/* Hover state per Figma node 19738:44775. The Figma frame fills the
+   card with the SLDS 2 token color/brand-base/95 (Electric Blue 95 in
+   light mode, Electric Blue 5 in dark beta). That token has not been
+   promoted to a CSS custom property by @salesforce-ux/design-system-2
+   yet, so the fallback hex (#edf4ff) is what paints today; once the
+   upstream hook lands, the var() call will pick it up automatically.
+   Radius and inner padding mirror the Figma frame (rounded-8 / p-8).
+   The 8px padding is offset with equal negative margin so the fill
+   appears to grow around the rule and flag button without nudging
+   any sibling element's resting position. Text colors are unchanged
+   from base — verified against the same Figma hover spec. */
+.wi-card:hover {
+    background-color: var(--slds-g-color-brand-base-95, #edf4ff);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+    padding-left: var(--slds-g-spacing-2, 0.5rem);
+    padding-right: var(--slds-g-spacing-2, 0.5rem);
+    margin-left: calc(var(--slds-g-spacing-2, 0.5rem) * -1);
+    margin-right: calc(var(--slds-g-spacing-2, 0.5rem) * -1);
+}
 .wi-meta-row {
     display: flex;
     align-items: center;

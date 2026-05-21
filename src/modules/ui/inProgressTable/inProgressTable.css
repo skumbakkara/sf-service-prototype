@@ -2,16 +2,127 @@
     display: block;
 }
 
+/* ── Applied-filter chip row ─────────────────────────────────────────────
+   Sits above the scroll-container. Wraps on overflow so a heavy filter set
+   never pushes the table off the page. Mirrors Figma stages 3-4. */
+.ipt-chiprow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem);
+    border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    background-color: var(--slds-g-color-surface-container-1, #fafafa);
+}
+.ipt-chiprow__count {
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    font-weight: var(--slds-g-font-weight-6, 600);
+}
+.ipt-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+    padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-2, 0.5rem);
+    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-radius: var(--slds-g-radius-border-3, 999px);
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    color: var(--slds-g-color-on-surface-2, #181818);
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    /* No SLDS hook matches the desired chip cap-width; documented literal. */
+    max-width: 13.75rem;
+}
+.ipt-chip__label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.ipt-chip__remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--slds-g-sizing-5, 1rem);
+    height: var(--slds-g-sizing-5, 1rem);
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    border-radius: var(--slds-g-radius-border-3, 999px);
+    flex-shrink: 0;
+}
+.ipt-chip__remove:hover {
+    background-color: var(--slds-g-color-neutral-base-90, #e5e5e5);
+}
+.ipt-chip__remove:focus-visible {
+    outline: 2px solid var(--slds-g-color-accent-2, #0250d9);
+    outline-offset: 1px;
+}
+.ipt-chip__remove-icon {
+    --slds-c-icon-color-foreground:        var(--slds-g-color-on-surface-1, #5c5c5c);
+    --slds-c-icon-color-foreground-default:var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+.ipt-chiprow__clear {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    padding: 0 var(--slds-g-spacing-2, 0.5rem);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    color: var(--slds-g-color-accent-2, #0250d9);
+}
+.ipt-chiprow__clear:hover { text-decoration: underline; }
+.ipt-chiprow__clear:focus-visible {
+    outline: 2px solid var(--slds-g-color-accent-2, #0250d9);
+    outline-offset: 2px;
+    border-radius: var(--slds-g-radius-border-1, 0.25rem);
+}
+
+/* Shell: holds the table area and the optional inline filter drawer in a
+   flex row. When the drawer is closed the table area fills the full width;
+   when open the drawer claims a fixed flex-basis column on the right and
+   the table area shrinks (its horizontal scroll handles overflow).
+   `min-height: 0` is required so the table-container's own overflow
+   continues to work inside this flex container. */
+.ipt-shell {
+    display: flex;
+    align-items: stretch;
+    min-height: 0;
+}
+
 /* Scroll-container for the table:
    - overflow-x preserves the existing horizontal scroll for wide content
    - overflow-y + max-height bounds the vertical extent so the body of the
      table scrolls (rather than the whole page) — required for both the
-     sticky thead and the infinite-scroll handler in inProgressTable.js. */
+     sticky thead and the infinite-scroll handler in inProgressTable.js.
+   - flex sizing lets the panel sibling claim its own column when open. */
 .ipt-container {
+    flex: 1 1 auto;
+    min-width: 0;
     overflow-x: auto;
     overflow-y: auto;
     max-height: 60vh;
     padding: 0 var(--slds-g-spacing-4, 1rem);
+}
+
+/* Inline filter drawer column. Width tuned to the new Figma mock — wide
+   enough for the longest facet label + summary on one line, narrow enough
+   that the table keeps the majority of the card width. */
+.ipt-filter-panel {
+    flex: 0 0 18rem;
+    min-width: 0;
+    /* Match the table container's vertical bounds so the drawer and the
+       table scroll independently inside the same card row. */
+    max-height: 60vh;
+    overflow: hidden;
+}
+
+/* When the drawer is open we trim the table-container's right padding so
+   the drawer butts up against the card edge with only its own border-left
+   acting as the visual divider (matches the new mock). */
+.ipt-shell_panel-open .ipt-container {
+    padding-right: 0;
 }
 
 /* ── Table borders ───────────────────────────────────────────── */

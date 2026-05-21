@@ -1,0 +1,185 @@
+/* In-Progress filter inline drawer.
+   ─────────────────────────────────────────────────────────────────────────
+   Lives INSIDE the In-Progress card, parallel to the table area. No fixed
+   positioning, no backdrop, no z-index stacking. The parent flex container
+   (.ipt-shell in ui-in-progress-table) sizes this column via flex-basis;
+   the panel itself just fills the space it's given. */
+
+:host {
+    /* Fill the flex slot the parent reserved for us. The parent decides the
+       width (e.g. flex: 0 0 18rem); we just need to be a block that fills
+       the height of its row so the divider runs edge-to-edge. */
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    /* Faint vertical divider separating the panel from the table area.
+       Same hook the rest of the card uses for borders. */
+    border-left: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    color: var(--slds-g-color-on-surface-2, #181818);
+}
+
+.fp {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────── */
+.fp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
+}
+
+.fp-title {
+    margin: 0;
+    font-size: var(--slds-g-font-scale-base, 0.875rem);
+    font-weight: var(--slds-g-font-weight-7, 700);
+    color: var(--slds-g-color-on-surface-2, #181818);
+}
+
+.fp-close {
+    display: inline-flex;
+    align-items: center;
+}
+
+/* ── Body (scrollable facet list) ───────────────────────────────────────── */
+.fp-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 0 var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+}
+
+/* ── Facet row ──────────────────────────────────────────────────────────── */
+.fp-facet {
+    border-radius: var(--slds-g-radius-border-1, 0.25rem);
+}
+.fp-facet + .fp-facet {
+    /* Visual gap matches the new mock: rows are spaced, not separated by
+       full-bleed dividers (the previous overlay design used borders). */
+    margin-top: var(--slds-g-spacing-1, 0.25rem);
+}
+.fp-facet_expanded {
+    background-color: var(--slds-g-color-surface-container-1, #fafafa);
+}
+
+.fp-facet__row {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    color: inherit;
+    font-family: inherit;
+    border-radius: var(--slds-g-radius-border-1, 0.25rem);
+}
+.fp-facet__row:hover {
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+.fp-facet__row:focus-visible {
+    outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-accent-2, #0250d9);
+    outline-offset: -2px;
+}
+
+.fp-facet__label {
+    font-size: var(--slds-g-font-scale-base, 0.875rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    color: var(--slds-g-color-on-surface-2, #181818);
+    line-height: var(--slds-g-font-lineheight-base, 1.25);
+}
+.fp-facet__summary {
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    line-height: var(--slds-g-font-lineheight-2, 1.375);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+/* When a facet has an applied selection, tint the summary line brand-blue
+   so the user can scan the rail and spot which rows are filtering. */
+.fp-facet_has-selection .fp-facet__summary {
+    color: var(--slds-g-color-accent-2, #0250d9);
+    font-weight: var(--slds-g-font-weight-6, 600);
+}
+
+/* ── Facet body (expanded) ──────────────────────────────────────────────── */
+.fp-facet__body {
+    padding: 0 var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-3, 0.75rem);
+}
+
+.fp-facet__search {
+    margin-bottom: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.fp-facet__empty {
+    margin: 0;
+    padding: var(--slds-g-spacing-2, 0.5rem) 0;
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
+.fp-facet__options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: var(--slds-g-sizing-14, 15rem);
+    overflow-y: auto;
+}
+.fp-facet__option {
+    padding: var(--slds-g-spacing-1, 0.25rem) 0;
+}
+
+.fp-facet__actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var(--slds-g-spacing-1, 0.25rem);
+}
+
+.fp-facet__clear-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    color: var(--slds-g-color-accent-2, #0250d9);
+}
+.fp-facet__clear-btn:hover { text-decoration: underline; }
+.fp-facet__clear-btn:focus-visible {
+    outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-accent-2, #0250d9);
+    outline-offset: 2px;
+    border-radius: var(--slds-g-radius-border-1, 0.25rem);
+}
+
+/* ── Reset-all (bottom of panel) ────────────────────────────────────────── */
+.fp-reset {
+    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-3, 0.75rem) 0;
+    display: flex;
+    justify-content: flex-start;
+}
+.fp-reset__btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    color: var(--slds-g-color-accent-2, #0250d9);
+}
+.fp-reset__btn:hover { text-decoration: underline; }
+.fp-reset__btn:focus-visible {
+    outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-accent-2, #0250d9);
+    outline-offset: 2px;
+    border-radius: var(--slds-g-radius-border-1, 0.25rem);
+}

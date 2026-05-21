@@ -1,4 +1,44 @@
 <template>
+    <!-- Applied-filters chip row. Sits above the scrollable table container
+         so it doesn't scroll horizontally with wide data; matches Figma
+         stages 3-4 of the filter flow. Renders only when ≥1 filter is set. -->
+    <template if:true={hasFilterChips}>
+        <div class="ipt-chiprow">
+            <span class="ipt-chiprow__count">{filterCountLabel}</span>
+            <template for:each={filterChips} for:item="chip">
+                <span key={chip.id} class="ipt-chip">
+                    <span class="ipt-chip__label">{chip.label}</span>
+                    <button
+                        type="button"
+                        class="ipt-chip__remove"
+                        data-facet={chip.id}
+                        title={chip.clearTitle}
+                        aria-label={chip.clearTitle}
+                        onclick={handleChipRemove}>
+                        <lightning-icon
+                            icon-name="utility:close"
+                            size="xx-small"
+                            alternative-text=""
+                            class="ipt-chip__remove-icon">
+                        </lightning-icon>
+                    </button>
+                </span>
+            </template>
+            <button
+                type="button"
+                class="ipt-chiprow__clear"
+                onclick={handleClearAllChips}>
+                Clear all
+            </button>
+        </div>
+    </template>
+
+    <!-- ipt-shell wraps the (narrower) table area and the optional inline
+         filter drawer in a flex row. When the panel is closed, the table
+         area fills the full width. When open, the drawer takes a fixed
+         flex-basis column on the right and the table area shrinks (its
+         horizontal scroll handles any overflow). -->
+    <div class={shellClass}>
     <div class="ipt-container">
         <table class="slds-table slds-table_bordered slds-table_col-bordered">
             <thead>
@@ -160,5 +200,16 @@
                 </template>
             </tbody>
         </table>
+    </div>
+
+        <template if:true={filterPanelOpen}>
+            <ui-in-progress-filter-panel
+                class="ipt-filter-panel"
+                items={data}
+                applied-filters={appliedFilters}
+                onapply={handleFilterPanelApply}
+                onclose={handleFilterPanelClose}>
+            </ui-in-progress-filter-panel>
+        </template>
     </div>
 </template>

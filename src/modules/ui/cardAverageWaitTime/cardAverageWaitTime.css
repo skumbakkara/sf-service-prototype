@@ -1,0 +1,20 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
+.cawt-footer {
+    display: inline;
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    line-height: 1.4167;
+}
+
+.cawt-num {
+    color: var(--slds-g-color-palette-red-40, #ba0517);
+    font-weight: var(--slds-g-font-weight-6, 600);
+}
+
+.cawt-label {
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    font-weight: var(--slds-g-font-weight-4, 400);
+}

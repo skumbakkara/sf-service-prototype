@@ -1,10 +1,10 @@
-/* Row heights are pinned to the Figma frame (node 19712:40017): the compact
-   value-card row is 148px tall and the chart rows are 312px. SLDS does not
-   ship a sizing hook that matches these exact values, so they are declared
-   here as component-scoped custom properties with the unit value inline. */
+/* Row heights are pinned to the Figma frame (node 67:122933):
+   compact value-card row is 148px tall; chart rows are 314px.
+   SLDS does not ship sizing hooks for these exact values, so they are
+   declared here as component-scoped custom properties. */
 :host {
     --wb-row-short: 148px;
-    --wb-row-tall: 312px;
+    --wb-row-tall: 314px;
     display: block;
 }
 
@@ -14,15 +14,16 @@
     padding-left: var(--slds-g-spacing-4, 1rem);
 }
 
-/* Header owns its own top padding (24px = --slds-g-spacing-5) so the
-   measurable gap from the tab-content edge to the title text is exactly
-   24px. .wb-root contributes 0 above the header to avoid double-padding. */
+/* Header top padding is exactly 24px per spec. The outer tab wrapper adds
+   its own margin-top, so we use a negative top margin to cancel it and keep
+   the total gap from the tab edge to the title text at exactly 24px. */
 .wb-page-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-top: var(--slds-g-spacing-5, 1.5rem);
+    padding-top: 24px;
     padding-bottom: var(--slds-g-spacing-4, 1rem);
+    margin-top: calc(-1 * var(--slds-g-spacing-4, 1rem)); /* cancel slds-m-top_medium from the tab wrapper */
 }
 
 .wb-page-header-left {
@@ -31,11 +32,9 @@
     gap: var(--slds-g-spacing-3, 0.75rem);
 }
 
-/* SLDS 2 Figma typography style "Titles/font-scale-5/Regular":
-   font-family-base + font-scale-5 (28px) + font-weight-4 (regular)
-   + line-height-2 (1.25 → 35px on 28px). Title color uses on-surface-3
-   (deep navy / link-blue in light mode, light blue in dark mode) per Figma
-   page-header spec for the wallboard frame (node 19712:40028). */
+/* SLDS 2 token: Titles/font-scale-5/Regular + Shade/on-surface/3
+   font-family-base, font-scale-5 (28px), font-weight-4 (regular),
+   line-height-2 (1.25), color on-surface-3 (#001e5b in shade mode). */
 .wb-page-title {
     margin: 0;
     font-family: var(--slds-g-font-family-base, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
@@ -43,14 +42,32 @@
     font-weight: var(--slds-g-font-weight-4, 400);
     line-height: var(--slds-g-font-line-height-2, 1.25);
     letter-spacing: 0;
-    color: var(--slds-g-color-on-surface-3, #03234d);
+    color: var(--slds-g-color-on-surface-3, #001e5b);
 }
 
+/* Shared grid base */
 .wb-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: var(--wb-row-short) repeat(3, var(--wb-row-tall));
     gap: var(--slds-g-spacing-3, 0.75rem);
+    margin-bottom: var(--slds-g-spacing-3, 0.75rem);
+}
+
+/* Row 1: 4 equal compact cards */
+.wb-grid-row1 {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: var(--wb-row-short);
+}
+
+/* Row 2: speed-to-answer spans left half, work item status spans right half */
+.wb-grid-row2 {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: var(--wb-row-tall);
+}
+
+/* Row 3: 3 equal chart cells */
+.wb-grid-row3 {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: var(--wb-row-tall);
 }
 
 .wb-cell {
@@ -58,8 +75,20 @@
     min-width: 0;
 }
 
-.wb-grid-placeholder {
-    /* Intentionally empty: Phase 2 will replace each placeholder with a card
-       component. No border, no fill so the spacing of the rendered cards
-       remains visually correct against the Figma reference. */
+/* Span 2 columns in a 4-col grid */
+.wb-cell-span2 {
+    grid-column: span 2;
+}
+
+/* Stacked column: two compact cards filling the tall row */
+.wb-stacked-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-3, 0.75rem);
+    height: var(--wb-row-tall);
+}
+
+.wb-stacked-card {
+    flex: 1 1 0;
+    min-height: 0;
 }
