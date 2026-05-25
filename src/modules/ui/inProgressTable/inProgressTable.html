@@ -1,38 +1,4 @@
 <template>
-    <!-- Applied-filters chip row. Sits above the scrollable table container
-         so it doesn't scroll horizontally with wide data; matches Figma
-         stages 3-4 of the filter flow. Renders only when ≥1 filter is set. -->
-    <template if:true={hasFilterChips}>
-        <div class="ipt-chiprow">
-            <span class="ipt-chiprow__count">{filterCountLabel}</span>
-            <template for:each={filterChips} for:item="chip">
-                <span key={chip.id} class="ipt-chip">
-                    <span class="ipt-chip__label">{chip.label}</span>
-                    <button
-                        type="button"
-                        class="ipt-chip__remove"
-                        data-facet={chip.id}
-                        title={chip.clearTitle}
-                        aria-label={chip.clearTitle}
-                        onclick={handleChipRemove}>
-                        <lightning-icon
-                            icon-name="utility:close"
-                            size="xx-small"
-                            alternative-text=""
-                            class="ipt-chip__remove-icon">
-                        </lightning-icon>
-                    </button>
-                </span>
-            </template>
-            <button
-                type="button"
-                class="ipt-chiprow__clear"
-                onclick={handleClearAllChips}>
-                Clear all
-            </button>
-        </div>
-    </template>
-
     <!-- ipt-shell wraps the (narrower) table area and the optional inline
          filter drawer in a flex row. When the panel is closed, the table
          area fills the full width. When open, the drawer takes a fixed
@@ -123,22 +89,49 @@
                                 </div>
                             </td>
                         </template>
-                        <!-- Flag -->
+                        <!-- Flag: icon trigger + SLDS 2 popover with the latest
+                             whisper from the rep and a "Lower Flag" action. The
+                             trigger and popover are wrapped in a position:relative
+                             anchor so the popover sits directly below the button. -->
                         <template if:true={showFlag}>
                             <td class="slds-text-align_left ipt-flag-td">
                                 <template if:true={row.hasFlag}>
-                                    <lightning-button-menu
-                                        icon-name="utility:priority"
-                                        icon-size="medium"
-                                        variant="border-filled"
-                                        alternative-text="Flag actions"
-                                        title="Flag actions"
-                                        menu-alignment="right"
-                                        class="ipt-flag-button">
-                                        <lightning-menu-item value="resolve"  label="Resolve flag"></lightning-menu-item>
-                                        <lightning-menu-item value="reassign" label="Reassign work"></lightning-menu-item>
-                                        <lightning-menu-item value="escalate" label="Escalate"></lightning-menu-item>
-                                    </lightning-button-menu>
+                                    <div class="ipt-flag-wrap">
+                                        <!-- lightning-button-menu gives us the
+                                             flag icon + native down chevron in
+                                             a single LBC trigger. We slot our
+                                             custom SLDS 2 popover content
+                                             inside its dropdown (CSS in this
+                                             component overrides the default
+                                             slds-dropdown__list look so the
+                                             slot reads as the popover from
+                                             Figma 19427-55644). -->
+                                        <lightning-button-menu
+                                            icon-name="utility:priority"
+                                            icon-size="medium"
+                                            variant="border-filled"
+                                            alternative-text="Flag actions"
+                                            title="Flag actions"
+                                            menu-alignment="left"
+                                            class="ipt-flag-button">
+                                            <div class="ipt-flag-popover" role="dialog" aria-labelledby={row.flagPopoverTitleId}>
+                                                <div class="ipt-flag-popover__body">
+                                                    <p class="ipt-flag-popover__title" id={row.flagPopoverTitleId}>{row.flagWhisperTitle}</p>
+                                                    <p class="ipt-flag-popover__text">{row.flagWhisperBody}</p>
+                                                </div>
+                                                <footer class="ipt-flag-popover__footer">
+                                                    <lightning-button
+                                                        variant="neutral"
+                                                        icon-name="utility:lower_flag"
+                                                        icon-position="left"
+                                                        label="Lower Flag"
+                                                        data-id={row.id}
+                                                        onclick={handleLowerFlag}>
+                                                    </lightning-button>
+                                                </footer>
+                                            </div>
+                                        </lightning-button-menu>
+                                    </div>
                                 </template>
                             </td>
                         </template>

@@ -30,11 +30,15 @@
     font-size: var(--slds-g-font-scale-base, 0.8125rem);
     font-weight: var(--slds-g-font-weight-6, 600);
     color: var(--slds-g-color-on-surface-2, #2e2e2e);
-    /* height matches one tick row so labels stay aligned with bars */
-    height: 1.625rem;
-    display: flex;
-    align-items: flex-end;
     white-space: nowrap;
+    padding-bottom: var(--slds-g-spacing-1, 0.25rem);
+}
+
+/* Spacer in the label column matching the tick row height so row labels stay
+   vertically aligned with the bar tracks above the tick row */
+.cb-tick-spacer {
+    height: 1.625rem;
+    flex-shrink: 0;
 }
 
 .cb-row-label {
@@ -58,13 +62,14 @@
     position: relative;
 }
 
-/* Tick labels sit above the bars, evenly distributed */
+/* Tick labels sit below the bars, evenly distributed */
 .cb-tick-row {
     display: flex;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: flex-start;
     height: 1.625rem;
-    border-bottom: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
+    border-top: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
+    padding-top: var(--slds-g-spacing-1, 0.25rem);
 }
 
 .cb-tick {

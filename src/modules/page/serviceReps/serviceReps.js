@@ -103,11 +103,19 @@ export default class ServiceReps extends LightningElement {
     @track aiFilterActive    = false;
     @track humanFilterActive = false;
 
-    // Mirror of the table's inline-drawer open state. Updated via the
-    // `panelchange` event the table dispatches on open / close. Drives
-    // the funnel button's brand variant so the user sees a visual hint
-    // that the drawer is open (matches the new mock).
+    // Mirror of the table's inline-drawer open state.
     @track inProgressFilterOpen = false;
+
+    // Chip array mirrored from the table via `filterchange` events.
+    @track inProgressFilterChips = [];
+    // Number of chips that fit before the 100px gap; computed in renderedCallback.
+    @track _visibleChipCount = 999;
+
+    get hasInProgressFilterChips() { return this.inProgressFilterChips.length > 0; }
+    get visibleChips()    { return this.inProgressFilterChips.slice(0, this._visibleChipCount); }
+    get overflowCount()   { return Math.max(0, this.inProgressFilterChips.length - this._visibleChipCount); }
+    get hasOverflowChips(){ return this.overflowCount > 0; }
+    get overflowLabel()   { return `+${this.overflowCount} more`; }
 
     // Source list, optionally narrowed by the AI/Human quick-toggles. The
     // table further narrows by its own multi-facet drawer state and search.
@@ -265,11 +273,71 @@ export default class ServiceReps extends LightningElement {
         table?.toggleFilterPanel?.();
     }
 
-    // The table dispatches `panelchange` whenever its drawer opens or closes
-    // (via the toolbar button, the drawer's X icon, or programmatic API).
-    // We mirror that into a local `@track` so the funnel button variant can
-    // reflect the state.
     handleInProgressPanelChange(event) {
         this.inProgressFilterOpen = !!event.detail?.open;
+    }
+
+    handleInProgressFilterChange(event) {
+        this.inProgressFilterChips = event.detail?.chips ?? [];
+        // Reset to show all so renderedCallback can re-measure.
+        this._visibleChipCount = 999;
+    }
+
+    // lightning-pill fires onremove with event.detail.item.name = the pill's name attr.
+    handleChipRemove(event) {
+        const id = event.detail?.item?.name ?? event.currentTarget?.dataset?.facet;
+        if (!id) return;
+        const table = this.template.querySelector('ui-in-progress-table');
+        table?.clearFacet?.(id);
+    }
+
+    handleChipClearAll() {
+        const table = this.template.querySelector('ui-in-progress-table');
+        table?.clearAllFilters?.();
+    }
+
+    renderedCallback() {
+        // Use rAF to measure after paint so pill widths are finalised.
+        // _measureScheduled prevents stacking multiple rAF calls per render.
+        if (this._measureScheduled) return;
+        this._measureScheduled = true;
+        requestAnimationFrame(() => {
+            this._measureScheduled = false;
+            this._measureChipOverflow();
+        });
+    }
+
+    _measureChipOverflow() {
+        if (!this.hasInProgressFilterChips) return;
+        const left = this.template.querySelector('.ipt-toolbar-left');
+        const controls = this.template.querySelector('.ipt-controls');
+        if (!left || !controls) return;
+
+        const leftRect = left.getBoundingClientRect();
+        const controlsRect = controls.getBoundingClientRect();
+        // Available width = space between the left section and the controls,
+        // minus 100px clearance required by the spec.
+        const available = controlsRect.left - leftRect.left - 100;
+
+        const countEl = this.template.querySelector('.ipt-toolbar-count');
+        let usedWidth = countEl ? countEl.getBoundingClientRect().width + 4 : 0;
+
+        const pills = this.template.querySelectorAll('.ipt-pill');
+        let fits = 0;
+        for (let i = 0; i < pills.length; i++) {
+            const w = pills[i].getBoundingClientRect().width + 4; // 4px gap
+            if (usedWidth + w <= available) {
+                usedWidth += w;
+                fits = i + 1;
+            } else {
+                break;
+            }
+        }
+
+        const total = this.inProgressFilterChips.length;
+        const next = fits < total ? fits : total;
+        if (next !== this._visibleChipCount) {
+            this._visibleChipCount = next;
+        }
     }
 }

@@ -7,20 +7,21 @@
                 <template for:each={computedRows} for:item="row">
                     <div key={row.id} class="cb-row-label">{row.label}</div>
                 </template>
+                <div class="cb-tick-spacer" aria-hidden="true"></div>
             </div>
 
             <!-- Bar + tick column -->
             <div class="cb-bars-col">
-                <div class="cb-tick-row" aria-hidden="true">
-                    <template for:each={computedTicks} for:item="tick">
-                        <span key={tick.id} class="cb-tick">{tick.label}</span>
-                    </template>
-                </div>
                 <template for:each={computedRows} for:item="row">
                     <div key={row.id} class="cb-bar-track">
                         <div class="cb-bar" style={row.barStyle}></div>
                     </div>
                 </template>
+                <div class="cb-tick-row" aria-hidden="true">
+                    <template for:each={computedTicks} for:item="tick">
+                        <span key={tick.id} class="cb-tick">{tick.label}</span>
+                    </template>
+                </div>
                 <template if:true={hasColAxisLabel}>
                     <div class="cb-col-axis-label" aria-hidden="true">{colAxisLabel}</div>
                 </template>

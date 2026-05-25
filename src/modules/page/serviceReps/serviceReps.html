@@ -96,14 +96,28 @@
                             </div>
                         </div>
 
-                        <!-- Stats + search bar. AI/Human quick-toggles sit
-                             alongside the search input as before — high-
-                             frequency filter, lives in the toolbar. The
-                             funnel icon opens the inline filter drawer
-                             inside the table card; its variant flips to
-                             `brand` while the drawer is open. -->
-                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-horizontal_medium slds-p-bottom_small">
-                            <p class="slds-text-body_small slds-text-color_weak">{inProgressCount} Work Items &bull; Live Updates</p>
+                        <!-- Stats row + filter chips + controls. The chips
+                             sit inline with the count/live-updates text so
+                             they don't push the table down. -->
+                        <div class="slds-grid slds-grid_vertical-align-center slds-p-horizontal_medium slds-p-bottom_small ipt-toolbar-row">
+                            <div class="slds-grid slds-grid_vertical-align-center ipt-toolbar-left">
+                                <p class="slds-text-body_small slds-text-color_weak ipt-toolbar-count">{inProgressCount} Work Items &bull; Live Updates</p>
+                                <template if:true={hasInProgressFilterChips}>
+                                    <template for:each={visibleChips} for:item="chip">
+                                        <lightning-pill
+                                            key={chip.id}
+                                            label={chip.label}
+                                            name={chip.id}
+                                            data-facet={chip.id}
+                                            class="ipt-pill"
+                                            onremove={handleChipRemove}>
+                                        </lightning-pill>
+                                    </template>
+                                    <template if:true={hasOverflowChips}>
+                                        <span class="ipt-pill-overflow">{overflowLabel}</span>
+                                    </template>
+                                </template>
+                            </div>
                             <div class="slds-grid slds-grid_vertical-align-center ipt-controls">
                                 <lightning-input
                                     type="search"
@@ -152,7 +166,8 @@
                         <ui-in-progress-table
                             data={inProgressItems}
                             hide-columns="status,priority"
-                            onpanelchange={handleInProgressPanelChange}>
+                            onpanelchange={handleInProgressPanelChange}
+                            onfilterchange={handleInProgressFilterChange}>
                         </ui-in-progress-table>
 
                     </div>

@@ -71,17 +71,39 @@
 
 /* ── Active pills ─────────────────────────────────────────────────────── */
 
+.cmp-pills-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+    min-width: 0;
+}
+
 .cmp-pills {
     list-style: none;
     margin: 0;
     padding: 0;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: var(--slds-g-spacing-1, 0.25rem);
 }
 
 .cmp-pill-item {
-    display: inline-flex;
+    display: block;
+    min-width: 0;
+    /* Pills fill the container width so labels truncate rather than overflow */
+    max-width: 100%;
+}
+
+/* lightning-pill truncates internally; cap pill to full panel width */
+.cmp-pill-item lightning-pill {
+    max-width: 100%;
+}
+
+.cmp-pills-overflow {
+    font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    color: var(--slds-g-color-accent-2, #0250d9);
 }
 
 /* ── Grouped combobox row ─────────────────────────────────────────────── */

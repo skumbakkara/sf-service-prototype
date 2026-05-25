@@ -89,6 +89,15 @@ const COLUMN_DEFS = [
 // is appended.
 const SCROLL_THRESHOLD_PX = 120;
 
+// Default copy for the flag popover. The Figma spec for the flagged-work
+// popover (node 19427:55644) shows a "Latest Whisper from Rep" title with a
+// short note body and a "Lower Flag" action. For this prototype the same
+// text is shown for every flagged row; varied per-row whispers can be
+// added later by attaching `flagWhisperTitle` / `flagWhisperBody` to the
+// source items in serviceReps.js.
+const FLAG_WHISPER_TITLE_DEFAULT = 'Latest Whisper from Rep';
+const FLAG_WHISPER_BODY_DEFAULT  = 'Help needed with this case';
+
 export default class InProgressTable extends LightningElement {
     _data = [];
     _pageCount = 0;        // # of extra cloned pages appended after the seed
@@ -198,12 +207,10 @@ export default class InProgressTable extends LightningElement {
         return true;
     }
 
-    // ── Filter chip row (above the table) ──────────────────────────────────
-    // One chip per facet that has at least one selected value. Chip label is
-    // "Facet: First Value +Nmore" so the toolbar fits a lot of state in a
-    // narrow space — matches Figma stages 3-4. Each chip dispatches a single
-    // facet-clear when X'd; the panel's draft state will pick up the change
-    // the next time it opens.
+    // ── Filter chip row (toolbar row in the parent page) ───────────────────
+    // Exposed as @api so the parent page can render chips inline with the
+    // "N Work Items • Live Updates" row. Each chip maps to one active facet.
+    @api
     get filterChips() {
         const chips = [];
         const f = this._appliedFilters;
@@ -219,10 +226,27 @@ export default class InProgressTable extends LightningElement {
         return chips;
     }
 
-    get hasFilterChips()   { return this.filterChips.length > 0; }
-    get filterCountLabel() {
+    @api get hasFilterChips()   { return this.filterChips.length > 0; }
+    @api get filterCountLabel() {
         const n = this.filterChips.length;
         return `${n} ${n === 1 ? 'filter' : 'filters'} applied`;
+    }
+
+    @api
+    clearFacet(id) {
+        if (!id) return;
+        this._appliedFilters = { ...this._appliedFilters, [id]: [] };
+        this._pageCount = 0;
+        this.selectedIds = new Set();
+        this._fireFilterChange();
+    }
+
+    @api
+    clearAllFilters() {
+        this._appliedFilters = emptyFilters();
+        this._pageCount = 0;
+        this.selectedIds = new Set();
+        this._fireFilterChange();
     }
 
     _chipValueText(id, values) {
@@ -299,8 +323,9 @@ export default class InProgressTable extends LightningElement {
             if (item.caseNumber)     detailsParts.push(String(item.caseNumber));
             if (statusCfg?.label)    detailsParts.push(statusCfg.label);
             if (priorityCfg?.label)  detailsParts.push(`${priorityCfg.label} Priority`);
+            const rowId = String(item.id);
             return {
-                id: String(item.id),
+                id: rowId,
                 channelIcon: CHANNEL_ICONS[item.channel] ?? 'utility:record',
                 channelLabel: CHANNEL_LABELS[item.channel] ?? item.channel,
                 subject: item.subject,
@@ -324,6 +349,15 @@ export default class InProgressTable extends LightningElement {
                 routeByIcon: item.routeByIcon
                     || (item.routeBy === 'Direct to Agent' ? 'utility:forward' : null),
                 hasFlag: item.hasFlag,
+                // Flag popover title id is unique per row so the dialog can
+                // be labelled by it. lightning-button-menu manages its own
+                // open/close state — the CSS `:has(button[aria-expanded="true"])`
+                // selector on `.ipt-flag-td` handles the stacking-context lift
+                // automatically when the dropdown opens, so no row-level
+                // open/closed flag is tracked in JS.
+                flagPopoverTitleId: `ipt-flag-popover-title-${rowId}`,
+                flagWhisperTitle: item.flagWhisperTitle || FLAG_WHISPER_TITLE_DEFAULT,
+                flagWhisperBody:  item.flagWhisperBody  || FLAG_WHISPER_BODY_DEFAULT,
                 sentimentIcon: sentimentCfg.icon,
                 sentimentLabel: sentimentCfg.label,
                 sentimentClass: sentimentCfg.cssClass,
@@ -382,6 +416,29 @@ export default class InProgressTable extends LightningElement {
         this.selectedIds = next;
     }
 
+    // ── Flag popover handlers ──────────────────────────────────────────────
+    // The popover is the lightning-button-menu's native dropdown with our
+    // SLDS 2 popover content slotted inside. The menu manages open/close,
+    // outside-click dismissal, and Escape-to-close on its own, so the only
+    // handler we still need is for the "Lower Flag" action button.
+    handleLowerFlag(event) {
+        const id = event.currentTarget?.dataset?.id;
+        if (!id) return;
+        // Demo behaviour: emit an event so the page (or future consumers)
+        // can update the source row's `hasFlag`. The table doesn't own
+        // the data so it can't mutate it directly. We also nudge the menu
+        // closed by blurring the active element — lightning-button-menu
+        // auto-closes on outside click after that.
+        this.dispatchEvent(new CustomEvent('flaglower', {
+            detail: { id },
+            bubbles: true,
+            composed: true,
+        }));
+        if (document.activeElement && typeof document.activeElement.blur === 'function') {
+            document.activeElement.blur();
+        }
+    }
+
     // ── Infinite scroll ─────────────────────────────────────────────────────
     renderedCallback() {
         if (this._scrollAttached) return;
@@ -402,13 +459,6 @@ export default class InProgressTable extends LightningElement {
     // template can bind to them without leading-underscore warnings.
     get filterPanelOpen() { return this._filterPanelOpen; }
     get appliedFilters()  { return this._appliedFilters; }
-    /**
-     * `.ipt-shell` is a flex row that contains the table-container and,
-     * when the drawer is open, the panel as a second column. The
-     * `_panel-open` variant trims the right padding so the drawer butts
-     * up against the card edge with only its own border-left separating
-     * it from the table area.
-     */
     get shellClass() {
         return `ipt-shell${this._filterPanelOpen ? ' ipt-shell_panel-open' : ''}`;
     }
@@ -430,6 +480,7 @@ export default class InProgressTable extends LightningElement {
         this.selectedIds = new Set();
         const container = this.template.querySelector('.ipt-container');
         if (container) container.scrollTop = 0;
+        this._fireFilterChange();
     }
 
     handleChipRemove(event) {
@@ -438,12 +489,20 @@ export default class InProgressTable extends LightningElement {
         this._appliedFilters = { ...this._appliedFilters, [id]: [] };
         this._pageCount = 0;
         this.selectedIds = new Set();
+        this._fireFilterChange();
     }
 
     handleClearAllChips() {
         this._appliedFilters = emptyFilters();
         this._pageCount = 0;
         this.selectedIds = new Set();
+        this._fireFilterChange();
+    }
+
+    _fireFilterChange() {
+        this.dispatchEvent(new CustomEvent('filterchange', {
+            detail: { chips: this.filterChips },
+        }));
     }
 
     _onScroll = () => {

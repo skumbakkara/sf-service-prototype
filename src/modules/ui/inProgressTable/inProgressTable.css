@@ -2,83 +2,6 @@
     display: block;
 }
 
-/* ── Applied-filter chip row ─────────────────────────────────────────────
-   Sits above the scroll-container. Wraps on overflow so a heavy filter set
-   never pushes the table off the page. Mirrors Figma stages 3-4. */
-.ipt-chiprow {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--slds-g-spacing-2, 0.5rem);
-    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-4, 1rem);
-    border-bottom: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
-    background-color: var(--slds-g-color-surface-container-1, #fafafa);
-}
-.ipt-chiprow__count {
-    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-    color: var(--slds-g-color-on-surface-1, #5c5c5c);
-    font-weight: var(--slds-g-font-weight-6, 600);
-}
-.ipt-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--slds-g-spacing-1, 0.25rem);
-    padding: var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-2, 0.5rem);
-    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
-    border-radius: var(--slds-g-radius-border-3, 999px);
-    background-color: var(--slds-g-color-surface-1, #ffffff);
-    color: var(--slds-g-color-on-surface-2, #181818);
-    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-    /* No SLDS hook matches the desired chip cap-width; documented literal. */
-    max-width: 13.75rem;
-}
-.ipt-chip__label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-.ipt-chip__remove {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--slds-g-sizing-5, 1rem);
-    height: var(--slds-g-sizing-5, 1rem);
-    border: none;
-    background: transparent;
-    padding: 0;
-    cursor: pointer;
-    border-radius: var(--slds-g-radius-border-3, 999px);
-    flex-shrink: 0;
-}
-.ipt-chip__remove:hover {
-    background-color: var(--slds-g-color-neutral-base-90, #e5e5e5);
-}
-.ipt-chip__remove:focus-visible {
-    outline: 2px solid var(--slds-g-color-accent-2, #0250d9);
-    outline-offset: 1px;
-}
-.ipt-chip__remove-icon {
-    --slds-c-icon-color-foreground:        var(--slds-g-color-on-surface-1, #5c5c5c);
-    --slds-c-icon-color-foreground-default:var(--slds-g-color-on-surface-1, #5c5c5c);
-}
-.ipt-chiprow__clear {
-    margin-left: auto;
-    background: transparent;
-    border: none;
-    padding: 0 var(--slds-g-spacing-2, 0.5rem);
-    cursor: pointer;
-    font-family: inherit;
-    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-    font-weight: var(--slds-g-font-weight-6, 600);
-    color: var(--slds-g-color-accent-2, #0250d9);
-}
-.ipt-chiprow__clear:hover { text-decoration: underline; }
-.ipt-chiprow__clear:focus-visible {
-    outline: 2px solid var(--slds-g-color-accent-2, #0250d9);
-    outline-offset: 2px;
-    border-radius: var(--slds-g-radius-border-1, 0.25rem);
-}
-
 /* Shell: holds the table area and the optional inline filter drawer in a
    flex row. When the drawer is closed the table area fills the full width;
    when open the drawer claims a fixed flex-basis column on the right and
@@ -112,10 +35,11 @@
 .ipt-filter-panel {
     flex: 0 0 18rem;
     min-width: 0;
-    /* Match the table container's vertical bounds so the drawer and the
-       table scroll independently inside the same card row. */
     max-height: 60vh;
-    overflow: hidden;
+    /* overflow: visible lets the popover escape to the left without being
+       clipped. The inner .fp-body already has overflow-y: auto so vertical
+       scroll is handled inside the panel component itself. */
+    overflow: visible;
 }
 
 /* When the drawer is open we trim the table-container's right padding so
@@ -124,6 +48,7 @@
 .ipt-shell_panel-open .ipt-container {
     padding-right: 0;
 }
+
 
 /* ── Table borders ───────────────────────────────────────────── */
 .slds-table,
@@ -134,9 +59,12 @@
 }
 
 /* Fixed table layout so the inline column widths are honored strictly —
-   the column never grows on hover when the sort chevron appears. */
+   the column never grows on hover when the sort chevron appears.
+   min-width: max-content ensures the table never compresses below its
+   natural width — horizontal scroll handles any overflow instead. */
 .slds-table {
     table-layout: fixed;
+    min-width: max-content;
 }
 
 /* ── Header corner radius ────────────────────────────────────── */
@@ -159,9 +87,10 @@ thead tr th:last-child  { border-top-right-radius: var(--slds-g-radius-border-2,
 .slds-table_header-fixed_container .slds-table thead th {
     position: sticky;
     top: 0;
-    /* Header must outrank the flag cell's stacking context (z-index: 3
-       below) so the priority button-icon doesn't bleed through the
-       header label/icon when the body scrolls underneath. */
+    /* Header must outrank the flag cell's open-popover stacking context
+       (z-index 19, scoped to the open row) so the priority button-icon
+       doesn't bleed through the header label/icon when the body scrolls
+       underneath. */
     z-index: 20;
     box-shadow: inset 0 -1px 0 var(--slds-g-color-neutral-base-90, #e5e5e5) !important;
     filter: none !important;
@@ -173,6 +102,22 @@ thead tr th:last-child  { border-top-right-radius: var(--slds-g-radius-border-2,
     min-width: 40px !important;
     max-width: 40px !important;
     vertical-align: middle;
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+.slds-table thead th.slds-cell_shrink {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 21;
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+.slds-table tbody td.slds-cell_shrink {
+    background-color: var(--slds-g-color-surface-1, #ffffff);
 }
 
 /* ── Row cells ───────────────────────────────────────────────── */
@@ -211,7 +156,8 @@ thead tr th:last-child  { border-top-right-radius: var(--slds-g-radius-border-2,
 th:hover .col-chevron { display: inline-flex; }
 
 /* ── Row hover ───────────────────────────────────────────────── */
-.ipt-row:hover td {
+.ipt-row:hover td,
+.ipt-row:hover td.slds-cell_shrink {
     background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
     box-shadow: none !important;
 }
@@ -305,24 +251,72 @@ th:hover .col-chevron { display: inline-flex; }
     fill: var(--slds-g-color-palette-blue-40, #0250d9);
 }
 
-/* ── Flag cell ───────────────────────────────────────────────── */
-/* Allow the lightning-button-menu popover to escape this cell. The body-cell
-   `overflow: hidden` truncation rule on `.ipt-row > td` would otherwise clip
-   the absolutely-positioned dropdown to the cell bounds. The cell + button-
-   menu host opt into a small stacking context (z-index: 3) so the popover
-   paints above the later-rendered column-divider borders from
-   `slds-table_col-bordered` — but stays *below* the sticky header
-   (z-index: 20 above), so the button doesn't bleed through the column
-   labels when the body scrolls underneath. */
+/* ── Flag cell + popover ─────────────────────────────────────── */
+/* The flag cell hosts a lightning-button-icon trigger and a custom SLDS 2
+   popover that is conditionally rendered next to the button when the row's
+   popover is open. `overflow: visible` lifts the clip on the parent td so
+   the popover can extend below the row and to the right across neighbour
+   columns. The wrap (`ipt-flag-wrap`) is the positioning context for the
+   absolutely-positioned popover so alignment stays attached to the icon
+   button regardless of the cell's padding. */
 .ipt-row > td.ipt-flag-td {
     overflow: visible;
-    position: relative;
-    z-index: 3;
 }
-.ipt-row > td.ipt-flag-td .ipt-flag-button {
+
+.ipt-flag-wrap {
     position: relative;
-    z-index: 3;
+    display: inline-flex;
 }
+
+.ipt-flag-button {
+    position: relative;
+}
+
+/* lightning-button-menu paints its dropdown chrome (white surface,
+   hairline border, drop shadow, 4px vertical padding) inside its own
+   synthetic shadow root, so plain descendant selectors from this file
+   cannot reach those styles — that chrome shows up as a second card
+   around the popover ("double border"). The dropdown wrapper is exposed
+   as `part="overlay dropdown"`, so `::part(dropdown)` lets us strip
+   the chrome from outside. The popover itself paints its own card +
+   nubbin from inside the slot. */
+.ipt-flag-button::part(dropdown) {
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
+}
+
+/* Stacking context for the open popover only.
+
+   The cell class `ipt-flag-cell_open` is toggled by the row template based
+   on the table's `_openFlagRowId` state. Only the open row's cell gets
+   `z-index: 19 + isolation: isolate`, which creates a single elevated
+   stacking context that paints above every other body cell.
+
+   Why this matters: if every `.ipt-flag-td` carried `z-index: 19`, every
+   flag cell in every row would share the same z-index, and CSS paints
+   equal-z-index siblings in document order. Flag cells in rows BELOW the
+   open one would then paint *on top of* the popover wherever it overlaps
+   the Flag column, showing as column-border bleed and row-hover fill
+   covering the right half of the popover.
+
+   The sticky thead is at z-index 20 (checkbox header 21), so the popover
+   still tucks under the column labels when the body scrolls behind it. */
+/* lightning-button-menu sets aria-expanded="true" on its inner trigger
+   when the dropdown is open. Lift only that single cell into its own
+   stacking context so the popover paints above the cell's right border,
+   the next column's left border, and the row-hover fill of the row
+   beneath it. */
+.ipt-row > td.ipt-flag-td:has(button[aria-expanded="true"]) {
+    position: relative;
+    z-index: 19;
+    isolation: isolate;
+}
+
 .ipt-flag-btn {
     display: inline-flex;
     align-items: center;
@@ -333,6 +327,93 @@ th:hover .col-chevron { display: inline-flex; }
 .ipt-flag-btn lightning-icon {
     --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #3e3e3e);
     --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #3e3e3e);
+}
+
+/* ── Flag popover (SLDS 2) ────────────────────────────────────
+   Per Figma node 19427:55644 — "Latest Whisper from Rep". The popover
+   paints its own card (bg, border, radius, shadow) and nubbin here.
+   The lightning-button-menu's built-in dropdown chrome is suppressed
+   via `::part(dropdown)` above so this is the only visible card. Width
+   is locked to the Figma frame (310px); no SLDS sizing hook covers
+   component-level widths. */
+.ipt-flag-popover {
+    position: relative;
+    width: 310px;
+    min-width: 310px;
+    padding: var(--slds-g-spacing-4, 1rem);
+    margin: 0;
+    background: var(--slds-g-color-surface-1, #ffffff);
+    border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+    /* Approximates SLDS 2 shadow/elevation/4 - down: a top hairline,
+       a mid-distance drop, and an ambient bloom. No CSS custom
+       property is exported for the composite elevation token, so the
+       three layers are inlined here. */
+    box-shadow:
+        0 -1px 3px 0 rgba(0, 0, 0, 0.06),
+        0 7px 7px 0 rgba(0, 0, 0, 0.08),
+        0 0 10px 0 rgba(0, 0, 0, 0.04);
+    text-align: left;
+    cursor: default;
+}
+
+/* Nubbin: a 12px square rotated 45° that pokes out the top edge of
+   the popover and reads as an arrow pointing up at the flag trigger.
+   The top + left borders continue the popover's hairline border so
+   the two visible faces of the rotated square line up with it. The
+   -7px top offset is half the rotated square's diagonal — that lines
+   the nubbin's tip up flush with the popover's top edge so the seam
+   is invisible. The 14px left offset centres the tip over the flag
+   glyph inside the ~52px-wide menu trigger (icon + chevron). No SLDS
+   sizing token lands at 7px or 14px, so these values are intentional. */
+.ipt-flag-popover::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    left: 14px;
+    width: var(--slds-g-sizing-4, 12px);
+    height: var(--slds-g-sizing-4, 12px);
+    background: var(--slds-g-color-surface-1, #ffffff);
+    border-top: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
+    border-left: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
+    transform: rotate(45deg);
+}
+
+.ipt-flag-popover__body {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+}
+
+/* Title — Body/font-scale-base/Regular, on-surface/3 per Figma. */
+.ipt-flag-popover__title {
+    margin: 0;
+    font-family: var(--slds-g-font-family-base, inherit);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 18px;
+    color: var(--slds-g-color-on-surface-3, #444444);
+}
+
+/* Supporting text — Body/font-scale-base/Regular per Figma. */
+.ipt-flag-popover__text {
+    margin: 0;
+    font-family: var(--slds-g-font-family-base, inherit);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 18px;
+    color: var(--slds-g-color-on-surface-2, #5c5c5c);
+}
+
+.ipt-flag-popover__footer {
+    padding: var(--slds-g-spacing-3, 0.75rem) 0 0;
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    border-top: none;
+    background: transparent;
 }
 
 /* ── Action cell: Monitor button ─────────────────────────────── */

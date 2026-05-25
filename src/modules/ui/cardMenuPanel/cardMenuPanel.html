@@ -31,17 +31,22 @@
 
             <!-- Active filter pills -->
             <template if:true={hasActivePills}>
-                <ul class="cmp-pills" role="list">
-                    <template for:each={activePills} for:item="pill">
-                        <li key={pill.id} class="cmp-pill-item">
-                            <lightning-pill
-                                label={pill.label}
-                                data-id={pill.id}
-                                onremove={handlePillRemove}>
-                            </lightning-pill>
-                        </li>
+                <div class="cmp-pills-wrap">
+                    <ul class="cmp-pills" role="list">
+                        <template for:each={activePills} for:item="pill">
+                            <li key={pill.id} class="cmp-pill-item">
+                                <lightning-pill
+                                    label={pill.label}
+                                    data-id={pill.id}
+                                    onremove={handlePillRemove}>
+                                </lightning-pill>
+                            </li>
+                        </template>
+                    </ul>
+                    <template if:true={hasHiddenPills}>
+                        <span class="cmp-pills-overflow">{hiddenPillLabel}</span>
                     </template>
-                </ul>
+                </div>
             </template>
 
             <!-- Grouped combobox: filter group selector + search input -->

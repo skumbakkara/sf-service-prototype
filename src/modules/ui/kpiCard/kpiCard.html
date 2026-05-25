@@ -4,28 +4,32 @@
             <div class="kc-header-text">
                 <h3 class="kc-title">{title}</h3>
                 <template if:true={caption}>
-                    <p class="kc-caption">{caption}</p>
-                </template>
-                <template if:true={hasChips}>
-                    <ul class="kc-chips" role="list">
-                        <template for:each={filterChips} for:item="chip">
-                            <li key={chip.id} class="kc-chip-item">
-                                <span class="kc-chip">
-                                    <span class="kc-chip-label">{chip.label}</span>
+                    <div class="kc-caption-row">
+                        <span class="kc-caption">{captionText}</span>
+                        <template if:true={hasAppliedFilters}>
+                            <template for:each={appliedFilterBadges} for:item="badge">
+                                <span
+                                    key={badge.id}
+                                    class="kc-filter-badge"
+                                    data-badge-id={badge.id}
+                                    onmouseenter={handleBadgeMouseEnter}
+                                    onmouseleave={handleBadgeMouseLeave}>
+                                    <span class="kc-filter-badge-group">{badge.groupLabel}</span><span class="kc-filter-badge-values">: {badge.values}</span>
                                     <button
                                         type="button"
-                                        class="kc-chip-remove"
-                                        aria-label="Remove filter">
-                                        <lightning-icon
-                                            icon-name="utility:close"
-                                            size="xx-small"
-                                            alternative-text="Remove filter">
-                                        </lightning-icon>
+                                        class="kc-filter-badge-remove"
+                                        data-group={badge.id}
+                                        aria-label="Remove filter"
+                                        onclick={handleBadgeRemove}>
+                                        <lightning-icon icon-name="utility:close" size="xx-small" alternative-text="Remove"></lightning-icon>
                                     </button>
                                 </span>
-                            </li>
+                            </template>
+                            <template if:true={hasAppliedFilterOverflow}>
+                                <span class="kc-filter-overflow">{appliedFilterOverflowLabel}</span>
+                            </template>
                         </template>
-                    </ul>
+                    </div>
                 </template>
             </div>
             <template if:true={hasMenu}>
@@ -45,9 +49,9 @@
                     </button>
                     <template if:true={menuOpen}>
                         <ui-card-menu-panel
-                            active-timeframe={activeTimeframe}
+                            active-timeframe={_activeTimeframe}
                             filter-groups={filterGroups}
-                            selected-filters={selectedFilters}
+                            selected-filters={currentSelectedFilters}
                             show-timeframe={showTimeframe}
                             panel-style={panelStyle}
                             onclose={closeMenu}
@@ -62,4 +66,17 @@
             <slot></slot>
         </div>
     </article>
+
+    <!-- Filter value popover — rendered fixed above all content -->
+    <template if:true={showPopover}>
+        <div class="kc-popover" style={popoverStyle} role="tooltip">
+            <div class="kc-popover-nubbin"></div>
+            <div class="kc-popover-body">
+                <p class="kc-popover-group">{hoveredBadge.groupLabel}</p>
+                <template for:each={hoveredBadge.allItems} for:item="item">
+                    <p key={item.id} class="kc-popover-item">{item.label}</p>
+                </template>
+            </div>
+        </div>
+    </template>
 </template>

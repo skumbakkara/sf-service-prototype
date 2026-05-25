@@ -131,26 +131,58 @@ export default class CardMenuPanel extends LightningElement {
         if (already >= 0) {
             this._pendingFilters = this._pendingFilters.filter(f => f.id !== id);
         } else {
+            const groups = Array.isArray(this.filterGroups) ? this.filterGroups : [];
+            const grp = groups.find(g => g.value === this._selectedGroup);
             this._pendingFilters = [
                 ...this._pendingFilters,
-                { id: opt.id, label: `${this.selectedGroup}: ${opt.label}` },
+                { id: opt.id, label: opt.label, group: this._selectedGroup, groupLabel: grp ? grp.label : this._selectedGroup },
             ];
         }
     }
 
     // ── Pills ──────────────────────────────────────────────────────────────
 
+    // One pill per filter group — label: "GroupName: Val1, Val2, +N"
+    _allPills() {
+        const map = new Map();
+        for (const f of this._pendingFilters) {
+            const key = f.group || f.id;
+            if (!map.has(key)) {
+                map.set(key, { id: key, groupLabel: f.groupLabel || key, items: [] });
+            }
+            map.get(key).items.push(f.label);
+        }
+        return Array.from(map.values()).map(g => {
+            const shown = g.items.slice(0, 2);
+            const hidden = g.items.length - shown.length;
+            const values = shown.join(', ') + (hidden > 0 ? `, +${hidden}` : '');
+            return { id: g.id, label: `${g.groupLabel}: ${values}` };
+        });
+    }
+
     get activePills() {
-        return this._pendingFilters;
+        return this._allPills().slice(0, 2);
     }
 
     get hasActivePills() {
         return this._pendingFilters.length > 0;
     }
 
+    get hiddenPillCount() {
+        return Math.max(0, this._allPills().length - 2);
+    }
+
+    get hasHiddenPills() {
+        return this.hiddenPillCount > 0;
+    }
+
+    get hiddenPillLabel() {
+        return `+${this.hiddenPillCount} more`;
+    }
+
     handlePillRemove(evt) {
-        const id = evt.currentTarget.dataset.id;
-        this._pendingFilters = this._pendingFilters.filter(f => f.id !== id);
+        const groupId = evt.currentTarget.dataset.id;
+        this._pendingFilters = this._pendingFilters.filter(f => (f.group || f.id) !== groupId);
     }
 
     handleClearAll() {

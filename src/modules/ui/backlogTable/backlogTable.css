@@ -2,16 +2,25 @@
     display: block;
 }
 
+/* Outer wrapper: provides the horizontal inset that matches the card header
+   padding so the bordered scroll-container doesn't run edge-to-edge. */
+.bkt-scroll-wrap {
+    padding: 0 var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-4, 1rem);
+}
+
 /* Scroll container for the table:
-   - overflow-x preserves the horizontal scroll for the wide column layout
+   - overflow-x enables horizontal scrolling for wide content
    - overflow-y + max-height bounds the vertical extent so the table body
      scrolls (rather than the whole page). This is required for both the
-     sticky thead and the infinite-scroll handler in backlogTable.js. */
+     sticky thead and the infinite-scroll handler in backlogTable.js.
+   - border + border-radius give the container a card-like surface border
+     that matches the existing card/surface border style. */
 .bkt-container {
     overflow-x: auto;
     overflow-y: auto;
     max-height: 60vh;
-    padding: 0 var(--slds-g-spacing-4, 1rem);
+    border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
 }
 
 /* ── Table borders (scoped to .bkt-table — same element as .slds-table) ── */
@@ -23,9 +32,12 @@
 }
 
 /* Fixed table layout so the inline column widths are honored strictly —
-   columns never grow on hover when the sort chevron appears. */
+   columns never grow on hover when the sort chevron appears.
+   min-width: max-content ensures the table never compresses below its
+   natural width — horizontal scroll handles any overflow instead. */
 .bkt-container .bkt-table {
     table-layout: fixed;
+    min-width: max-content;
 }
 
 /* ── Header corner radius ────────────────────────────────────── */
@@ -52,13 +64,29 @@
     background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
 }
 
-/* ── Checkbox column (custom class — avoids slds-cell_shrink + !important) ─ */
+/* ── Checkbox column: fixed width, sticky left during horizontal scroll ─ */
 .bkt-container .bkt-cell-checkbox {
     /* No SLDS hook exists for a checkbox column; intentional 40px lock-in. */
     width: 40px;
     min-width: 40px;
     max-width: 40px;
     vertical-align: middle;
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+.bkt-container .bkt-table thead th.bkt-cell-checkbox {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 4;
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+.bkt-container tbody td.bkt-cell-checkbox {
+    background-color: var(--slds-g-color-surface-1, #ffffff);
 }
 
 /* ── Row cells ───────────────────────────────────────────────── */
@@ -106,7 +134,8 @@
 .bkt-container th:hover .col-chevron { display: inline-flex; }
 
 /* ── Row hover ───────────────────────────────────────────────── */
-.bkt-container .bkt-row:hover td {
+.bkt-container .bkt-row:hover td,
+.bkt-container .bkt-row:hover td.slds-cell_shrink {
     background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
     box-shadow: none;
 }

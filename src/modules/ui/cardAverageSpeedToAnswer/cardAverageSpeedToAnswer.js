@@ -62,40 +62,28 @@ export default class CardAverageSpeedToAnswer extends LightningElement {
             id: 'q1', label: 'Billing',
             colorVar: '--ccs-g-color-chart-category-light-color-1',
             points: [
-                { x: 0, y: 1.8 }, { x: 1, y: 2.0 }, { x: 2, y: 2.1 }, { x: 3, y: 2.2 },
-                { x: 4, y: 2.5 }, { x: 5, y: 2.8 }, { x: 6, y: 3.0 }, { x: 7, y: 3.2 },
-                { x: 8, y: 3.5 }, { x: 9, y: 3.8 }, { x: 10, y: 4.0 }, { x: 11, y: 4.3 },
-                { x: 12, y: 4.5 }, { x: 13, y: 4.7 }, { x: 14, y: 5.0 }, { x: 15, y: 5.1 },
+                { x: 0, y: 1.5 }, { x: 5, y: 3.8 }, { x: 10, y: 2.2 }, { x: 15, y: 4.6 },
             ],
         },
         {
             id: 'q2', label: 'Tech Support',
             colorVar: '--ccs-g-color-chart-category-light-color-2',
             points: [
-                { x: 0, y: 1.5 }, { x: 1, y: 1.6 }, { x: 2, y: 1.8 }, { x: 3, y: 2.0 },
-                { x: 4, y: 2.2 }, { x: 5, y: 2.4 }, { x: 6, y: 2.6 }, { x: 7, y: 2.8 },
-                { x: 8, y: 3.0 }, { x: 9, y: 3.2 }, { x: 10, y: 3.5 }, { x: 11, y: 3.6 },
-                { x: 12, y: 3.8 }, { x: 13, y: 4.0 }, { x: 14, y: 4.2 }, { x: 15, y: 4.3 },
+                { x: 0, y: 3.0 }, { x: 6, y: 1.4 }, { x: 11, y: 4.5 }, { x: 15, y: 2.8 },
             ],
         },
         {
             id: 'q3', label: 'Renewals',
             colorVar: '--ccs-g-color-chart-category-light-color-3',
             points: [
-                { x: 0, y: 1.2 }, { x: 1, y: 1.4 }, { x: 2, y: 1.6 }, { x: 3, y: 1.8 },
-                { x: 4, y: 2.0 }, { x: 5, y: 2.1 }, { x: 6, y: 2.3 }, { x: 7, y: 2.4 },
-                { x: 8, y: 2.6 }, { x: 9, y: 2.8 }, { x: 10, y: 3.0 }, { x: 11, y: 3.2 },
-                { x: 12, y: 3.3 }, { x: 13, y: 3.5 }, { x: 14, y: 3.7 }, { x: 15, y: 3.8 },
+                { x: 0, y: 4.2 }, { x: 4, y: 2.0 }, { x: 9, y: 3.5 }, { x: 15, y: 1.8 },
             ],
         },
         {
             id: 'q4', label: 'Returns',
             colorVar: '--ccs-g-color-chart-category-light-color-4',
             points: [
-                { x: 0, y: 1.0 }, { x: 1, y: 1.1 }, { x: 2, y: 1.2 }, { x: 3, y: 1.4 },
-                { x: 4, y: 1.5 }, { x: 5, y: 1.7 }, { x: 6, y: 1.8 }, { x: 7, y: 2.0 },
-                { x: 8, y: 2.1 }, { x: 9, y: 2.3 }, { x: 10, y: 2.5 }, { x: 11, y: 2.6 },
-                { x: 12, y: 2.8 }, { x: 13, y: 2.9 }, { x: 14, y: 3.0 }, { x: 15, y: 3.1 },
+                { x: 0, y: 2.5 }, { x: 7, y: 4.8 }, { x: 12, y: 1.5 }, { x: 15, y: 3.9 },
             ],
         },
     ];

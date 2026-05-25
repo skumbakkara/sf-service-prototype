@@ -3,22 +3,34 @@
 }
 
 /* ── Change 1: align table edges with card header padding ── */
+/* Outer wrapper: provides the horizontal inset that matches the card header
+   padding so the bordered scroll-container doesn't run edge-to-edge. */
+.table-scroll-wrap {
+    padding: 0 var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-4, 1rem);
+}
+
 /* Scroll-container for the table:
-   - overflow-x preserves the existing horizontal scroll for wide content
+   - overflow-x enables horizontal scrolling for wide content
    - overflow-y + max-height bounds the vertical extent so the body of the
      table scrolls (rather than the whole page) — required for both the
-     sticky thead and the infinite-scroll handler in serviceRepsTable.js. */
+     sticky thead and the infinite-scroll handler in serviceRepsTable.js.
+   - border + border-radius give the container a card-like surface border
+     that matches the existing card/surface border style. */
 .table-container {
     overflow-x: auto;
     overflow-y: auto;
     max-height: 60vh;
-    padding: 0 var(--slds-g-spacing-4, 1rem);
+    border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
 }
 
 /* Fixed table layout so the inline column widths are honored strictly —
-   the column never grows on hover when the sort chevron appears. */
+   the column never grows on hover when the sort chevron appears.
+   min-width: max-content ensures the table never compresses below its
+   natural width — horizontal scroll handles any overflow instead. */
 .slds-table {
     table-layout: fixed;
+    min-width: max-content;
 }
 
 /* ── Table borders use SLDS 2 Neutral Base 90 ───────────── */
@@ -60,12 +72,35 @@ thead tr th:last-child {
     filter: none !important;
 }
 
-/* ── Checkbox column fixed width + vertical centering ───── */
+/* ── Checkbox column: fixed width, sticky left during horizontal scroll ─ */
 .slds-cell_shrink {
     width: 40px !important;
     min-width: 40px !important;
     max-width: 40px !important;
     vertical-align: middle;
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+/* Header checkbox cell: corner-sticky — pinned to both top and left */
+.slds-table thead th.slds-cell_shrink {
+    position: sticky;
+    top: 0;
+    left: 0;
+    z-index: 4;
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+
+/* Body rows have white background — keep the sticky checkbox cell white */
+.slds-table tbody td.slds-cell_shrink {
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+}
+
+/* Selected rows use a tinted background — match it on the sticky cell */
+.slds-table tbody tr.srt-row--selected td.slds-cell_shrink {
+    background-color: var(--slds-g-color-brand-container-1, #e8f4fe);
 }
 
 /* ── Rep row cells: +4px row height (2px top/bottom), keep content centered ───── */
@@ -297,6 +332,7 @@ th:hover .col-chevron { display: inline-flex; }
    The expanded state mirrors :hover so the parent row visually anchors
    its open accordion below. */
 .rep-row:hover td,
+.rep-row:hover td.slds-cell_shrink,
 .rep-row_expanded > td {
     background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
     box-shadow: none !important;

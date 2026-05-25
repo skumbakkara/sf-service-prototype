@@ -85,13 +85,55 @@
     width: 275px;
 }
 /* Equal 8px visual gap between Search and the two button groups in the
-   In-Progress controls row. Using flex `gap` instead of per-element margin
-   so the spacing is consistent regardless of each child's host padding.
-   The `> *` margin reset prevents any default lightning-button-group margin
-   from stacking with the parent's gap. */
+   In-Progress controls row. */
 .ipt-controls {
     gap: var(--slds-g-spacing-2, 0.5rem);
 }
 .ipt-controls > * {
     margin: 0 !important;
+}
+
+/* ── In-Progress toolbar row: count + pills left, controls right ── */
+.ipt-toolbar-row {
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+}
+.ipt-toolbar-left {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-wrap: nowrap;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+    align-items: center;
+    overflow: hidden;
+}
+.ipt-toolbar-count {
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin-right: var(--slds-g-spacing-1, 0.25rem);
+}
+
+/* ── Filter pills (lightning-pill host) ───────────────────────── */
+.ipt-pill {
+    flex-shrink: 0;
+    /* Constrain long labels so a single pill doesn't eat the whole row */
+    max-width: 11rem;
+}
+
+/* Overflow badge: "+N more" pill — same visual weight as lightning-pill */
+.ipt-pill-overflow {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    height: 1.5rem;
+    padding: 0 var(--slds-g-spacing-2, 0.5rem);
+    border: 1px solid var(--slds-g-color-border-base-1, #e5e5e5);
+    border-radius: var(--slds-g-radius-border-3, 999px);
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    white-space: nowrap;
+    cursor: default;
 }
