@@ -8,6 +8,11 @@ export default class KpiCard extends LightningElement {
     @api activeTimeframe = '1h';
     @api selectedFilters = [];
     @api showTimeframe = false;
+    @api metricOnly = false;
+
+    get cardClass() {
+        return `kc-card${this.metricOnly ? ' kc-card_metric-only' : ''}`;
+    }
 
     @track menuOpen = false;
     @track _panelTop = 0;

@@ -1,0 +1,178 @@
+<template>
+    <div class="cap-tooltip" role="tooltip" aria-hidden="true"></div>
+    <div class={layoutClass}>
+        <div class="table-scroll-wrap">
+        <div class="table-container">
+            <table class="slds-table slds-table_bordered slds-table_col-bordered">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th scope="col" class="slds-cell_shrink">
+                            <div class="slds-text-align_center">
+                                <input type="checkbox" class="hdr-checkbox" checked={allSelected} onchange={handleSelectAll} />
+                            </div>
+                        </th>
+                        <template for:each={columnHeaders} for:item="col">
+                            <th key={col.fieldName} scope="col" style={col.style} class={col.thClass} data-field={col.fieldName} onclick={handleSort}>
+                                <div class="slds-th__action th-action-inner">
+                                    <span class="slds-truncate">{col.label}</span>
+                                    <lightning-icon icon-name="utility:chevrondown" size="xx-small" class="col-chevron"></lightning-icon>
+                                </div>
+                            </th>
+                        </template>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={tableRows} for:item="row">
+                        <tr key={row.id} class={row.repRowClass} data-id={row.id} onclick={handleRowClick}>
+                            <td class="slds-cell_shrink">
+                                <div class="slds-text-align_center">
+                                    <input type="checkbox" class="row-checkbox" checked={row.isSelected} data-id={row.id} onchange={handleRowSelect} />
+                                </div>
+                            </td>
+                            <td class="rep-name-td">
+                                <div class="rep-name-inner">
+                                    <span class="rep-name">{row.name}</span>
+                                </div>
+                            </td>
+                            <td class={row.statusCellClass}>
+                                <div class="status-inner">
+                                    <lightning-icon icon-name={row.statusIcon} size="xx-small" class="status-dot"></lightning-icon>
+                                    <div class="status-text">
+                                        <span class="status-label">{row.statusLabel}</span>
+                                        <span class="status-time">{row.statusTime}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="channel-icons">
+                                    <template for:each={row.channelIcons} for:item="ch">
+                                        <lightning-icon key={ch.icon} icon-name={ch.icon} size="xx-small" title={ch.label} class="channel-icon"></lightning-icon>
+                                    </template>
+                                </div>
+                            </td>
+                            <td>{row.workSummary}</td>
+                            <td class="slds-text-align_left">
+                                <template if:true={row.hasFlagIcon}>
+                                    <span class="flag-pill" role="img" aria-label="Flagged" title="Flagged">
+                                        <lightning-icon icon-name="utility:priority" size="xx-small"></lightning-icon>
+                                    </span>
+                                </template>
+                            </td>
+                            <td class="slds-text-align_right">{row.login}</td>
+                            <td class="slds-text-align_right">{row.state}</td>
+                            <td class="capacity-cell">
+                                <div class="capacity-badges">
+                                    <span class="capacity-badge capacity-badge_primary" data-tooltip="Primary capacity"
+                                        onmouseenter={handleTooltipShow} onmouseleave={handleTooltipHide}
+                                        onfocus={handleTooltipShow} onblur={handleTooltipHide}
+                                        tabindex="0">{row.capacityPLabel}</span>
+                                    <span class="capacity-badge capacity-badge_interruptible" data-tooltip="Interruptible capacity"
+                                        onmouseenter={handleTooltipShow} onmouseleave={handleTooltipHide}
+                                        onfocus={handleTooltipShow} onblur={handleTooltipHide}
+                                        tabindex="0">{row.capacityILabel}</span>
+                                </div>
+                            </td>
+                            <td class="slds-text-align_right">{row.accept}</td>
+                            <td class="slds-text-align_right">{row.workload}</td>
+                            <td class="slds-text-align_right">{row.acw}</td>
+                            <td>{row.queuesDisplay}</td>
+                            <td>{row.skillsDisplay}</td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+        </div>
+
+        <!-- Side panel -->
+        <template if:true={_isPanelOpen}>
+            <div class={panelClass} role="complementary" aria-label="Rep Details">
+
+                <!-- Panel header: name + new-window icon + close -->
+                <div class="srp-panel-header">
+                    <div class="srp-panel-title-row">
+                        <div class="srp-panel-name-group">
+                            <span class="srp-panel-name">{selectedRepName}</span>
+                            <lightning-icon icon-name="utility:new_window" size="xx-small" class="srp-panel-newwin-icon"></lightning-icon>
+                        </div>
+                        <button class="srp-panel-close" onclick={handlePanelClose} aria-label="Close panel">
+                            <lightning-icon icon-name="utility:close" size="xx-small"></lightning-icon>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Panel body: work summary + cards -->
+                <div class="srp-panel-body">
+                    <template if:true={hasSelectedRepWorkItems}>
+                        <!-- Work summary line -->
+                        <p class="srp-work-summary">{selectedRepSummaryLine}</p>
+
+                        <!-- Work item cards -->
+                        <div class="srp-wi-list">
+                            <template for:each={selectedRepWorkItems} for:item="wi">
+                                <article key={wi.id} class="srp-wi-card">
+                                    <div class="srp-wi-inner">
+
+                                        <!-- Top row: channel icon + customer name + meta -->
+                                        <div class="srp-wi-top">
+                                            <div class="srp-wi-ch-wrap">
+                                                <span class={wi.channelIconClass}>
+                                                    <lightning-icon icon-name={wi.channelIcon} size="xx-small" alternative-text={wi.channelLabel}></lightning-icon>
+                                                </span>
+                                            </div>
+                                            <div class="srp-wi-info">
+                                                <span class="srp-wi-customer">{wi.customer}</span>
+                                                <div class="srp-wi-meta">
+                                                    <span class="srp-wi-meta-pair">
+                                                        <span class="srp-wi-meta-label">{wi.workLoadLabel}</span><span class="srp-wi-meta-value">{wi.workLoadValue}</span>
+                                                    </span>
+                                                    <span class="srp-wi-dot" aria-hidden="true"></span>
+                                                    <span class="srp-wi-meta-pair">
+                                                        <span class="srp-wi-meta-label">{wi.queueLabel}</span><span class="srp-wi-meta-value">{wi.queueValue}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Description link -->
+                                        <a href="javascript:void(0)" class="srp-wi-desc" title={wi.descriptionLink}>{wi.descriptionLink}</a>
+
+                                        <!-- Whisper box (flagged items only) -->
+                                        <template if:true={wi.hasFlag}>
+                                            <div class="srp-wi-whisper">
+                                                <div class="srp-wi-whisper-header">
+                                                    <lightning-icon icon-name="utility:priority" size="xx-small" class="srp-wi-whisper-icon"></lightning-icon>
+                                                    <span class="srp-wi-whisper-title">Rep Whisper</span>
+                                                </div>
+                                                <p class="srp-wi-whisper-body">{wi.flagWhisperBody}</p>
+                                            </div>
+                                        </template>
+
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="srp-wi-actions">
+                                        <template if:true={wi.hasFlag}>
+                                            <lightning-button
+                                                variant="brand-outline"
+                                                icon-name="utility:lower_flag"
+                                                icon-position="left"
+                                                label="Lower Flag">
+                                            </lightning-button>
+                                        </template>
+                                        <lightning-button variant="brand" icon-name="utility:preview" icon-position="left" label="Monitor"></lightning-button>
+                                    </div>
+                                </article>
+                            </template>
+                        </div>
+                    </template>
+
+                    <template if:false={hasSelectedRepWorkItems}>
+                        <p class="srp-panel-empty">No active work items.</p>
+                    </template>
+                </div>
+
+            </div>
+        </template>
+    </div>
+</template>

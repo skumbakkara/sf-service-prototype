@@ -29,8 +29,8 @@
                         </div>
                         <div class="slds-grid slds-grid_vertical-align-center">
                             <lightning-button-group>
-                                <lightning-button label="Action 1" variant="neutral"></lightning-button>
-                                <lightning-button label="Action 2" variant="neutral"></lightning-button>
+                                <lightning-button label="Accordion" variant={accordionBtnVariant} data-view="accordion" onclick={handleRepViewChange}></lightning-button>
+                                <lightning-button label="Panel" variant={panelBtnVariant} data-view="panel" onclick={handleRepViewChange}></lightning-button>
                             </lightning-button-group>
                         </div>
                     </div>
@@ -48,7 +48,12 @@
                             </lightning-button-group>
                         </div>
                     </div>
-                    <ui-service-reps-table data={reps}></ui-service-reps-table>
+                    <template if:true={isRepViewAccordion}>
+                        <ui-service-reps-table data={reps}></ui-service-reps-table>
+                    </template>
+                    <template if:true={isRepViewPanel}>
+                        <ui-service-reps-panel data={reps}></ui-service-reps-panel>
+                    </template>
                 </div>
             </template>
 

@@ -110,6 +110,7 @@ const NEW_BKT_ARRIVALS = [
 export default class ServiceReps extends LightningElement {
     activeTab = 'wallboard';
     reps = REPS_DATA;
+    @track repView = 'accordion';
 
     // Counters cycling through the arrival pools on each tab visit.
     _ipArrivalIdx  = 0;
@@ -277,6 +278,17 @@ export default class ServiceReps extends LightningElement {
 
     get backlogCount() {
         return this.backlogItems.length;
+    }
+
+    // ── Rep view toggle (Accordion / Panel) ───────────────────────────────
+    get isRepViewAccordion()    { return this.repView === 'accordion'; }
+    get isRepViewPanel()        { return this.repView === 'panel'; }
+    get accordionBtnVariant()   { return this.repView === 'accordion' ? 'brand' : 'neutral'; }
+    get panelBtnVariant()       { return this.repView === 'panel'     ? 'brand' : 'neutral'; }
+
+    handleRepViewChange(event) {
+        const view = event.currentTarget.dataset.view;
+        if (view) this.repView = view;
     }
 
     // ── Tab bar getters ────────────────────────────────────────────────────

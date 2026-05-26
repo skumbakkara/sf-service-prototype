@@ -26,7 +26,7 @@
             <tbody>
                 <template for:each={tableRows} for:item="row">
                     <!-- Parent rep row -->
-                    <tr key={row.id} class={row.repRowClass}>
+                    <tr key={row.id} class={row.repRowClass} data-id={row.id} onclick={handleRowClick}>
                         <td class="slds-cell_shrink">
                             <div class="slds-text-align_center">
                                 <input type="checkbox" class="row-checkbox" checked={row.isSelected} data-id={row.id} onchange={handleRowSelect} />
@@ -97,41 +97,68 @@
                         <td>{row.queuesDisplay}</td>
                         <td>{row.skillsDisplay}</td>
                     </tr>
-                    <!-- Expanded: stack of work-item cards (no title row). -->
-                    <template if:true={row.isExpanded}>
-                        <template for:each={row.workItems} for:item="wi">
-                            <tr key={wi.id} class={wi.rowClass}>
-                                <td colspan="14" class="work-item-cell">
-                                    <div class="wi-row">
-                                        <article class="wi-card">
+                    <!-- Expanded: stack of work-item cards matching Figma node 19988:23606. -->
+                    <template if:true={row.hasChildren}>
+                        <tr key={row.wiPanelId} class={row.wiPanelClass}>
+                            <td colspan="14" class="work-item-cell">
+                                <div class="wi-stack">
+                                    <template for:each={row.workItems} for:item="wi">
+                                        <article key={wi.id} class="wi-card">
                                             <div class="wi-content">
                                                 <div class="wi-top-row">
                                                     <span class="wi-customer">{wi.customerLabel}</span>
                                                     <a href="javascript:void(0)" class="wi-summary-link" title={wi.summaryLink}>{wi.summaryLink}</a>
                                                 </div>
                                                 <div class="wi-meta-row">
-                                                    <lightning-icon icon-name={wi.channelIcon} size="xx-small" alternative-text={wi.channelLabel} class="wi-channel-icon"></lightning-icon>
+                                                    <span class={wi.channelIconClass} aria-hidden="true">
+                                                        <lightning-icon icon-name={wi.channelIcon} size="xx-small" alternative-text={wi.channelLabel}></lightning-icon>
+                                                    </span>
                                                     <span class="wi-meta-dot" aria-hidden="true"></span>
-                                                    <span class="wi-meta-text">{wi.workLoadText}</span>
+                                                    <span class="wi-meta-pair"><span class="wi-meta-label">{wi.workLoadLabel}</span><span class="wi-meta-value">{wi.workLoadValue}</span></span>
                                                     <span class="wi-meta-dot" aria-hidden="true"></span>
-                                                    <span class="wi-meta-text">{wi.queueText}</span>
+                                                    <span class="wi-meta-pair"><span class="wi-meta-label">{wi.queueLabel}</span><span class="wi-meta-value">{wi.queueValue}</span></span>
                                                 </div>
                                             </div>
-                                            <template if:true={wi.hasFlagIcon}>
-                                                <lightning-button-icon
-                                                    icon-name="utility:priority"
-                                                    variant="border-filled"
-                                                    size="medium"
-                                                    alternative-text="Flag work item"
-                                                    title="Flag"
-                                                    class="wi-flag-btn">
-                                                </lightning-button-icon>
-                                            </template>
+                                            <div class="wi-actions">
+                                                <template if:true={wi.hasFlagIcon}>
+                                                    <div class="wi-flag-wrap">
+                                                        <lightning-button-icon
+                                                            icon-name="utility:priority"
+                                                            variant="brand"
+                                                            size="medium"
+                                                            alternative-text="Flag actions"
+                                                            title="Flag actions"
+                                                            data-id={wi.id}
+                                                            onclick={handleWiFlagToggle}
+                                                            class="wi-flag-btn">
+                                                        </lightning-button-icon>
+                                                        <template if:true={wi.isFlagOpen}>
+                                                            <div class="ipt-flag-popover" role="dialog" aria-labelledby={wi.flagPopoverTitleId}>
+                                                                <div class="ipt-flag-popover__body">
+                                                                    <p class="ipt-flag-popover__title" id={wi.flagPopoverTitleId}>{wi.flagWhisperTitle}</p>
+                                                                    <p class="ipt-flag-popover__text">{wi.flagWhisperBody}</p>
+                                                                </div>
+                                                                <footer class="ipt-flag-popover__footer">
+                                                                    <lightning-button
+                                                                        variant="neutral"
+                                                                        icon-name="utility:lower_flag"
+                                                                        icon-position="left"
+                                                                        label="Lower Flag"
+                                                                        data-id={wi.id}
+                                                                        onclick={handleWiLowerFlag}>
+                                                                    </lightning-button>
+                                                                </footer>
+                                                            </div>
+                                                        </template>
+                                                    </div>
+                                                </template>
+                                                <lightning-button label="Monitor" variant="neutral" class="wi-monitor-btn"></lightning-button>
+                                            </div>
                                         </article>
-                                    </div>
-                                </td>
-                            </tr>
-                        </template>
+                                    </template>
+                                </div>
+                            </td>
+                        </tr>
                     </template>
                 </template>
             </tbody>

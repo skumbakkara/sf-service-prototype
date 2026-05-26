@@ -1,8 +1,5 @@
 import { LightningElement, api, track } from 'lwc';
 
-const FLAG_WHISPER_TITLE_DEFAULT = 'Latest Whisper from Rep';
-const FLAG_WHISPER_BODY_DEFAULT  = 'Help needed with this case';
-
 const STATUS_ICON = {
     online:  'utility:record',
     break:   'utility:record',
@@ -19,10 +16,6 @@ const CHANNEL_BG_CLASS = {
     messaging: 'wi-ch-icon wi-ch-icon_messaging',
 };
 
-// Maps each work-item channel to its `Work Summary` bucket. `chat` and
-// `messaging` both roll up to "Message(s)" since they share an inbox in
-// the demo. `cases` is the catch-all bucket so unknown channels still
-// produce a sensible count rather than silently disappearing.
 const WORK_SUMMARY_BUCKETS = [
     { key: 'cases',   match: ['cases'],            singular: 'Case',    plural: 'Cases' },
     { key: 'message', match: ['chat', 'messaging'], singular: 'Message', plural: 'Messages' },
@@ -35,7 +28,7 @@ function summarizeWorkItems(children) {
     const counts = Object.fromEntries(WORK_SUMMARY_BUCKETS.map(b => [b.key, 0]));
     for (const wi of children) {
         const bucket = WORK_SUMMARY_BUCKETS.find(b => b.match.includes(wi.channel))
-            ?? WORK_SUMMARY_BUCKETS[0]; // fall back to "Case" for unknown channels
+            ?? WORK_SUMMARY_BUCKETS[0];
         counts[bucket.key] += 1;
     }
     const parts = [];
@@ -46,11 +39,6 @@ function summarizeWorkItems(children) {
     return parts.join(' ');
 }
 
-// Widths sized to actual cell content. Icon-only columns floor at 80px; text
-// columns fit the header label without truncation (chevron-on-hover is
-// display:none + table-layout:fixed). Queues/Skills get extra room for typical
-// "first1, first2, +N" strings; Service Rep Name accommodates the chevron and
-// names like "Savannah Nguyen".
 const COLUMN_DEFS = [
     { label: 'Service Rep Name', fieldName: 'name',             sortable: true,  width: 200 },
     { label: 'Status',           fieldName: 'statusLabel',      sortable: true,  width: 130 },
@@ -67,45 +55,31 @@ const COLUMN_DEFS = [
     { label: 'Skills',           fieldName: 'skillsDisplay',    sortable: false, width: 200 },
 ];
 
-// Infinite-scroll bottom threshold in pixels — when the user scrolls within
-// this distance of the bottom of the scroll container, another page of clones
-// is appended.
 const SCROLL_THRESHOLD_PX = 120;
 
-// Cap how many work-item cards an expanded rep can show in the accordion.
-// Keeps the panel short enough that the table body remains scrollable and
-// the next rep stays in view. The Work Summary column count is derived
-// from the *capped* list (see tableRows below) so the header label and the
-// accordion always agree.
-const MAX_WORK_ITEMS_PER_REP = 3;
-
-export default class ServiceRepsTable extends LightningElement {
+export default class ServiceRepsPanel extends LightningElement {
     _data = [];
-    _pageCount = 0;        // # of extra cloned pages appended after the seed
-    _isLoading = false;    // guard so a single scroll burst can't double-load
+    _pageCount = 0;
+    _isLoading = false;
     _scrollAttached = false;
 
     @track sortedBy;
     @track sortedDirection = 'asc';
-    @track expandedIds = new Set();
     @track selectedIds = new Set();
-    @track _openFlagWiId = null;
+    @track _selectedRep = null;
+    @track _isPanelOpen = false;
 
     @api
     get data() { return this._data; }
     set data(value) {
         this._data = Array.isArray(value) ? value : [];
-        // A new source array means the user changed the underlying dataset
-        // (e.g. a parent filter toggled). Reset pagination + transient state
-        // so they start from page 1 of the new source.
         this._pageCount = 0;
         this._isLoading = false;
-        this.expandedIds = new Set();
         this.selectedIds = new Set();
+        this._selectedRep = null;
+        this._isPanelOpen = false;
     }
 
-    // Seed array plus cloned pages, each clone has a unique `id` so selection
-    // and expand/collapse state never collide between original rows and clones.
     get expandedData() {
         const seed = this._data ?? [];
         if (seed.length === 0) return [];
@@ -134,44 +108,21 @@ export default class ServiceRepsTable extends LightningElement {
 
     get tableRows() {
         const rows = (this.expandedData ?? []).map((rep) => {
-            const isExpanded = this.expandedIds.has(String(rep.id));
-            // Cap children before *both* the accordion render and the
-            // Work Summary count so the two stay in lockstep.
-            const visibleChildren = (rep.children ?? []).slice(0, MAX_WORK_ITEMS_PER_REP);
-            const lastVisibleIdx = visibleChildren.length - 1;
-            const workItems = visibleChildren.map((wi, wiIdx) => {
-                // First / last position drives a CSS modifier class so the
-                // top and bottom of the entire accordion panel get the
-                // requested 8px breathing room (only the outermost cards
-                // pick up the extra padding; the cards between just butt
-                // against each other).
-                const isFirst = wiIdx === 0;
-                const isLast = wiIdx === lastVisibleIdx;
-                const positionClass = `${isFirst ? ' work-item-row_first' : ''}${isLast ? ' work-item-row_last' : ''}`;
-                // Compact card per Figma node 19738:44775. Top row composes
-                // "<customer> |" (semibold) + "<subject> | <caseNumber>" (link).
-                // Bottom row composes channel-icon · "Work load: N" · "Queue: <name>".
-                const wiId = `${rep.id}-wi-${wiIdx}`;
-                const isFlagOpen = wiId === this._openFlagWiId;
-                return {
-                    id: wiId,
-                    customerLabel: `${wi.customer} |`,
-                    summaryLink: `${wi.subject} | ${wi.caseNumber}`,
-                    workLoadLabel: 'Work load: ',
-                    workLoadValue: `${wi.workLoad ?? 0}/20`,
-                    queueLabel: 'Queue: ',
-                    queueValue: wi.queue,
-                    channelIcon: CHANNEL_ICONS[wi.channel] ?? 'utility:record',
-                    channelLabel: CHANNEL_LABELS[wi.channel] ?? wi.channel,
-                    channelIconClass: CHANNEL_BG_CLASS[wi.channel] ?? 'wi-ch-icon wi-ch-icon_cases',
-                    hasFlagIcon: wi.hasFlag,
-                    isFlagOpen,
-                    flagPopoverTitleId: `wi-flag-popover-title-${wiId}`,
-                    flagWhisperTitle: wi.flagWhisperTitle || FLAG_WHISPER_TITLE_DEFAULT,
-                    flagWhisperBody:  wi.flagWhisperBody  || FLAG_WHISPER_BODY_DEFAULT,
-                    rowClass: `work-item-row${positionClass}`,
-                };
-            });
+            const workItems = (rep.children ?? []).map((wi, wiIdx) => ({
+                id: `${rep.id}-wi-${wiIdx}`,
+                channel: wi.channel,
+                customer: wi.customer,
+                descriptionLink: `${wi.subject} | ${wi.status ?? 'Working'} | ${wi.caseNumber}${wi.priority ? ' | ' + wi.priority : ''}`,
+                workLoadLabel: 'Work load: ',
+                workLoadValue: `${wi.workLoad ?? 0}/20`,
+                queueLabel: 'Queue: ',
+                queueValue: wi.queue,
+                channelIcon: CHANNEL_ICONS[wi.channel] ?? 'utility:record',
+                channelLabel: CHANNEL_LABELS[wi.channel] ?? wi.channel,
+                channelIconClass: CHANNEL_BG_CLASS[wi.channel] ?? 'wi-ch-icon wi-ch-icon_cases',
+                hasFlag: wi.hasFlag,
+                flagWhisperBody: wi.flagWhisperBody || 'Help needed with this work item.',
+            }));
             return {
                 id: String(rep.id),
                 name: rep.name,
@@ -180,10 +131,7 @@ export default class ServiceRepsTable extends LightningElement {
                 statusIcon: STATUS_ICON[rep.status] ?? 'utility:record',
                 statusCellClass: `status-cell status-cell_${rep.status}`,
                 hasFlagIcon: rep.hasFlag,
-                // Computed from the *capped* children list (not the page-level
-                // `workSummary` string) so the column count is always in sync
-                // with the cards shown when the row is expanded.
-                workSummary: summarizeWorkItems(visibleChildren),
+                workSummary: summarizeWorkItems(rep.children ?? []),
                 channelIcons: rep.channels.map(c => ({ icon: CHANNEL_ICONS[c] ?? 'utility:record', label: CHANNEL_LABELS[c] ?? c })),
                 channelsDisplay: rep.channels.map(c => CHANNEL_LABELS[c] ?? c).join(' · '),
                 login: rep.login,
@@ -197,18 +145,10 @@ export default class ServiceRepsTable extends LightningElement {
                 acw: rep.acw,
                 queuesDisplay: rep.queues.join(', '),
                 skillsDisplay: rep.skills.join(', '),
-                hasChildren: workItems.length > 0,
-                hasMoreChildren: (rep.children ?? []).length > MAX_WORK_ITEMS_PER_REP,
-                wiPanelId: `${String(rep.id)}-wi-panel`,
-                isExpanded,
-                wiPanelClass: `work-item-row work-item-row_wrap${isExpanded ? ' wi-panel_open' : ' wi-panel_closed'}`,
-                // Add `rep-row_expanded` while the accordion is open so the
-                // parent row keeps the same neutral-base-95 fill as :hover —
-                // gives a clear visual link between the row and its expanded
-                // work-items panel.
-                repRowClass: `slds-hint-parent rep-row${isExpanded ? ' rep-row_expanded' : ''}`,
-                workItems,
                 isSelected: this.selectedIds.has(String(rep.id)),
+                isActive: this._selectedRep && this._selectedRep.id === String(rep.id),
+                repRowClass: `slds-hint-parent rep-row${this._selectedRep && this._selectedRep.id === String(rep.id) ? ' rep-row_active' : ''}`,
+                workItems,
             };
         });
 
@@ -222,6 +162,71 @@ export default class ServiceRepsTable extends LightningElement {
         });
     }
 
+    get layoutClass() {
+        return `srp-layout${this._isPanelOpen ? ' srp-layout_panel-open' : ''}`;
+    }
+
+    get panelClass() {
+        return 'srp-side-panel';
+    }
+
+    get selectedRepWorkItems() {
+        return this._selectedRep?.workItems ?? [];
+    }
+
+    get selectedRepName() {
+        return this._selectedRep?.name ?? '';
+    }
+
+    get selectedRepStatusLabel() {
+        return this._selectedRep?.statusLabel ?? '';
+    }
+
+    get selectedRepStatusCellClass() {
+        return this._selectedRep?.statusCellClass ?? 'status-cell';
+    }
+
+    get selectedRepStatusIcon() {
+        return this._selectedRep?.statusIcon ?? 'utility:record';
+    }
+
+    get selectedRepChannelIcons() {
+        return this._selectedRep?.channelIcons ?? [];
+    }
+
+    get selectedRepCapacityPLabel() {
+        return this._selectedRep?.capacityPLabel ?? '';
+    }
+
+    get selectedRepCapacityILabel() {
+        return this._selectedRep?.capacityILabel ?? '';
+    }
+
+    get selectedRepQueues() {
+        return this._selectedRep?.queuesDisplay ?? '';
+    }
+
+    get selectedRepSkills() {
+        return this._selectedRep?.skillsDisplay ?? '';
+    }
+
+    get hasSelectedRepWorkItems() {
+        return (this._selectedRep?.workItems ?? []).length > 0;
+    }
+
+    get selectedRepSummaryLine() {
+        const items = this._selectedRep?.workItems ?? [];
+        if (items.length === 0) return '';
+        const counts = {};
+        for (const wi of items) {
+            const label = CHANNEL_LABELS[wi.channel] ?? wi.channel ?? 'Item';
+            counts[label] = (counts[label] ?? 0) + 1;
+        }
+        return Object.entries(counts)
+            .map(([label, n]) => `${n} ${label}${n > 1 ? 's' : ''}`)
+            .join(' • ');
+    }
+
     handleSort(event) {
         const field = event.currentTarget.dataset.field;
         if (!field) return;
@@ -233,28 +238,6 @@ export default class ServiceRepsTable extends LightningElement {
             this.sortedBy = field;
             this.sortedDirection = 'asc';
         }
-    }
-
-    handleRowClick(event) {
-        // Ignore clicks on the checkbox or the chevron toggle button itself
-        if (event.target.type === 'checkbox') return;
-        if (event.target.closest?.('.toggle-btn')) return;
-        const id = event.currentTarget.dataset.id;
-        if (!id) return;
-        const next = new Set(this.expandedIds);
-        if (next.has(id)) { next.delete(id); } else { next.add(id); }
-        this.expandedIds = next;
-    }
-
-    handleExpandToggle(event) {
-        const id = event.currentTarget.dataset.id;
-        const next = new Set(this.expandedIds);
-        if (next.has(id)) {
-            next.delete(id);
-        } else {
-            next.add(id);
-        }
-        this.expandedIds = next;
     }
 
     handleSelectAll(event) {
@@ -276,9 +259,30 @@ export default class ServiceRepsTable extends LightningElement {
         this.selectedIds = next;
     }
 
-    // Tooltip uses position: fixed so it escapes the .table-container's
-    // overflow-x: auto clip and the .slds-card's overflow: hidden clip;
-    // neither z-index nor padding can solve a clipping-ancestor problem.
+    handleRowClick(event) {
+        // Ignore clicks on the checkbox cell
+        if (event.target.type === 'checkbox') return;
+        const id = event.currentTarget.dataset.id;
+        if (!id) return;
+
+        const row = this.tableRows.find(r => r.id === id);
+        if (!row) return;
+
+        if (this._selectedRep && this._selectedRep.id === id) {
+            // Second click on the same row closes the panel
+            this._selectedRep = null;
+            this._isPanelOpen = false;
+        } else {
+            this._selectedRep = row;
+            this._isPanelOpen = true;
+        }
+    }
+
+    handlePanelClose() {
+        this._selectedRep = null;
+        this._isPanelOpen = false;
+    }
+
     handleTooltipShow(event) {
         const badge = event.currentTarget;
         const text = badge?.dataset?.tooltip;
@@ -296,47 +300,20 @@ export default class ServiceRepsTable extends LightningElement {
         if (tip) tip.classList.remove('is-visible');
     }
 
-    // ── Flag popover handlers ────────────────────────────────────────────────
-    handleWiFlagToggle(event) {
-        const id = event.currentTarget?.dataset?.id;
-        if (!id) return;
-        event.stopPropagation();
-        this._openFlagWiId = this._openFlagWiId === id ? null : id;
-    }
-
-    handleWiLowerFlag(event) {
-        const id = event.currentTarget?.dataset?.id;
-        if (!id) return;
-        this._openFlagWiId = null;
-    }
-
-    _handleDocClick = () => {
-        if (this._openFlagWiId !== null) this._openFlagWiId = null;
-    };
-
-    // ── Infinite scroll ─────────────────────────────────────────────────────
-    // Bind the scroll handler once the .table-container is in the DOM. Guarded
-    // by `_scrollAttached` because renderedCallback fires on every re-render.
     renderedCallback() {
         if (this._scrollAttached) return;
         const container = this.template.querySelector('.table-container');
         if (!container) return;
         container.addEventListener('scroll', this._onScroll);
-        document.addEventListener('click', this._handleDocClick);
         this._scrollAttached = true;
     }
 
     disconnectedCallback() {
         const container = this.template.querySelector('.table-container');
         if (container) container.removeEventListener('scroll', this._onScroll);
-        document.removeEventListener('click', this._handleDocClick);
         this._scrollAttached = false;
     }
 
-    // Arrow fn so `this` is bound for add/removeEventListener. The rAF wrap
-    // collapses a burst of scroll events into a single page append, and the
-    // `_isLoading` flag prevents a second burst from queuing before the first
-    // append's render commits (clientHeight changes on next paint).
     _onScroll = () => {
         if (this._isLoading) return;
         const container = this.template.querySelector('.table-container');

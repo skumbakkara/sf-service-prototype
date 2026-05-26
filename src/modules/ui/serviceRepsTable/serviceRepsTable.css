@@ -111,6 +111,7 @@ thead tr th:last-child {
     text-overflow: ellipsis;
     white-space: nowrap;
     vertical-align: middle;
+    cursor: pointer;
 }
 
 /* ── Column header sort hover ───────────────────────────── */
@@ -348,129 +349,84 @@ th:hover .col-chevron { display: inline-flex; }
     box-shadow: none !important;
 }
 
-/* ── Work item rows: grid aligned to table columns ────────
-   Accordion fill is the SLDS 2 surface-1 token (light-dark(#fff, #242424)),
-   one step brighter than the rep-row_expanded fill above it (neutral-base-95
-   / #f3f3f3) so the open accordion reads as an elevated white panel sitting
-   inside the darker expanded parent row. */
+/* ── Work item accordion row ────────────────────────────────────────────── */
 .work-item-row {
     background-color: var(--slds-g-color-surface-1, #ffffff);
 }
+.work-item-row_wrap {
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+}
 .work-item-cell {
-    /* No padding so the card fills the cell width; the card itself owns its
-       outer border + radius. Suppress inherited table cell horizontal borders
-       so only the card outline shows inside the accordion. */
-    padding: 0 !important;
+    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-3, 0.75rem) 40px !important;
     border-top: 0 !important;
-    border-bottom: 0 !important;
+    border-bottom: 2px solid var(--slds-g-color-border-1, #c9c9c9) !important;
 }
-/* 8px breathing room at the top and bottom of the entire accordion panel
-   (first card gets the top padding, last card gets the bottom). Cards in
-   between intentionally butt against each other so the panel reads as one
-   stack rather than a list of loose cards. */
-.work-item-row_first > .work-item-cell {
-    padding-top: var(--slds-g-spacing-2, 0.5rem) !important;
-}
-.work-item-row_last > .work-item-cell {
-    padding-bottom: var(--slds-g-spacing-2, 0.5rem) !important;
-    /* Anchor the bottom-edge shadow pseudo-element. The cell's box-shadow
-       was hosting the elevation earlier, but `--slds-g-shadow-1` (the value
-       behind `--slds-g-shadow-block-end-1`) carries a small upward-edge
-       layer that visibly bled across the last card. Painting the shadow on
-       a 1px pseudo-element pinned to the cell's bottom edge confines any
-       upward bleed to the 8px white padding strip below the last card,
-       keeping the cast strictly under the whole accordion. */
-    position: relative;
-}
-.work-item-row_last > .work-item-cell::after {
-    content: '';
-    position: absolute;
-    inset-inline: 0;
-    bottom: 0;
-    height: 1px;
-    pointer-events: none;
-    /* Drop shadow on the bottom border of the open accordion. SLDS 2
-       ships --slds-g-shadow-block-end-1 (block-end = downward variant of
-       elevation level 1, aliased to --slds-g-shadow-1) which maps 1:1 to
-       the Figma effect shadow/elevation/1-down. The fallback reproduces
-       the three-layer composition from slds2.cosmos.css with the
-       light-dark() rgba values flattened to their light-mode pairs so
-       the shadow still renders when the hook is unavailable. */
-    box-shadow: var(
-        --slds-g-shadow-block-end-1,
-        0 0 2px 0 rgba(0, 0, 0, 0.18),
-        0 2px 2px 0 rgba(0, 0, 0, 0.18),
-        0 -1px 2px 0 rgba(0, 0, 0, 0.10)
-    );
-}
-/* Defensive: work-item rows themselves never react to hover at the row
-   level — only the .wi-card inside reacts (brand-base-95 fill). Force
-   the surface-1 fill back on the hovered row even if a future ancestor
-   rule (or SLDS default) tries to tint it. */
 .work-item-row:hover,
 .work-item-row:hover > .work-item-cell {
     background-color: var(--slds-g-color-surface-1, #ffffff);
 }
-/* Pin border-color and clear box-shadow on the hovered work-item row AND
-   its next sibling row (typically the next rep-row). SLDS's default
-   `tbody tr:hover` paints a darker border on the hovered cell's bottom
-   AND on the next row's top — visible as a dark line below the last
-   work-item card. Background is intentionally NOT forced on the sibling
-   because the next row may be a rep-row (neutral-base-95 when expanded)
-   or another work-item-row (surface-1) — only the border/shadow bleed
-   needs neutralizing. This mirrors the .rep-row:hover + tr td/th rule
-   above. */
 .work-item-row:hover > .work-item-cell,
 .work-item-row:hover + tr > td,
 .work-item-row:hover + tr > th {
     border-color: var(--slds-g-color-neutral-base-90, #e5e5e5) !important;
     box-shadow: none !important;
 }
-/* ── Compact work-item card (Figma node 19738:44775) ───────────────────────
-   Rendered inside each expanded `.work-item-row`. The card hugs content
-   width (multiple cards stack vertically per rep), sits 56px in from the
-   row's left edge so the content column aligns under the rep name, and
-   exposes:
-     1. a content stack with two rows:
-        - top:    "<customer> |" (semibold) + "<subject> | <case#>" (link)
-        - bottom: channel icon · "Work load: N" · "Queue: <name>", separated
-          by 4×4 gray dots,
-     2. an optional bordered priority button on the right when flagged
-        (also the only escalation indicator on the card now that the
-        left-edge rule has been removed).
-   Typography mirrors ui-chart-donut's legend:
-     base-row = font-scale-base (13px) / line-height-3 (1.375),
-     meta-row = font-scale-neg-1 (12px). */
-.wi-row {
-    /* 56px indent = 48px Figma indent + 8px additional nudge per design
-       refinement so the card sits clearly inside the rep row. Composed
-       from --slds-g-spacing-7 (3rem / 48px) + --slds-g-spacing-2
-       (0.5rem / 8px) since no single SLDS spacing hook represents 56px.
-       This value is held constant after the left-edge indicator rule
-       was removed — the card content shifts left into the space the
-       rule + gap used to occupy, intentional per design. */
-    padding-left: calc(var(--slds-g-spacing-7, 3rem) + var(--slds-g-spacing-2, 0.5rem));
-    padding-right: var(--slds-g-spacing-4, 1rem);
+
+/* ── Accordion open/close animation ────────────────────────────────────── */
+@keyframes wi-panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
+
+.wi-panel_closed {
+    display: none;
+}
+.wi-panel_open > .work-item-cell {
+    animation: wi-panel-in 0.2s ease-out both;
+}
+
+/* Card stack inside the accordion cell */
+.wi-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-3, 0.75rem);
+}
+
+/* ── Work-item card (Figma node 19988:23624) ────────────────────────────── */
 .wi-card {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: var(--slds-g-spacing-3, 0.75rem);
-    padding: var(--slds-g-spacing-2, 0.5rem) 0;
-    background: transparent;
-    border: 0;
-    /* `width: max-content` lets each card hug its own content width per
-       Figma — cards in the same accordion stack are not forced to the
-       same width. */
-    width: max-content;
-    max-width: 100%;
+    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
+    background-color: var(--slds-g-color-surface-1, #ffffff);
+    border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+    border-radius: 12px;
     min-width: 0;
+    width: 760px;
+    box-sizing: border-box;
+}
+.wi-card:hover {
+    background-color: var(--slds-g-color-surface-1, #ffffff) !important;
+    box-shadow: var(
+        --slds-g-shadow-1,
+        0 1px 2px 0 rgba(0, 0, 0, 0.10),
+        0 2px 2px 0 rgba(0, 0, 0, 0.08),
+        0 -1px 2px 0 rgba(0, 0, 0, 0.06)
+    );
 }
 .wi-content {
     display: flex;
     flex-direction: column;
     gap: var(--slds-g-spacing-1, 0.25rem);
     min-width: 0;
+    flex: 1 1 auto;
 }
 .wi-top-row {
     display: flex;
@@ -478,25 +434,18 @@ th:hover .col-chevron { display: inline-flex; }
     gap: var(--slds-g-spacing-1, 0.25rem);
     min-width: 0;
 }
-/* Body/font-scale-base/Semibold per Figma 19738:44783: 13px / 18px /
-   weight-6, on-surface-2. */
 .wi-customer {
-    font-family: var(--slds-g-font-family-base, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
     font-size: var(--slds-g-font-scale-base, 0.8125rem);
     font-weight: var(--slds-g-font-weight-6, 600);
-    line-height: var(--slds-g-font-line-height-3, 1.375);
-    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    line-height: 1.375;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
     white-space: nowrap;
     flex-shrink: 0;
 }
-/* Body/font-scale-base/Regular per Figma 19738:44785: 13px / 18px /
-   weight-4, accent-2 (link blue). The whole "<subject> | <case#>" string
-   is the clickable link. */
 .wi-summary-link {
-    font-family: var(--slds-g-font-family-base, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
     font-size: var(--slds-g-font-scale-base, 0.8125rem);
     font-weight: var(--slds-g-font-weight-4, 400);
-    line-height: var(--slds-g-font-line-height-3, 1.375);
+    line-height: 1.375;
     color: var(--slds-g-color-accent-2, #0250d9);
     text-decoration: none;
     overflow: hidden;
@@ -506,58 +455,73 @@ th:hover .col-chevron { display: inline-flex; }
 }
 .wi-summary-link:hover,
 .wi-summary-link:focus { text-decoration: underline; }
-/* Hover state per Figma node 19738:44775. The Figma frame fills the
-   card with the SLDS 2 token color/brand-base/95 (Electric Blue 95 in
-   light mode, Electric Blue 5 in dark beta). That token has not been
-   promoted to a CSS custom property by @salesforce-ux/design-system-2
-   yet, so the fallback hex (#edf4ff) is what paints today; once the
-   upstream hook lands, the var() call will pick it up automatically.
-   Radius and inner padding mirror the Figma frame (rounded-8 / p-8).
-   The 8px padding is offset with equal negative margin so the fill
-   appears to grow around the rule and flag button without nudging
-   any sibling element's resting position. Text colors are unchanged
-   from base — verified against the same Figma hover spec. */
-.wi-card:hover {
-    background-color: var(--slds-g-color-brand-base-95, #edf4ff);
-    border-radius: var(--slds-g-radius-border-2, 0.5rem);
-    padding-left: var(--slds-g-spacing-2, 0.5rem);
-    padding-right: var(--slds-g-spacing-2, 0.5rem);
-    margin-left: calc(var(--slds-g-spacing-2, 0.5rem) * -1);
-    margin-right: calc(var(--slds-g-spacing-2, 0.5rem) * -1);
-}
+
 .wi-meta-row {
     display: flex;
     align-items: center;
-    gap: var(--slds-g-spacing-1, 0.25rem);
+    gap: var(--slds-g-spacing-2, 0.5rem);
     min-width: 0;
 }
-.wi-channel-icon {
+
+/* ── Channel icon box (18×18 coloured background) ───────────────────────── */
+.wi-ch-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 2px;
     flex-shrink: 0;
-    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
-    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
-    fill: var(--slds-g-color-on-surface-1, #5c5c5c);
 }
-/* 4×4 gray separator dots between meta items. `border-radius: 50%` is
-   required to render a perfect circle (no SLDS hook represents 50%);
-   the literal is intentional and follows the precedent in
-   ui-chart-donut .cd-legend-dot and ui-chart-line .cl-dot. */
+.wi-ch-icon_cases {
+    background-color: var(--slds-g-color-palette-pink-95, #fdf2ff);
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-pink-60, #d47fff);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-pink-60, #d47fff);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-pink-60, #d47fff);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-pink-60, #d47fff);
+}
+.wi-ch-icon_call {
+    background-color: var(--slds-g-color-palette-green-95, #ebf7e6);
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-green-60, #3ba755);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-green-60, #3ba755);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-green-60, #3ba755);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-green-60, #3ba755);
+}
+.wi-ch-icon_chat {
+    background-color: var(--slds-g-color-palette-blue-95, #eaf5fe);
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-blue-60, #57a3fd);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-60, #57a3fd);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-blue-60, #57a3fd);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-60, #57a3fd);
+}
+.wi-ch-icon_email {
+    background-color: var(--slds-g-color-palette-orange-95, #fef6e6);
+    --slds-c-icon-color-foreground: var(--slds-g-color-warning-1, #a86304);
+    --sds-c-icon-color-foreground: var(--slds-g-color-warning-1, #a86304);
+}
+.wi-ch-icon_messaging {
+    background-color: var(--slds-g-color-info-container-1, #cfe5fc);
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-blue-40, 0250d9);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-blue-40, #0250d9);
+}
+
+/* 4×4 separator dots */
 .wi-meta-dot {
     display: inline-block;
     flex-shrink: 0;
-    width: var(--slds-g-spacing-1, 0.25rem);
-    height: var(--slds-g-spacing-1, 0.25rem);
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
-    background-color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    background-color: var(--slds-g-color-neutral-base-80, #c9c9c9);
 }
-/* Body/font-scale-neg-1/Regular per Figma 19738:44793,44796:
-   12px / 17px line-height / weight-4, on-surface-1. 17/12 = 1.4167 has
-   no SLDS hook between line-height-1 (1) and line-height-2 (1.25); the
-   literal matches the same intentional pattern used in ui-kpi-card,
-   ui-kpi-value, and the row-1 Wallboard cards. */
-.wi-meta-text {
-    font-family: var(--slds-g-font-family-base, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+.wi-meta-pair {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+    flex-shrink: 0;
+}
+
+.wi-meta-label {
     font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
     font-weight: var(--slds-g-font-weight-4, 400);
     line-height: 1.4167;
@@ -565,10 +529,93 @@ th:hover .col-chevron { display: inline-flex; }
     white-space: nowrap;
     flex-shrink: 0;
 }
-/* Bordered priority button on the right of the card when the work item
-   is flagged. Spacing matches Figma 19738:44799 (32px height button
-   inset from the content by the card's outer flex gap). */
+.wi-meta-value {
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    line-height: 1.4167;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ── Card action area (right side) ─────────────────────────────────────── */
+.wi-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    flex-shrink: 0;
+}
+.wi-flag-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+}
 .wi-flag-btn {
     flex-shrink: 0;
-    margin-left: var(--slds-g-spacing-3, 0.75rem);
+}
+
+/* ── Flag popover — same style as ipt-flag-popover in inProgressTable ── */
+.ipt-flag-popover {
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    z-index: 999;
+    width: 310px;
+    min-width: 310px;
+    padding: var(--slds-g-spacing-4, 1rem);
+    background: var(--slds-g-color-surface-1, #ffffff);
+    border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+    box-shadow:
+        0 -1px 3px 0 rgba(0, 0, 0, 0.06),
+        0 7px 7px 0 rgba(0, 0, 0, 0.08),
+        0 0 10px 0 rgba(0, 0, 0, 0.04);
+    text-align: left;
+    cursor: default;
+}
+.ipt-flag-popover::before {
+    content: '';
+    position: absolute;
+    top: -7px;
+    right: 14px;
+    width: 12px;
+    height: 12px;
+    background: var(--slds-g-color-surface-1, #ffffff);
+    border-top: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+    border-left: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+    transform: rotate(45deg);
+}
+.ipt-flag-popover__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+}
+.ipt-flag-popover__title {
+    margin: 0;
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 18px;
+    color: var(--slds-g-color-on-surface-3, #444444);
+}
+.ipt-flag-popover__text {
+    margin: 0;
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 18px;
+    color: var(--slds-g-color-on-surface-2, #5c5c5c);
+}
+.ipt-flag-popover__footer {
+    padding: var(--slds-g-spacing-3, 0.75rem) 0 0;
+    display: flex;
+    justify-content: flex-end;
+}
+.wi-monitor-btn {
+    flex-shrink: 0;
+}
+
+/* ── "View All" link below the card stack ───────────────────────────────── */
+.wi-view-all {
+    display: flex;
+    align-items: center;
 }
