@@ -1,6 +1,6 @@
 <template>
     <div class="kv-root">
-        <p class="kv-value">{value}</p>
+        <p class={valueClass}>{value}</p>
         <template if:true={hasDelta}>
             <p class={deltaClass}>{delta}</p>
         </template>

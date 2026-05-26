@@ -43,9 +43,22 @@ export default class BacklogTable extends LightningElement {
     _isLoading = false;
     _scrollAttached = false;
 
+    @track _newRowId = null;
+
     @track sortedBy;
     @track sortedDirection = 'asc';
     @track selectedIds = new Set();
+
+    @api
+    get newRowId() { return this._newRowId; }
+    set newRowId(value) {
+        const id = value ? String(value) : null;
+        this._newRowId = id;
+        if (id) {
+            // eslint-disable-next-line @lwc/lwc/no-async-operation
+            setTimeout(() => { this._newRowId = null; }, 2600);
+        }
+    }
 
     @api
     get data() { return this._data; }
@@ -126,8 +139,11 @@ export default class BacklogTable extends LightningElement {
             if (item.priority) summaryParts.push(`${item.priority} Priority`);
             const summaryDisplay = summaryParts.join(' | ');
 
+            const rowId = String(item.id);
+            const isNew = rowId === this._newRowId;
             return {
-                id: String(item.id),
+                id: rowId,
+                rowClass: `slds-hint-parent bkt-row${isNew ? ' bkt-row--new' : ''}`,
 
                 // Priority
                 priorityRank: Number.isFinite(item.priorityRank) ? item.priorityRank : 3,

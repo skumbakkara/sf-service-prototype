@@ -16,7 +16,7 @@ export const routes = [
   {
     path: '/',
     component: 'page-service-reps',
-    title: 'Service Reps',
+    title: 'Command Centre for Service',
     navPage: 'service-reps',
     navLabel: 'Service Reps',
   },

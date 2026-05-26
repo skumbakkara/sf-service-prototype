@@ -89,9 +89,38 @@ const REPS_DATA = [
     { id: 32, name: 'Pamela Howard',      status: 'online',  statusLabel: 'All Online', statusTime: 'Since 9:55am', hasFlag: true,  workSummary: '2 Cases',           channels: ['chat','cases'],       login: '2h 06m',  state: '9m 45s',  capacityP: 100, capacityI: 100, accept: '1m 58s',  workload: '0/20', acw: '3m 03s',  queues: ['Escalations','VIP','+2'],      skills: ['Escalations','Premium','+2'],        children: WORK_ITEMS.slice(0, 2) },
 ];
 
+// New-arrival items cycled into the In-Progress table on each tab visit.
+const NEW_IP_ARRIVALS = [
+    { id: 'ip-new-a', channel: 'chat',     subject: 'Billing dispute — incorrect charge',    caseNumber: '100799001', priority: 'High',   status: 'New',     assignedTo: 'Dana Bose',       isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/women/44.jpg', routeBy: 'Skills-Based', routeByIcon: 'utility:skill',      hasFlag: false, sentiment: 'bad',     workSize: 4, isInterruptible: false, handleTime: '—',   assignedTime: 'Just now', speedToAnswer: '—', acceptedTime: '—', queue: 'Billing',      team: 'Tier 1', skills: ['Billing','Refunds']       },
+    { id: 'ip-new-b', channel: 'call',     subject: 'Password reset not arriving via SMS',   caseNumber: '100799002', priority: 'Medium', status: 'New',     assignedTo: 'Ethan Brooks',    isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/men/45.jpg',  routeBy: 'Most Available', routeByIcon: 'utility:skill',   hasFlag: false, sentiment: 'neutral', workSize: 2, isInterruptible: true,  handleTime: '—',   assignedTime: 'Just now', speedToAnswer: '—', acceptedTime: '—', queue: 'Tech Support', team: 'AMER',   skills: ['Technical','Tier 3']     },
+    { id: 'ip-new-c', channel: 'email',    subject: 'Refund request for cancelled order',    caseNumber: '100799003', priority: '',       status: 'Working', assignedTo: 'Marcus Cole',     isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/men/76.jpg',  routeBy: 'Round Robin',    routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'good',    workSize: 3, isInterruptible: true,  handleTime: '—',   assignedTime: 'Just now', speedToAnswer: '—', acceptedTime: '—', queue: 'Returns',      team: 'SMB',    skills: ['Refunds','Account Mgmt'] },
+    { id: 'ip-new-d', channel: 'messaging',subject: 'App crash on checkout — iOS 18',       caseNumber: '100799004', priority: 'High',   status: 'New',     assignedTo: 'Triage Agent',    isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: true,  sentiment: 'terrible',workSize: 7, isInterruptible: false, handleTime: '—',   assignedTime: 'Just now', speedToAnswer: '—', acceptedTime: '—', queue: 'Escalations',  team: 'Tier 2', skills: ['Technical','Diagnostics'] },
+    { id: 'ip-new-e', channel: 'cases',    subject: 'Duplicate invoice sent — 2 charges',   caseNumber: '100799005', priority: 'Medium', status: 'New',     assignedTo: 'Olivia Bennett',  isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=14',                 routeBy: 'Most Idle',      routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'bad',     workSize: 5, isInterruptible: false, handleTime: '—',   assignedTime: 'Just now', speedToAnswer: '—', acceptedTime: '—', queue: 'Billing',      team: 'EMEA',   skills: ['Billing','Account Mgmt'] },
+];
+
+// New-arrival items cycled into the Backlog table on each tab visit.
+const NEW_BKT_ARRIVALS = [
+    { id: 'ip-new-f', channel: 'chat',  subject: 'Cannot log in after password change',     caseNumber: '100799006', priority: 'High',   status: 'New',    assignedTo: 'Aisha Khan',     isAgent: false, avatarUrl: 'https://randomuser.me/api/portraits/women/63.jpg', routeBy: 'Skills-Based',   routeByIcon: 'utility:skill',      hasFlag: false, sentiment: 'bad',     workSize: 3, isInterruptible: false, handleTime: '—', assignedTime: 'Just now', speedToAnswer: '—', acceptedTime: '—', queue: 'Tech Support',  team: 'APAC',   skills: ['Technical','Account Mgmt'] },
+    { id: 'ip-new-g', channel: 'cases', subject: 'Wrong item shipped — exchange needed',    caseNumber: '100799007', priority: 'Medium', status: 'New',    assignedTo: 'Renewal Agent',  isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'neutral', workSize: 2, isInterruptible: true,  handleTime: '—', assignedTime: 'Just now', speedToAnswer: '—', acceptedTime: '—', queue: 'Returns',       team: 'Tier 1', skills: ['Refunds','Onboarding']     },
+    { id: 'ip-new-h', channel: 'email', subject: 'GDPR data access request — urgent',       caseNumber: '100799008', priority: 'High',   status: 'New',    assignedTo: 'Isabella Reed',  isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=24',                 routeBy: 'Round Robin',    routeByIcon: 'utility:work_queue', hasFlag: false, sentiment: 'bad',     workSize: 6, isInterruptible: false, handleTime: '—', assignedTime: 'Just now', speedToAnswer: '—', acceptedTime: '—', queue: 'Escalations',   team: 'EMEA',   skills: ['Tier 3','Account Mgmt']    },
+    { id: 'ip-new-i', channel: 'call',  subject: 'Overcharged — requesting callback',       caseNumber: '100799009', priority: '',       status: 'New',    assignedTo: 'Bay Assist Agent',isAgent: true,  routeBy: 'Direct to Agent', routeByIcon: null,                                  hasFlag: false, sentiment: 'neutral', workSize: 4, isInterruptible: true,  handleTime: '—', assignedTime: 'Just now', speedToAnswer: '—', acceptedTime: '—', queue: 'Billing',       team: 'Tier 2', skills: ['Billing','Refunds']         },
+    { id: 'ip-new-j', channel: 'chat',  subject: 'Promo discount not applied at checkout',  caseNumber: '100799010', priority: 'Medium', status: 'New',    assignedTo: 'Lucas Bailey',   isAgent: false, avatarUrl: 'https://i.pravatar.cc/64?img=26',                 routeBy: 'Most Available', routeByIcon: 'utility:skill',      hasFlag: false, sentiment: 'good',    workSize: 1, isInterruptible: true,  handleTime: '—', assignedTime: 'Just now', speedToAnswer: '—', acceptedTime: '—', queue: 'Loyalty',       team: 'SMB',    skills: ['Sales','Retention']        },
+];
+
 export default class ServiceReps extends LightningElement {
-    activeTab = 'service-reps';
+    activeTab = 'wallboard';
     reps = REPS_DATA;
+
+    // Counters cycling through the arrival pools on each tab visit.
+    _ipArrivalIdx  = 0;
+    _bktArrivalIdx = 0;
+    // Extra rows prepended to each table; reset on tab switch to avoid stale
+    // rows accumulating across multiple visits in one session.
+    @track _extraIpRow    = null;
+    @track _extraBktRow   = null;
+    // ID passed to the table as new-row-id so it can apply the animation class.
+    @track _ipNewRowId    = null;
+    @track _bktNewRowId   = null;
 
     // ── In-Progress toolbar quick-toggles + filter trigger state ───────────
     // Per the new Figma mock, the multi-facet drawer covers the 6 listed
@@ -120,9 +149,10 @@ export default class ServiceReps extends LightningElement {
     // Source list, optionally narrowed by the AI/Human quick-toggles. The
     // table further narrows by its own multi-facet drawer state and search.
     get inProgressItems() {
-        if (this.aiFilterActive)    return IN_PROGRESS_ITEMS.filter(i => i.isAgent);
-        if (this.humanFilterActive) return IN_PROGRESS_ITEMS.filter(i => !i.isAgent);
-        return IN_PROGRESS_ITEMS;
+        const base = this.aiFilterActive    ? IN_PROGRESS_ITEMS.filter(i => i.isAgent)
+                   : this.humanFilterActive ? IN_PROGRESS_ITEMS.filter(i => !i.isAgent)
+                   : IN_PROGRESS_ITEMS;
+        return this._extraIpRow ? [this._extraIpRow, ...base] : base;
     }
 
     get inProgressCount() {
@@ -206,7 +236,9 @@ export default class ServiceReps extends LightningElement {
         // Backlog still applies the legacy AI/Human filter quick-toggles, which
         // we kept off the In-Progress tab. For now Backlog reads the unfiltered
         // source — a follow-up could give Backlog its own filter panel.
-        const source = IN_PROGRESS_ITEMS;
+        const source = this._extraBktRow
+            ? [this._extraBktRow, ...IN_PROGRESS_ITEMS]
+            : IN_PROGRESS_ITEMS;
         let aiCounter = 0;
         return source.map((item, index) => {
             let routeKind;
@@ -247,8 +279,52 @@ export default class ServiceReps extends LightningElement {
         return this.backlogItems.length;
     }
 
-    handleTabChange(event) {
-        this.activeTab = event.target.value;
+    // ── Tab bar getters ────────────────────────────────────────────────────
+    get isWallboard()   { return this.activeTab === 'wallboard'; }
+    get isServiceReps() { return this.activeTab === 'service-reps'; }
+    get isInProgress()  { return this.activeTab === 'in-progress'; }
+    get isBacklog()     { return this.activeTab === 'backlog'; }
+
+    get tabClassWallboard()   { return this._tabClass('wallboard'); }
+    get tabClassServiceReps() { return this._tabClass('service-reps'); }
+    get tabClassInProgress()  { return this._tabClass('in-progress'); }
+    get tabClassBacklog()     { return this._tabClass('backlog'); }
+
+    _tabClass(tab) {
+        return `sr-tab${this.activeTab === tab ? ' sr-tab--active' : ''}`;
+    }
+
+    handleTabClick(event) {
+        const tab = event.currentTarget.dataset.tab;
+        if (tab && tab !== this.activeTab) this._onTabActivated(tab);
+    }
+
+    _onTabActivated(tab) {
+        this.activeTab = tab;
+
+        if (tab === 'in-progress') {
+            const arrival = NEW_IP_ARRIVALS[this._ipArrivalIdx % NEW_IP_ARRIVALS.length];
+            this._ipArrivalIdx += 1;
+            this._extraIpRow  = null;
+            this._ipNewRowId  = null;
+            // eslint-disable-next-line @lwc/lwc/no-async-operation
+            setTimeout(() => {
+                this._extraIpRow = arrival;
+                this._ipNewRowId = arrival.id;
+            }, 800);
+        }
+
+        if (tab === 'backlog') {
+            const arrival = NEW_BKT_ARRIVALS[this._bktArrivalIdx % NEW_BKT_ARRIVALS.length];
+            this._bktArrivalIdx += 1;
+            this._extraBktRow = null;
+            this._bktNewRowId = null;
+            // eslint-disable-next-line @lwc/lwc/no-async-operation
+            setTimeout(() => {
+                this._extraBktRow = arrival;
+                this._bktNewRowId = arrival.id;
+            }, 800);
+        }
     }
 
     // Mutually-exclusive quick-toggles: turning AI on turns Human off (and

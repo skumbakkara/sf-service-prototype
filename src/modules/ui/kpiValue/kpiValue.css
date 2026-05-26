@@ -8,6 +8,15 @@
     gap: var(--slds-g-spacing-1, 0.25rem);
 }
 
+@keyframes kv-pulse-up {
+    0%   { color: var(--slds-g-color-palette-green-40, #2e844a); }
+    100% { color: var(--slds-g-color-on-surface-2, #2e2e2e); }
+}
+@keyframes kv-pulse-down {
+    0%   { color: var(--slds-g-color-palette-red-40, #ba0517); }
+    100% { color: var(--slds-g-color-on-surface-2, #2e2e2e); }
+}
+
 /* Figma "Titles/font-scale-6/Regular": 32px, weight 4 (regular), 40px line-height,
    color on-surface-2. Matches node 19716:41039. */
 .kv-value {
@@ -17,6 +26,8 @@
     line-height: var(--slds-g-font-line-height-2, 1.25);
     color: var(--slds-g-color-on-surface-2, #2e2e2e);
 }
+.kv-value--pulse-up   { animation: kv-pulse-up   0.8s ease-out both; }
+.kv-value--pulse-down { animation: kv-pulse-down 0.8s ease-out both; }
 
 .kv-delta {
     margin: 0;

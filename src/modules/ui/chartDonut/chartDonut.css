@@ -31,9 +31,14 @@
 /* The per-segment stroke colour is supplied by a bound `style` expression on
    each <circle>, declaring `--cd-segment-color: var(--slds-g-color-palette-…);`.
    The blue-40 default is the fallback when no segment style runs. */
+@keyframes cd-segment-draw {
+    from { opacity: 0; stroke-dasharray: 0.5 9999; }
+}
+
 .cd-segment {
     stroke: var(--cd-segment-color, var(--slds-g-color-palette-blue-40, #0176d3));
     transition: stroke-dashoffset 200ms ease-out;
+    animation: cd-segment-draw 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Legend container that stacks an optional title above the list. Sits

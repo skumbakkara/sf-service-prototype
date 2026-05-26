@@ -1,242 +1,155 @@
 <template>
     <div class="service-reps-page">
 
-        <!-- Tab bar + content -->
         <div class="slds-m-horizontal_medium slds-m-top_medium">
-            <lightning-tabset active-tab-value={activeTab} ontabchange={handleTabChange}>
 
-                <lightning-tab label="Wallboard" value="wallboard">
-                    <ui-wallboard></ui-wallboard>
-                </lightning-tab>
+            <!-- ── Custom tab bar ── -->
+            <div class="sr-tabs" role="tablist">
+                <button role="tab" class={tabClassWallboard}     data-tab="wallboard"    onclick={handleTabClick} aria-selected={isWallboard}>Wallboard</button>
+                <button role="tab" class={tabClassServiceReps}   data-tab="service-reps" onclick={handleTabClick} aria-selected={isServiceReps}>Service Reps</button>
+                <button role="tab" class={tabClassInProgress}    data-tab="in-progress"  onclick={handleTabClick} aria-selected={isInProgress}>In-Progress Work</button>
+                <button role="tab" class={tabClassBacklog}       data-tab="backlog"      onclick={handleTabClick} aria-selected={isBacklog}>Backlog</button>
+            </div>
 
-                <lightning-tab label="Service Reps" value="service-reps">
-                    <!-- Card -->
-                    <div class="slds-card slds-m-top_medium">
+            <!-- ── Wallboard ── -->
+            <template if:true={isWallboard}>
+                <ui-wallboard></ui-wallboard>
+            </template>
 
-                        <!-- Card header -->
-                        <div class="slds-card__header slds-p-around_medium slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
-                            <div class="slds-grid slds-grid_vertical-align-center">
-                                <lightning-icon
-                                    icon-name="utility:questions_and_answers"
-                                    size="medium"
-                                    class="slds-m-right_small">
-                                </lightning-icon>
-                                <div>
-                                    <h2 class="slds-text-heading_medium">Service Reps Overview</h2>
-                                    <p class="slds-text-body_small slds-text-color_weak">An overview of all the service representatives in your team</p>
-                                </div>
-                            </div>
-                            <div class="slds-grid slds-grid_vertical-align-center">
-                                <lightning-button-group>
-                                    <lightning-button label="Action 1" variant="neutral"></lightning-button>
-                                    <lightning-button label="Action 2" variant="neutral"></lightning-button>
-                                </lightning-button-group>
+            <!-- ── Service Reps ── -->
+            <template if:true={isServiceReps}>
+                <div class="slds-card slds-m-top_medium">
+                    <div class="slds-card__header slds-p-around_medium slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="utility:questions_and_answers" size="medium" class="slds-m-right_small"></lightning-icon>
+                            <div>
+                                <h2 class="slds-text-heading_medium">Service Reps Overview</h2>
+                                <p class="slds-text-body_small slds-text-color_weak">An overview of all the service representatives in your team</p>
                             </div>
                         </div>
-
-                        <!-- Stats + search bar -->
-                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-horizontal_medium slds-p-bottom_small">
-                            <p class="slds-text-body_small slds-text-color_weak">312 Reps &bull; 3 Flags Raised</p>
-                            <div class="slds-grid slds-grid_vertical-align-center">
-                                <lightning-input
-                                    type="search"
-                                    label="Search reps"
-                                    variant="label-hidden"
-                                    placeholder="Search..."
-                                    class="search-input slds-m-right_x-small">
-                                </lightning-input>
-                                <lightning-button-group>
-                                    <lightning-button-icon icon-name="utility:filterList" variant="border-filled" alternative-text="Filter" title="Filter"></lightning-button-icon>
-                                    <lightning-button-menu icon-name="utility:down" variant="border-filled" alternative-text="Filter options" menu-alignment="right">
-                                        <lightning-menu-item value="all" label="All reps"></lightning-menu-item>
-                                        <lightning-menu-item value="online" label="Online only"></lightning-menu-item>
-                                        <lightning-menu-item value="flagged" label="Flagged"></lightning-menu-item>
-                                    </lightning-button-menu>
-                                </lightning-button-group>
-                            </div>
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-button-group>
+                                <lightning-button label="Action 1" variant="neutral"></lightning-button>
+                                <lightning-button label="Action 2" variant="neutral"></lightning-button>
+                            </lightning-button-group>
                         </div>
-
-                        <!-- Tree Grid table -->
-                        <ui-service-reps-table data={reps}></ui-service-reps-table>
-
                     </div>
-                </lightning-tab>
+                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-horizontal_medium slds-p-bottom_small">
+                        <p class="slds-text-body_small slds-text-color_weak">312 Reps &bull; 3 Flags Raised</p>
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-input type="search" label="Search reps" variant="label-hidden" placeholder="Search..." class="search-input slds-m-right_x-small"></lightning-input>
+                            <lightning-button-group>
+                                <lightning-button-icon icon-name="utility:filterList" variant="border-filled" alternative-text="Filter" title="Filter"></lightning-button-icon>
+                                <lightning-button-menu icon-name="utility:down" variant="border-filled" alternative-text="Filter options" menu-alignment="right">
+                                    <lightning-menu-item value="all" label="All reps"></lightning-menu-item>
+                                    <lightning-menu-item value="online" label="Online only"></lightning-menu-item>
+                                    <lightning-menu-item value="flagged" label="Flagged"></lightning-menu-item>
+                                </lightning-button-menu>
+                            </lightning-button-group>
+                        </div>
+                    </div>
+                    <ui-service-reps-table data={reps}></ui-service-reps-table>
+                </div>
+            </template>
 
-                <lightning-tab label="In-Progress Work" value="in-progress">
-                    <!-- Card -->
-                    <div class="slds-card slds-m-top_medium">
-
-                        <!-- Card header (mirrors Service Reps tab structure) -->
-                        <div class="slds-card__header slds-p-around_medium slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
-                            <div class="slds-grid slds-grid_vertical-align-center">
-                                <lightning-icon
-                                    icon-name="standard:work_order_item"
-                                    size="medium"
-                                    class="slds-m-right_small">
-                                </lightning-icon>
-                                <div>
-                                    <h2 class="slds-text-heading_medium">In-Progress Work Summary</h2>
-                                    <p class="slds-text-body_small slds-text-color_weak">An overview of all in-progress work items being handled</p>
-                                </div>
-                            </div>
-                            <div class="slds-grid slds-grid_vertical-align-center">
-                                <lightning-button-group>
-                                    <lightning-button label="Reassign All Work" variant="neutral"></lightning-button>
-                                    <lightning-button-menu icon-name="utility:down" variant="border" alternative-text="More options" menu-alignment="right">
-                                        <lightning-menu-item value="reassign" label="Reassign All Work"></lightning-menu-item>
-                                    </lightning-button-menu>
-                                </lightning-button-group>
-                                <lightning-button-icon
-                                    icon-name="utility:settings"
-                                    variant="border-filled"
-                                    alternative-text="Settings"
-                                    title="Settings"
-                                    class="slds-m-left_x-small">
-                                </lightning-button-icon>
+            <!-- ── In-Progress Work ── -->
+            <template if:true={isInProgress}>
+                <div class="slds-card slds-m-top_medium">
+                    <div class="slds-card__header slds-p-around_medium slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="standard:work_order_item" size="medium" class="slds-m-right_small"></lightning-icon>
+                            <div>
+                                <h2 class="slds-text-heading_medium">In-Progress Work Summary</h2>
+                                <p class="slds-text-body_small slds-text-color_weak">An overview of all in-progress work items being handled</p>
                             </div>
                         </div>
-
-                        <!-- Stats row + filter chips + controls. The chips
-                             sit inline with the count/live-updates text so
-                             they don't push the table down. -->
-                        <div class="slds-grid slds-grid_vertical-align-center slds-p-horizontal_medium slds-p-bottom_small ipt-toolbar-row">
-                            <div class="slds-grid slds-grid_vertical-align-center ipt-toolbar-left">
-                                <p class="slds-text-body_small slds-text-color_weak ipt-toolbar-count">{inProgressCount} Work Items &bull; Live Updates</p>
-                                <template if:true={hasInProgressFilterChips}>
-                                    <template for:each={visibleChips} for:item="chip">
-                                        <lightning-pill
-                                            key={chip.id}
-                                            label={chip.label}
-                                            name={chip.id}
-                                            data-facet={chip.id}
-                                            class="ipt-pill"
-                                            onremove={handleChipRemove}>
-                                        </lightning-pill>
-                                    </template>
-                                    <template if:true={hasOverflowChips}>
-                                        <span class="ipt-pill-overflow">{overflowLabel}</span>
-                                    </template>
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-button-group>
+                                <lightning-button label="Reassign All Work" variant="neutral"></lightning-button>
+                                <lightning-button-menu icon-name="utility:down" variant="border" alternative-text="More options" menu-alignment="right">
+                                    <lightning-menu-item value="reassign" label="Reassign All Work"></lightning-menu-item>
+                                </lightning-button-menu>
+                            </lightning-button-group>
+                            <lightning-button-icon icon-name="utility:settings" variant="border-filled" alternative-text="Settings" title="Settings" class="slds-m-left_x-small"></lightning-button-icon>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-grid_vertical-align-center slds-p-horizontal_medium slds-p-bottom_small ipt-toolbar-row">
+                        <div class="slds-grid slds-grid_vertical-align-center ipt-toolbar-left">
+                            <p class="slds-text-body_small slds-text-color_weak ipt-toolbar-count">{inProgressCount} Work Items &bull; Live Updates</p>
+                            <template if:true={hasInProgressFilterChips}>
+                                <template for:each={visibleChips} for:item="chip">
+                                    <lightning-pill key={chip.id} label={chip.label} name={chip.id} data-facet={chip.id} class="ipt-pill" onremove={handleChipRemove}></lightning-pill>
                                 </template>
-                            </div>
-                            <div class="slds-grid slds-grid_vertical-align-center ipt-controls">
-                                <lightning-input
-                                    type="search"
-                                    label="Search"
-                                    variant="label-hidden"
-                                    placeholder="Search..."
-                                    class="search-input">
-                                </lightning-input>
-                                <lightning-button-group>
-                                    <lightning-button-icon
-                                        icon-name="utility:agent_astro"
-                                        variant={aiFilterVariant}
-                                        alternative-text="Show only AI-agent work items"
-                                        title="Show only AI-agent work items"
-                                        onclick={handleAiFilterToggle}>
-                                    </lightning-button-icon>
-                                    <lightning-button-icon
-                                        icon-name="utility:questions_and_answers"
-                                        variant={humanFilterVariant}
-                                        alternative-text="Show only human-rep work items"
-                                        title="Show only human-rep work items"
-                                        onclick={handleHumanFilterToggle}>
-                                    </lightning-button-icon>
-                                </lightning-button-group>
-                                <lightning-button-group>
-                                    <lightning-button-icon
-                                        icon-name="utility:filterList"
-                                        variant={filterPanelVariant}
-                                        alternative-text="Filter"
-                                        title="Filter"
-                                        onclick={handleToggleInProgressFilter}>
-                                    </lightning-button-icon>
-                                    <lightning-button-menu icon-name="utility:down" variant="border-filled" alternative-text="More filter options" menu-alignment="right">
-                                        <lightning-menu-item value="all" label="All work items"></lightning-menu-item>
-                                        <lightning-menu-item value="flagged" label="Flagged only"></lightning-menu-item>
-                                    </lightning-button-menu>
-                                </lightning-button-group>
-                            </div>
+                                <template if:true={hasOverflowChips}>
+                                    <span class="ipt-pill-overflow">{overflowLabel}</span>
+                                </template>
+                            </template>
                         </div>
-
-                        <!-- Table — receives the (possibly AI/Human-filtered)
-                             list. The 6-facet drawer state + applied chips
-                             live inside the table component. `panelchange`
-                             tells the page when the drawer opens/closes so
-                             the funnel button can flip variant. -->
-                        <ui-in-progress-table
-                            data={inProgressItems}
-                            hide-columns="status,priority"
-                            onpanelchange={handleInProgressPanelChange}
-                            onfilterchange={handleInProgressFilterChange}>
-                        </ui-in-progress-table>
-
+                        <div class="slds-grid slds-grid_vertical-align-center ipt-controls">
+                            <lightning-input type="search" label="Search" variant="label-hidden" placeholder="Search..." class="search-input"></lightning-input>
+                            <lightning-button-group>
+                                <lightning-button-icon icon-name="utility:agent_astro" variant={aiFilterVariant} alternative-text="Show only AI-agent work items" title="Show only AI-agent work items" onclick={handleAiFilterToggle}></lightning-button-icon>
+                                <lightning-button-icon icon-name="utility:questions_and_answers" variant={humanFilterVariant} alternative-text="Show only human-rep work items" title="Show only human-rep work items" onclick={handleHumanFilterToggle}></lightning-button-icon>
+                            </lightning-button-group>
+                            <lightning-button-group>
+                                <lightning-button-icon icon-name="utility:filterList" variant={filterPanelVariant} alternative-text="Filter" title="Filter" onclick={handleToggleInProgressFilter}></lightning-button-icon>
+                                <lightning-button-menu icon-name="utility:down" variant="border-filled" alternative-text="More filter options" menu-alignment="right">
+                                    <lightning-menu-item value="all" label="All work items"></lightning-menu-item>
+                                    <lightning-menu-item value="flagged" label="Flagged only"></lightning-menu-item>
+                                </lightning-button-menu>
+                            </lightning-button-group>
+                        </div>
                     </div>
-                </lightning-tab>
+                    <ui-in-progress-table
+                        data={inProgressItems}
+                        new-row-id={_ipNewRowId}
+                        hide-columns="status,priority"
+                        onpanelchange={handleInProgressPanelChange}
+                        onfilterchange={handleInProgressFilterChange}>
+                    </ui-in-progress-table>
+                </div>
+            </template>
 
-                <lightning-tab label="Backlog" value="backlog">
-                    <!-- Card -->
-                    <div class="slds-card slds-m-top_medium">
-
-                        <!-- Card header -->
-                        <div class="slds-card__header slds-p-around_medium slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
-                            <div class="slds-grid slds-grid_vertical-align-center">
-                                <lightning-icon
-                                    icon-name="standard:work_queue"
-                                    size="medium"
-                                    class="slds-m-right_small">
-                                </lightning-icon>
-                                <div>
-                                    <h2 class="slds-text-heading_medium">Backlog</h2>
-                                    <p class="slds-text-body_small slds-text-color_weak">Work items waiting to be assigned to a service rep</p>
-                                </div>
-                            </div>
-                            <div class="slds-grid slds-grid_vertical-align-center">
-                                <lightning-button-group>
-                                    <lightning-button label="Assign Selected" variant="neutral"></lightning-button>
-                                    <lightning-button-menu icon-name="utility:down" variant="border" alternative-text="More options" menu-alignment="right">
-                                        <lightning-menu-item value="assign-all" label="Assign All Backlog"></lightning-menu-item>
-                                    </lightning-button-menu>
-                                </lightning-button-group>
-                                <lightning-button-icon
-                                    icon-name="utility:settings"
-                                    variant="border-filled"
-                                    alternative-text="Settings"
-                                    title="Settings"
-                                    class="slds-m-left_x-small">
-                                </lightning-button-icon>
+            <!-- ── Backlog ── -->
+            <template if:true={isBacklog}>
+                <div class="slds-card slds-m-top_medium">
+                    <div class="slds-card__header slds-p-around_medium slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-icon icon-name="standard:work_queue" size="medium" class="slds-m-right_small"></lightning-icon>
+                            <div>
+                                <h2 class="slds-text-heading_medium">Backlog</h2>
+                                <p class="slds-text-body_small slds-text-color_weak">Work items waiting to be assigned to a service rep</p>
                             </div>
                         </div>
-
-                        <!-- Stats + search bar -->
-                        <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-horizontal_medium slds-p-bottom_small">
-                            <p class="slds-text-body_small slds-text-color_weak">{backlogCount} Work Items &bull; Live Updates</p>
-                            <div class="slds-grid slds-grid_vertical-align-center ipt-controls">
-                                <lightning-input
-                                    type="search"
-                                    label="Search"
-                                    variant="label-hidden"
-                                    placeholder="Search..."
-                                    class="search-input">
-                                </lightning-input>
-                                <lightning-button-group>
-                                    <lightning-button-icon icon-name="utility:filterList" variant="border-filled" alternative-text="Filter" title="Filter"></lightning-button-icon>
-                                    <lightning-button-menu icon-name="utility:down" variant="border-filled" alternative-text="More filter options" menu-alignment="right">
-                                        <lightning-menu-item value="all" label="All work items"></lightning-menu-item>
-                                        <lightning-menu-item value="flagged" label="Flagged only"></lightning-menu-item>
-                                        <lightning-menu-item value="agent" label="AI Agent only"></lightning-menu-item>
-                                        <lightning-menu-item value="human" label="Human only"></lightning-menu-item>
-                                    </lightning-button-menu>
-                                </lightning-button-group>
-                            </div>
+                        <div class="slds-grid slds-grid_vertical-align-center">
+                            <lightning-button-group>
+                                <lightning-button label="Assign Selected" variant="neutral"></lightning-button>
+                                <lightning-button-menu icon-name="utility:down" variant="border" alternative-text="More options" menu-alignment="right">
+                                    <lightning-menu-item value="assign-all" label="Assign All Backlog"></lightning-menu-item>
+                                </lightning-button-menu>
+                            </lightning-button-group>
+                            <lightning-button-icon icon-name="utility:settings" variant="border-filled" alternative-text="Settings" title="Settings" class="slds-m-left_x-small"></lightning-button-icon>
                         </div>
-
-                        <!-- Table -->
-                        <ui-backlog-table data={backlogItems}></ui-backlog-table>
-
                     </div>
-                </lightning-tab>
+                    <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-p-horizontal_medium slds-p-bottom_small">
+                        <p class="slds-text-body_small slds-text-color_weak">{backlogCount} Work Items &bull; Live Updates</p>
+                        <div class="slds-grid slds-grid_vertical-align-center ipt-controls">
+                            <lightning-input type="search" label="Search" variant="label-hidden" placeholder="Search..." class="search-input"></lightning-input>
+                            <lightning-button-group>
+                                <lightning-button-icon icon-name="utility:filterList" variant="border-filled" alternative-text="Filter" title="Filter"></lightning-button-icon>
+                                <lightning-button-menu icon-name="utility:down" variant="border-filled" alternative-text="More filter options" menu-alignment="right">
+                                    <lightning-menu-item value="all" label="All work items"></lightning-menu-item>
+                                    <lightning-menu-item value="flagged" label="Flagged only"></lightning-menu-item>
+                                    <lightning-menu-item value="agent" label="AI Agent only"></lightning-menu-item>
+                                    <lightning-menu-item value="human" label="Human only"></lightning-menu-item>
+                                </lightning-button-menu>
+                            </lightning-button-group>
+                        </div>
+                    </div>
+                    <ui-backlog-table data={backlogItems} new-row-id={_bktNewRowId}></ui-backlog-table>
+                </div>
+            </template>
 
-            </lightning-tabset>
         </div>
     </div>
 </template>

@@ -20,11 +20,14 @@
     gap: var(--slds-g-spacing-4, 1rem);
 }
 
+/* flex: 0 0 auto prevents the header from growing or shrinking in the card's
+   flex column, so adding/removing filter pills never shifts the card body. */
 .kc-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--slds-g-spacing-2, 0.5rem);
+    flex: 0 0 auto;
 }
 
 .kc-header-text {
@@ -82,17 +85,25 @@
     background: var(--slds-g-color-neutral-base-95, #f3f3f3);
 }
 
-/* Inline caption + filter badges row — single line, overflow clipped */
+/* Inline caption + filter badges row — fixed height so adding or removing
+   pills never changes the row's rendered height and never shifts the card
+   body. 1.5rem (24px) comfortably fits both the caption text (≈17px) and
+   the pill (font 12px + 4px padding = 16px) with room to spare.
+   overflow: visible lets pills render at full height without clipping. */
 .kc-caption-row {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
     gap: var(--slds-g-spacing-1, 0.25rem);
     min-width: 0;
-    overflow: hidden;
+    overflow: visible;
+    height: 1.5rem;
+    flex-shrink: 0;
 }
 
-/* Filter badges: "GroupLabel: val1, val2 ×" pill */
+/* Filter badges: "GroupLabel: val1, val2 ×" pill.
+   line-height: 1 collapses the text's line box to 12px so the pill height
+   = 12px + 4px top + 4px bottom padding = 20px — fits within the 24px row. */
 .kc-filter-badge {
     display: inline-flex;
     align-items: center;
@@ -100,9 +111,10 @@
     position: relative;
     background: var(--slds-g-color-surface-2, #f3f3f3);
     border-radius: 20px;
-    padding: 2px 4px 2px var(--slds-g-spacing-2, 0.5rem);
+    padding: 4px 4px 4px var(--slds-g-spacing-2, 0.5rem);
     font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
     font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    line-height: 1;
     color: var(--slds-g-color-on-surface-1, #5c5c5c);
     white-space: nowrap;
     cursor: default;

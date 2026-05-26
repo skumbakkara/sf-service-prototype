@@ -68,25 +68,21 @@ export default class ChartDonut extends LightningElement {
         const total = this.totalValue || 1;
         const C = this.circumference;
         const rawGap = Math.max(0, Number(this.segmentGap) || 0);
-        // Don't try to apply a gap when the chart only has one (or zero)
-        // segments, otherwise the single ring would just shrink uselessly.
         const gap = segs.length > 1 ? rawGap : 0;
         let cumulative = 0;
         return segs.map((s, idx) => {
             const value = Number(s.value) || 0;
             const fullArcLen = (value / total) * C;
-            // Clamp so a tiny segment can't go negative when the gap is wider
-            // than the segment itself; leave at least 0.5 unit of stroke so
-            // the rendering engine still draws a hairline.
             const visibleArcLen = Math.max(0.5, fullArcLen - gap);
             const dashGap = C - visibleArcLen;
             const offset = -cumulative;
             cumulative += fullArcLen;
+            const delayS = (idx * 0.15).toFixed(2);
             return {
                 id: s.id ?? `seg-${idx}`,
                 dashArray: `${visibleArcLen} ${dashGap}`,
                 dashOffset: `${offset}`,
-                colorStyle: `--cd-segment-color: var(${s.colorVar});`,
+                colorStyle: `--cd-segment-color: var(${s.colorVar}); animation-delay: ${delayS}s;`,
             };
         });
     }

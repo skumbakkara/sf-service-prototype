@@ -39,7 +39,7 @@ export default class ChartBar extends LightningElement {
             return {
                 id: r.id ?? `row-${idx}`,
                 label: r.label,
-                barStyle: `width: ${pct.toFixed(2)}%; background-color: var(${colorVar});`,
+                barStyle: `width: ${pct.toFixed(2)}%; background-color: var(${colorVar}); animation-delay: ${(idx * 0.12).toFixed(2)}s;`,
             };
         });
     }

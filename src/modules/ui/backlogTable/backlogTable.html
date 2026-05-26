@@ -23,7 +23,7 @@
             </thead>
             <tbody>
                 <template for:each={tableRows} for:item="row">
-                    <tr key={row.id} class="slds-hint-parent bkt-row">
+                    <tr key={row.id} class={row.rowClass}>
                         <!-- Checkbox -->
                         <td class="bkt-cell-checkbox">
                             <div class="slds-text-align_center">

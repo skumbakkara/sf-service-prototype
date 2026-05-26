@@ -7,6 +7,38 @@
     min-height: 100vh;
 }
 
+/* ── Custom tab bar ─────────────────────────────────── */
+.sr-tabs {
+    display: flex;
+    border-bottom: 2px solid var(--slds-g-color-border-1, #e5e5e5);
+    gap: 0;
+}
+
+.sr-tab {
+    padding: 0.625rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-5, 500);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.sr-tab:hover {
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+}
+
+.sr-tab--active {
+    color: var(--slds-g-color-accent-2, #0250d9);
+    border-bottom-color: var(--slds-g-color-accent-2, #0250d9);
+    font-weight: var(--slds-g-font-weight-6, 600);
+}
+
 /* ── Card ───────────────────────────────────────────── */
 .slds-card {
     background-color: var(--slds-g-color-surface-1, #ffffff);

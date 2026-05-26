@@ -54,6 +54,11 @@
     height: 100%;
 }
 
+@keyframes cl-line-draw {
+    from { stroke-dashoffset: 1; }
+    to   { stroke-dashoffset: 0; }
+}
+
 /* Line chart stroke. Color flows in via the per-instance custom property
    --cl-line-color set on the path's `style` attribute (same dynamic-CSS
    pattern as ui-chart-donut's per-segment colors). */
@@ -62,6 +67,9 @@
     stroke-width: var(--slds-g-sizing-border-2, 2px);
     stroke-linecap: round;
     stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    animation: cl-line-draw 1s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Range band fill. Uses the same color family as the line, dimmed to a

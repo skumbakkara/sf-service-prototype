@@ -334,7 +334,7 @@ th:hover .col-chevron { display: inline-flex; }
 .rep-row:hover td,
 .rep-row:hover td.slds-cell_shrink,
 .rep-row_expanded > td {
-    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3) !important;
     box-shadow: none !important;
 }
 /* Pin every border on the hovered row AND the next-sibling row to the standard

@@ -133,6 +133,22 @@
 }
 .bkt-container th:hover .col-chevron { display: inline-flex; }
 
+/* ── New-row arrival animation ───────────────────────────────── */
+@keyframes bkt-row-slide {
+    0%   { opacity: 0; transform: translateY(-6px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes bkt-row-highlight {
+    0%   { background-color: var(--slds-g-color-palette-green-95, #ebf7e6); }
+    60%  { background-color: var(--slds-g-color-palette-green-95, #ebf7e6); }
+    100% { background-color: var(--slds-g-color-surface-1, #ffffff); }
+}
+.bkt-container .bkt-row--new > td {
+    animation:
+        bkt-row-slide     0.8s ease-out both,
+        bkt-row-highlight 2.4s ease-in  both;
+}
+
 /* ── Row hover ───────────────────────────────────────────────── */
 .bkt-container .bkt-row:hover td,
 .bkt-container .bkt-row:hover td.slds-cell_shrink {

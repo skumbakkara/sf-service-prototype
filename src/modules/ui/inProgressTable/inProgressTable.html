@@ -28,7 +28,7 @@
             </thead>
             <tbody>
                 <template for:each={tableRows} for:item="row">
-                    <tr key={row.id} class="slds-hint-parent ipt-row">
+                    <tr key={row.id} class={row.rowClass}>
                         <!-- Checkbox -->
                         <td class="slds-cell_shrink">
                             <div class="slds-text-align_center">
@@ -97,23 +97,17 @@
                             <td class="slds-text-align_left ipt-flag-td">
                                 <template if:true={row.hasFlag}>
                                     <div class="ipt-flag-wrap">
-                                        <!-- lightning-button-menu gives us the
-                                             flag icon + native down chevron in
-                                             a single LBC trigger. We slot our
-                                             custom SLDS 2 popover content
-                                             inside its dropdown (CSS in this
-                                             component overrides the default
-                                             slds-dropdown__list look so the
-                                             slot reads as the popover from
-                                             Figma 19427-55644). -->
-                                        <lightning-button-menu
+                                        <lightning-button-icon
                                             icon-name="utility:priority"
-                                            icon-size="medium"
+                                            size="medium"
                                             variant="border-filled"
                                             alternative-text="Flag actions"
                                             title="Flag actions"
-                                            menu-alignment="left"
+                                            data-id={row.id}
+                                            onclick={handleFlagToggle}
                                             class="ipt-flag-button">
+                                        </lightning-button-icon>
+                                        <template if:true={row.isFlagOpen}>
                                             <div class="ipt-flag-popover" role="dialog" aria-labelledby={row.flagPopoverTitleId}>
                                                 <div class="ipt-flag-popover__body">
                                                     <p class="ipt-flag-popover__title" id={row.flagPopoverTitleId}>{row.flagWhisperTitle}</p>
@@ -130,7 +124,7 @@
                                                     </lightning-button>
                                                 </footer>
                                             </div>
-                                        </lightning-button-menu>
+                                        </template>
                                     </div>
                                 </template>
                             </td>

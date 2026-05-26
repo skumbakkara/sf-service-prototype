@@ -104,6 +104,25 @@ export default class InProgressTable extends LightningElement {
     _isLoading = false;
     _scrollAttached = false;
 
+    // ID of the most-recently-prepended row; drives the slide-in animation.
+    @track _newRowId = null;
+
+    // ID of the row whose flag popover is currently open; null = all closed.
+    @track _openFlagRowId = null;
+
+    // Parent passes the id of the arriving row via this attribute so the
+    // animation class is applied in the same render that draws the row.
+    @api
+    get newRowId() { return this._newRowId; }
+    set newRowId(value) {
+        const id = value ? String(value) : null;
+        this._newRowId = id;
+        if (id) {
+            // eslint-disable-next-line @lwc/lwc/no-async-operation
+            setTimeout(() => { this._newRowId = null; }, 2600);
+        }
+    }
+
     // Comma-separated list of column fieldNames to hide. Kebab-case attribute:
     // `hide-columns="status,assignedTo,hasFlag"`. Empty string => show all.
     @api hideColumns = '';
@@ -324,8 +343,12 @@ export default class InProgressTable extends LightningElement {
             if (statusCfg?.label)    detailsParts.push(statusCfg.label);
             if (priorityCfg?.label)  detailsParts.push(`${priorityCfg.label} Priority`);
             const rowId = String(item.id);
+            const isNew = rowId === this._newRowId;
+            const isFlagOpen = rowId === this._openFlagRowId;
             return {
                 id: rowId,
+                rowClass: `slds-hint-parent ipt-row${isNew ? ' ipt-row--new' : ''}`,
+                isFlagOpen,
                 channelIcon: CHANNEL_ICONS[item.channel] ?? 'utility:record',
                 channelLabel: CHANNEL_LABELS[item.channel] ?? item.channel,
                 subject: item.subject,
@@ -417,40 +440,44 @@ export default class InProgressTable extends LightningElement {
     }
 
     // ── Flag popover handlers ──────────────────────────────────────────────
-    // The popover is the lightning-button-menu's native dropdown with our
-    // SLDS 2 popover content slotted inside. The menu manages open/close,
-    // outside-click dismissal, and Escape-to-close on its own, so the only
-    // handler we still need is for the "Lower Flag" action button.
+    handleFlagToggle(event) {
+        const id = event.currentTarget?.dataset?.id;
+        if (!id) return;
+        event.stopPropagation();
+        this._openFlagRowId = this._openFlagRowId === id ? null : id;
+    }
+
     handleLowerFlag(event) {
         const id = event.currentTarget?.dataset?.id;
         if (!id) return;
-        // Demo behaviour: emit an event so the page (or future consumers)
-        // can update the source row's `hasFlag`. The table doesn't own
-        // the data so it can't mutate it directly. We also nudge the menu
-        // closed by blurring the active element — lightning-button-menu
-        // auto-closes on outside click after that.
+        this._openFlagRowId = null;
         this.dispatchEvent(new CustomEvent('flaglower', {
             detail: { id },
             bubbles: true,
             composed: true,
         }));
-        if (document.activeElement && typeof document.activeElement.blur === 'function') {
-            document.activeElement.blur();
-        }
     }
 
-    // ── Infinite scroll ─────────────────────────────────────────────────────
+    _handleDocClick = () => {
+        if (this._openFlagRowId !== null) {
+            this._openFlagRowId = null;
+        }
+    };
+
+    // ── Infinite scroll + outside-click dismiss ─────────────────────────────
     renderedCallback() {
         if (this._scrollAttached) return;
         const container = this.template.querySelector('.ipt-container');
         if (!container) return;
         container.addEventListener('scroll', this._onScroll);
+        document.addEventListener('click', this._handleDocClick);
         this._scrollAttached = true;
     }
 
     disconnectedCallback() {
         const container = this.template.querySelector('.ipt-container');
         if (container) container.removeEventListener('scroll', this._onScroll);
+        document.removeEventListener('click', this._handleDocClick);
         this._scrollAttached = false;
     }
 

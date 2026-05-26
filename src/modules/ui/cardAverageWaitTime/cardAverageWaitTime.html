@@ -1,6 +1,6 @@
 <template>
     <ui-kpi-card title="Average Wait Time" caption="Current" filter-groups={filterGroups} show-timeframe>
-        <ui-kpi-value value="5m">
+        <ui-kpi-value value={displayValue}>
             <span slot="footer" class="cawt-footer">
                 <span class="cawt-num">+7.3%</span><span class="cawt-label">&nbsp;period vs period</span>
             </span>

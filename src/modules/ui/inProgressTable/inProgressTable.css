@@ -155,10 +155,26 @@ thead tr th:last-child  { border-top-right-radius: var(--slds-g-radius-border-2,
 }
 th:hover .col-chevron { display: inline-flex; }
 
+/* ── New-row arrival animation ───────────────────────────────── */
+@keyframes ipt-row-slide {
+    0%   { opacity: 0; transform: translateY(-6px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes ipt-row-highlight {
+    0%   { background-color: var(--slds-g-color-palette-green-95, #ebf7e6); }
+    60%  { background-color: var(--slds-g-color-palette-green-95, #ebf7e6); }
+    100% { background-color: var(--slds-g-color-surface-1, #ffffff); }
+}
+.ipt-row--new > td {
+    animation:
+        ipt-row-slide     0.8s ease-out both,
+        ipt-row-highlight 2.4s ease-in  both;
+}
+
 /* ── Row hover ───────────────────────────────────────────────── */
 .ipt-row:hover td,
 .ipt-row:hover td.slds-cell_shrink {
-    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3) !important;
     box-shadow: none !important;
 }
 .ipt-row:hover td,
@@ -266,28 +282,11 @@ th:hover .col-chevron { display: inline-flex; }
 .ipt-flag-wrap {
     position: relative;
     display: inline-flex;
+    align-items: center;
 }
 
 .ipt-flag-button {
     position: relative;
-}
-
-/* lightning-button-menu paints its dropdown chrome (white surface,
-   hairline border, drop shadow, 4px vertical padding) inside its own
-   synthetic shadow root, so plain descendant selectors from this file
-   cannot reach those styles — that chrome shows up as a second card
-   around the popover ("double border"). The dropdown wrapper is exposed
-   as `part="overlay dropdown"`, so `::part(dropdown)` lets us strip
-   the chrome from outside. The popover itself paints its own card +
-   nubbin from inside the slot. */
-.ipt-flag-button::part(dropdown) {
-    padding: 0;
-    margin: 0;
-    background-color: transparent;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    overflow: visible;
 }
 
 /* Stacking context for the open popover only.
@@ -306,12 +305,9 @@ th:hover .col-chevron { display: inline-flex; }
 
    The sticky thead is at z-index 20 (checkbox header 21), so the popover
    still tucks under the column labels when the body scrolls behind it. */
-/* lightning-button-menu sets aria-expanded="true" on its inner trigger
-   when the dropdown is open. Lift only that single cell into its own
-   stacking context so the popover paints above the cell's right border,
-   the next column's left border, and the row-hover fill of the row
-   beneath it. */
-.ipt-row > td.ipt-flag-td:has(button[aria-expanded="true"]) {
+/* Lift the flag cell into its own stacking context when the popover is open
+   so the popover paints above adjacent cell borders and row-hover fills. */
+.ipt-row > td.ipt-flag-td:has(.ipt-flag-popover) {
     position: relative;
     z-index: 19;
     isolation: isolate;
@@ -337,7 +333,10 @@ th:hover .col-chevron { display: inline-flex; }
    is locked to the Figma frame (310px); no SLDS sizing hook covers
    component-level widths. */
 .ipt-flag-popover {
-    position: relative;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 19;
     width: 310px;
     min-width: 310px;
     padding: var(--slds-g-spacing-4, 1rem);

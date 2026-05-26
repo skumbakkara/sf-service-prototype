@@ -9,7 +9,7 @@
 
 import { routes } from './routes.config.js';
 
-const DEFAULT_TITLE = 'Salesforce';
+const DEFAULT_TITLE = 'Command Centre for Service';
 
 const HASH_MODE = import.meta.env.VITE_ROUTER_MODE === 'hash';
 
