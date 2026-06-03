@@ -32,9 +32,12 @@
     gap: var(--slds-g-spacing-3, 0.75rem);
 }
 
-/* SLDS 2 token: Titles/font-scale-5/Regular + Shade/on-surface/3
-   font-family-base, font-scale-5 (28px), font-weight-4 (regular),
-   line-height-2 (1.25), color on-surface-3 (#001e5b in shade mode). */
+.wb-page-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
 .wb-page-title {
     margin: 0;
     font-family: var(--slds-g-font-family-base, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
@@ -43,6 +46,15 @@
     line-height: var(--slds-g-font-line-height-2, 1.25);
     letter-spacing: 0;
     color: var(--slds-g-color-on-surface-3, #001e5b);
+}
+
+.wb-page-subtitle {
+    margin: 0;
+    font-family: var(--slds-g-font-family-base, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+    font-size: var(--slds-g-font-size-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 18px;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
 }
 
 /* Shared grid base */

@@ -11,7 +11,9 @@
     border-radius: var(--slds-g-radius-border-4, 1.25rem);
     padding-top: var(--slds-g-spacing-4, 1rem);
     padding-right: var(--slds-g-spacing-4, 1rem);
-    padding-bottom: var(--slds-g-spacing-4, 1rem);
+    /* +8px breathing room below the metric/footer row so the values
+       don't sit flush against the card bottom edge. spacing-5 = 24px. */
+    padding-bottom: var(--slds-g-spacing-5, 1.5rem);
     padding-left: var(--slds-g-spacing-4, 1rem);
     height: 100%;
     box-sizing: border-box;
@@ -33,7 +35,7 @@
 .kc-header-text {
     display: flex;
     flex-direction: column;
-    gap: var(--slds-g-spacing-1, 0.25rem);
+    gap: 0;
     min-width: 0;
     flex: 1 1 auto;
 }
@@ -88,15 +90,14 @@
 /* Inline caption + filter badges row — fixed height so adding or removing
    pills never changes the row's rendered height and never shifts the card
    body. 1.5rem (24px) comfortably fits both the caption text (≈17px) and
-   the pill (font 12px + 4px padding = 16px) with room to spare.
-   overflow: visible lets pills render at full height without clipping. */
+   the pill (font 12px + 4px padding = 16px) with room to spare. */
 .kc-caption-row {
     display: flex;
     flex-wrap: nowrap;
     align-items: center;
     gap: var(--slds-g-spacing-1, 0.25rem);
     min-width: 0;
-    overflow: visible;
+    overflow: hidden;
     height: 1.5rem;
     flex-shrink: 0;
 }
@@ -126,12 +127,23 @@
     flex-shrink: 0;
 }
 
+.kc-card_metric-only .kc-filter-badge {
+    min-width: 0;
+    flex-shrink: 1;
+    overflow: hidden;
+}
+
 /* Values may truncate when space is tight */
 .kc-filter-badge-values {
     font-weight: var(--slds-g-font-weight-4, 400);
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 120px;
+}
+
+/* On metric-only cards truncate values sooner to prevent overflow */
+.kc-card_metric-only .kc-filter-badge-values {
+    max-width: 80px;
 }
 
 .kc-filter-badge-remove {
@@ -163,9 +175,13 @@
     text-decoration: none;
 }
 
+/* Metric-only cards: equal 16px top/bottom padding. Header→body gap
+   inherits the base `.kc-card` 16px so the title/timeframe sit at the
+   default distance above the value. */
 .kc-card_metric-only {
-    padding-top: 16px;
-    padding-bottom: 16px;
+    padding-top: var(--slds-g-spacing-4, 1rem);
+    padding-bottom: var(--slds-g-spacing-4, 1rem);
+    gap: var(--slds-g-spacing-1, 0.25rem);
 }
 
 .kc-body {

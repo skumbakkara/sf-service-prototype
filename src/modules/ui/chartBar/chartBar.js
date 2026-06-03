@@ -44,6 +44,11 @@ export default class ChartBar extends LightningElement {
         });
     }
 
+    get gridStyle() {
+        const count = Array.isArray(this.rows) ? this.rows.length : 0;
+        return `--cb-row-count: ${count};`;
+    }
+
     get computedTicks() {
         const ticks = Array.isArray(this.tickLabels) ? this.tickLabels : [];
         return ticks.map((t, i) => ({ id: `xt-${i}`, label: t }));

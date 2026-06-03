@@ -57,7 +57,7 @@ export default class CardAgentPresenceStatus extends LightningElement {
         { id: 'online',        label: 'Online',             value: 7,  colorVar: '--ccs-g-color-chart-category-light-color-1' },
         { id: 'avail-all',     label: 'Available All',      value: 7,  colorVar: '--ccs-g-color-chart-category-light-color-1' },
         { id: 'avail-call',    label: 'Available for Call', value: 6,  colorVar: '--ccs-g-color-chart-category-light-color-1' },
-        { id: 'avail-chat',    label: 'Available for Chat', value: 6,  colorVar: '--ccs-g-color-chart-category-light-color-1' },
+        { id: 'avail-chat',    label: 'Available for Chat', value: 5,  colorVar: '--ccs-g-color-chart-category-light-color-1' },
     ];
 
     tickLabels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];

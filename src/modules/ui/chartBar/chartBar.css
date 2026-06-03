@@ -5,69 +5,58 @@
 
 .cb-root {
     height: 100%;
-    display: flex;
-    flex-direction: column;
 }
 
-/* Two-column layout: fixed label column + stretchy bar column */
+/* Two-column CSS Grid: auto-sizing label column + stretchy bar column.
+   Items interleaved (label, bar, label, bar…) so each label is guaranteed
+   to be in the same grid row as its bar. */
 .cb-grid {
-    display: flex;
-    flex: 1 1 auto;
-    min-height: 0;
-    gap: var(--slds-g-spacing-3, 0.75rem);
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    /* data rows share available height equally; header/footer rows are auto */
+    grid-template-rows: auto repeat(var(--cb-row-count, 6), 1fr) auto auto;
+    column-gap: var(--slds-g-spacing-3, 0.75rem);
+    height: 100%;
 }
 
-/* Label column */
-.cb-labels-col {
-    display: flex;
-    flex-direction: column;
-    flex: 0 0 auto;
-    gap: 0;
-}
+/* "Status ↓" header sits in col 1 (above the row labels). Right-aligned
+   so its trailing arrow lines up vertically with the right edge of the
+   row labels below, which are also flex-end aligned. */
 
 .cb-axis-header {
     font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
     font-size: var(--slds-g-font-scale-base, 0.8125rem);
     font-weight: var(--slds-g-font-weight-6, 600);
+    line-height: var(--slds-g-font-line-height-3, 1.375);
     color: var(--slds-g-color-on-surface-2, #2e2e2e);
     white-space: nowrap;
-    padding-bottom: var(--slds-g-spacing-1, 0.25rem);
+    display: flex;
+    align-items: center; /* vertically aligns with the spacer in col 2 */
+    justify-content: flex-end;
 }
 
-/* Spacer in the label column matching the tick row height so row labels stay
-   vertically aligned with the bar tracks above the tick row */
-.cb-tick-spacer {
-    height: 1.625rem;
-    flex-shrink: 0;
-}
+/* Spacer in col 1 — height driven by the auto grid row it shares with the tick row */
+.cb-tick-spacer {}
 
 .cb-row-label {
     font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
     font-size: var(--slds-g-font-scale-base, 0.8125rem);
     font-weight: var(--slds-g-font-weight-4, 400);
     color: var(--slds-g-color-on-surface-1, #5c5c5c);
-    height: var(--cb-bar-row-height, 2rem);
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     white-space: nowrap;
-    padding-right: var(--slds-g-spacing-2, 0.5rem);
 }
 
-/* Bar column */
-.cb-bars-col {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    min-width: 0;
-    position: relative;
-}
+/* Bar track and tick row sit in column 2 via grid auto-placement */
 
-/* Tick labels sit below the bars, evenly distributed */
+/* Tick labels sit in col 2, below the bars, evenly distributed */
 .cb-tick-row {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    height: 1.625rem;
+    height: 1.25rem;
     border-top: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
     padding-top: var(--slds-g-spacing-1, 0.25rem);
 }
@@ -79,12 +68,10 @@
     color: var(--slds-g-color-on-surface-2, #2e2e2e);
 }
 
-/* Each bar row is a full-width track; the bar fills proportionally via inline width */
+/* Each bar row stretches to fill its 1fr grid row */
 .cb-bar-track {
-    height: var(--cb-bar-row-height, 2rem);
     display: flex;
     align-items: center;
-    border-bottom: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #e5e5e5);
 }
 
 @keyframes cb-bar-grow {
@@ -102,10 +89,11 @@
 }
 
 .cb-col-axis-label {
+    grid-column: 1 / -1;
     font-family: var(--slds-g-font-family-base, system-ui, sans-serif);
     font-size: var(--slds-g-font-scale-base, 0.8125rem);
-    font-weight: var(--slds-g-font-weight-4, 400);
+    font-weight: var(--slds-g-font-weight-6, 600);
     color: var(--slds-g-color-on-surface-2, #2e2e2e);
-    padding-top: var(--slds-g-spacing-2, 0.5rem);
-    text-align: right;
+    padding-top: var(--slds-g-spacing-1, 0.25rem);
+    text-align: center;
 }

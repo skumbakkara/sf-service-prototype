@@ -1,31 +1,32 @@
 <template>
     <div class="cb-root" role="img" aria-label={ariaLabel}>
-        <div class="cb-grid">
-            <!-- Row label column -->
-            <div class="cb-labels-col">
-                <div class="cb-axis-header">{rowAxisLabel}</div>
-                <template for:each={computedRows} for:item="row">
-                    <div key={row.id} class="cb-row-label">{row.label}</div>
+        <!-- CSS Grid: col 1 = labels (right-aligned), col 2 = bars.
+             Items are interleaved (label, bar, label, bar…) so each label
+             lands in the exact same grid row as its bar — guaranteed alignment. -->
+        <div class="cb-grid" style={gridStyle}>
+            <!-- Header row: axis title in col 1 (above labels), spacer in col 2 -->
+            <div class="cb-axis-header" aria-hidden="true">{rowAxisLabel}</div>
+            <div class="cb-axis-header-spacer" aria-hidden="true"></div>
+
+            <!-- Data rows: label (col 1) + bar track (col 2), interleaved -->
+            <template for:each={computedRows} for:item="row">
+                <div key={row.id} class="cb-row-label">{row.label}</div>
+                <div key={row.id} class="cb-bar-track">
+                    <div class="cb-bar" style={row.barStyle}></div>
+                </div>
+            </template>
+
+            <!-- Footer row: spacer in col 1 + tick row in col 2 -->
+            <div class="cb-tick-spacer" aria-hidden="true"></div>
+            <div class="cb-tick-row" aria-hidden="true">
+                <template for:each={computedTicks} for:item="tick">
+                    <span key={tick.id} class="cb-tick">{tick.label}</span>
                 </template>
-                <div class="cb-tick-spacer" aria-hidden="true"></div>
             </div>
 
-            <!-- Bar + tick column -->
-            <div class="cb-bars-col">
-                <template for:each={computedRows} for:item="row">
-                    <div key={row.id} class="cb-bar-track">
-                        <div class="cb-bar" style={row.barStyle}></div>
-                    </div>
-                </template>
-                <div class="cb-tick-row" aria-hidden="true">
-                    <template for:each={computedTicks} for:item="tick">
-                        <span key={tick.id} class="cb-tick">{tick.label}</span>
-                    </template>
-                </div>
-                <template if:true={hasColAxisLabel}>
-                    <div class="cb-col-axis-label" aria-hidden="true">{colAxisLabel}</div>
-                </template>
-            </div>
+            <template if:true={hasColAxisLabel}>
+                <div class="cb-col-axis-label" aria-hidden="true">{colAxisLabel}</div>
+            </template>
         </div>
     </div>
 </template>

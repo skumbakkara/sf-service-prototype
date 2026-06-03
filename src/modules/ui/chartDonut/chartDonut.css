@@ -5,11 +5,9 @@
     height: 100%;
 }
 
-/* Figma node 19719:42839: donut and legend wrap sit side-by-side with a
-   10px gap. SLDS spacing scale has no 10px step — spacing-2 is 8px and
-   spacing-3 is 12px. We pick `--slds-g-spacing-3` (12px) as the closest
-   hook; the resulting 2px variance from Figma is intentional and
-   preferred over a hardcoded literal.
+/* Donut and legend wrap sit side-by-side with a 24px gap
+   (--slds-g-spacing-5) so the legend column reads as a distinct
+   region next to the chart rather than crowding it.
    `justify-content: center` plus the `flex: 0 1 auto` on the legend wrap
    below keeps the donut + legend group hugging its own content and
    centered inside the parent card. Without these two together the legend
@@ -19,7 +17,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--slds-g-spacing-3, 0.75rem);
+    gap: var(--slds-g-spacing-5, 1.5rem);
     height: 100%;
 }
 

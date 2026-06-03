@@ -11,7 +11,10 @@ export default class KpiCard extends LightningElement {
     @api metricOnly = false;
 
     get cardClass() {
-        return `kc-card${this.metricOnly ? ' kc-card_metric-only' : ''}`;
+        // Boolean attrs without a value arrive as "" in this LWC/Vite env (falsy).
+        // Treat anything other than the explicit false default as opted-in.
+        const isMetricOnly = this.metricOnly !== false;
+        return `kc-card${isMetricOnly ? ' kc-card_metric-only' : ''}`;
     }
 
     @track menuOpen = false;
@@ -39,8 +42,9 @@ export default class KpiCard extends LightningElement {
         return this._selectedFilters;
     }
 
-    // Group applied filters into one badge per group
-    _groupedBadges() {
+    // Group applied filters into one badge per group.
+    // valuesPerBadge: how many values to show inline before truncating within the pill.
+    _groupedBadges(valuesPerBadge = 2) {
         const filters = Array.isArray(this._selectedFilters) ? this._selectedFilters : [];
         const map = new Map();
         for (const f of filters) {
@@ -51,12 +55,12 @@ export default class KpiCard extends LightningElement {
             map.get(key).items.push(f.label);
         }
         return Array.from(map.entries()).map(([key, g]) => {
-            const shown = g.items.slice(0, 2);
+            const shown = g.items.slice(0, valuesPerBadge);
             const hidden = g.items.length - shown.length;
             return {
                 id: key,
                 groupLabel: g.groupLabel,
-                values: shown.join(', ') + (hidden > 0 ? `, +${hidden}` : ''),
+                values: shown.join(', ') + (hidden > 0 ? ` +${hidden}` : ''),
                 allItems: g.items.map((label, i) => ({ id: `${key}-i${i}`, label })),
             };
         });
@@ -70,13 +74,24 @@ export default class KpiCard extends LightningElement {
         return this.hasAppliedFilters ? `${this.caption},` : this.caption;
     }
 
-    // Max 2 badges shown inline; rest collapsed into "+N more"
+    get _badgeLimit() {
+        return 2;
+    }
+
     get appliedFilterBadges() {
-        return this._groupedBadges().slice(0, 2);
+        const all = this._groupedBadges();
+        const limit = this._badgeLimit;
+        const visible = all.slice(0, limit);
+        // When multiple badges are visible on a metric-only card, cap each pill
+        // at 1 value so the pills stay narrow enough to fit side by side.
+        if (this.metricOnly !== false && visible.length > 1) {
+            return this._groupedBadges(1).slice(0, limit);
+        }
+        return visible;
     }
 
     get appliedFilterOverflowCount() {
-        return Math.max(0, this._groupedBadges().length - 2);
+        return Math.max(0, this._groupedBadges().length - this._badgeLimit);
     }
 
     get hasAppliedFilterOverflow() {
