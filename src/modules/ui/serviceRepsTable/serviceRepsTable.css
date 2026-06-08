@@ -2,11 +2,12 @@
     display: block;
 }
 
-/* ── Change 1: align table edges with card header padding ── */
-/* Outer wrapper: provides the horizontal inset that matches the card header
-   padding so the bordered scroll-container doesn't run edge-to-edge. */
+/* Outer wrapper: the table runs edge-to-edge — no left/right inset between the
+   table and the service-rep component. Only the bottom padding remains. The
+   header section keeps its own slds-p-around_medium and is unaffected. */
 .table-scroll-wrap {
-    padding: 0 var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-4, 1rem);
+    padding: 0 0 var(--slds-g-spacing-4, 1rem);
+    position: relative; /* anchor for position:absolute qs-popover */
 }
 
 /* Scroll-container for the table:
@@ -20,8 +21,7 @@
     overflow-x: auto;
     overflow-y: auto;
     max-height: 60vh;
-    border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
-    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+    border: none;
 }
 
 /* Fixed table layout so the inline column widths are honored strictly —
@@ -30,6 +30,9 @@
    natural width — horizontal scroll handles any overflow instead. */
 .slds-table {
     table-layout: fixed;
+    /* Span the full listview width; min-width keeps the table from compressing
+       below its natural content width (horizontal scroll handles overflow). */
+    width: 100%;
     min-width: max-content;
 }
 
@@ -43,13 +46,6 @@
     border-color: var(--slds-g-color-neutral-base-90, #e5e5e5);
 }
 
-/* ── Header row corner radius matches card ───────────────── */
-thead tr th:first-child {
-    border-top-left-radius: var(--slds-g-radius-border-2, 0.5rem);
-}
-thead tr th:last-child {
-    border-top-right-radius: var(--slds-g-radius-border-2, 0.5rem);
-}
 
 /* Suppress SLDS's default sticky-header drop shadow under the thead row */
 .slds-table thead,
@@ -96,6 +92,14 @@ thead tr th:last-child {
 /* Body rows have white background — keep the sticky checkbox cell white */
 .slds-table tbody td.slds-cell_shrink {
     background-color: var(--slds-g-color-surface-1, #ffffff);
+    border-left: none !important;
+}
+
+/* Expanded row's checkbox cell: restore the 4px white left border.
+   Higher specificity than the slds-cell_shrink none rule above. */
+.slds-table tbody tr.rep-row_expanded > td.slds-cell_shrink {
+    border-left: 4px solid var(--slds-g-color-surface-1, #ffffff) !important;
+    background-clip: padding-box;
 }
 
 /* Selected rows use a tinted background — match it on the sticky cell */
@@ -329,47 +333,120 @@ th:hover .col-chevron { display: inline-flex; }
     --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
 }
 
-/* ── Row hover / expanded — neutral-base-95 fill ────────────────────
-   The expanded state mirrors :hover so the parent row visually anchors
-   its open accordion below. */
-.rep-row:hover td,
-.rep-row:hover td.slds-cell_shrink,
-.rep-row_expanded > td {
+/* ── Row hover — neutral-base-95 fill ──────────────────────────────────
+   Excludes the expanded row: once open it's a static card and must not
+   change fill on hover. */
+.rep-row:hover:not(.rep-row_expanded) td,
+.rep-row:hover:not(.rep-row_expanded) td.slds-cell_shrink {
     background-color: var(--slds-g-color-neutral-base-95, #f3f3f3) !important;
     box-shadow: none !important;
 }
-/* Pin every border on the hovered row AND the next-sibling row to the standard
-   neutral-base-90 so SLDS hover state doesn't bleed darker lines (horizontal
-   on the row below, vertical between cells of the hovered row). */
-.rep-row:hover td,
-.rep-row:hover + tr td,
-.rep-row:hover + tr th,
+
+/* ── Expanded "card" group (Figma node 20248:28319) ─────────────────────
+   The expanded rep row + its work-items panel read as one rounded, filled
+   card floating over the white table. The parent row is the card's top
+   (rounded top corners + tinted fill); the panel cell is the card's body
+   and bottom (see .work-item-cell below). border-radius works under the
+   table's border-collapse model — same approach as the sticky thead
+   corners above. */
 .rep-row_expanded > td {
-    border-color: var(--slds-g-color-neutral-base-90, #e5e5e5) !important;
+    background-color: rgba(243, 243, 243, 0.6) !important;
     box-shadow: none !important;
+}
+/* 4px left/right margin on the open card without moving any content. A 4px
+   SURFACE-coloured (white) border + background-clip:padding-box pulls the
+   painted (tinted, rounded) background in 4px; white matches the listview
+   card behind the table, so the gap is a clean margin and the rounded corner
+   blends white-on-white (no gray arc showing through). The card's left/right
+   edges are the first cell's left and the last cell's right, so only those
+   two get inset. */
+.rep-row_expanded > td:first-child {
+    border-top-left-radius: var(--slds-g-radius-border-4, 20px);
+    border-left: 4px solid var(--slds-g-color-surface-1, #ffffff);
+    background-clip: padding-box;
+}
+.rep-row_expanded > td:last-child {
+    border-top-right-radius: var(--slds-g-radius-border-4, 20px);
+    border-right: 4px solid var(--slds-g-color-surface-1, #ffffff);
+    background-clip: padding-box;
+}
+/* Re-centre the checkbox: the 4px left border shifts the centred wrapper 2px
+   right (half the border on a 40px border-box cell). Nudge it back 2px —
+   transform is visual-only, so it adds no layout shift or border artifact. */
+.rep-row_expanded > td:first-child .slds-text-align_center {
+    transform: translateX(-2px);
+}
+/* Kill the SLDS2 dataTable row hover/focus drop shadow on the open card. The
+   theme paints `box-shadow: var(--_slds-c-datatable-row-shadow-hover)` on
+   `tbody tr:hover/:focus > td` (dataTable.css) — which fires on the expanded
+   row (it holds focus after the expand click) and on the work-items panel.
+   Nulling the custom property + an explicit none covers both states. */
+.rep-row_expanded > td,
+.rep-row_expanded:hover > td,
+.rep-row_expanded:focus > td,
+.work-item-row > td,
+.work-item-row:hover > td,
+.work-item-row:focus > td {
+    --_slds-c-datatable-row-shadow-hover: none;
+    box-shadow: none !important;
+}
+/* 4px breathing room above the open card: a surface-coloured top border on the
+   expanded row reads as a white gap separating the card from the row above.
+   Declared after the border-colour pin so the top edge wins. */
+.rep-row_expanded > td {
+    border-top: 4px solid var(--slds-g-color-surface-1, #ffffff) !important;
 }
 
 /* ── Work item accordion row ────────────────────────────────────────────── */
 .work-item-row {
-    background-color: var(--slds-g-color-surface-1, #ffffff);
+    background-color: rgba(243, 243, 243, 0.7);
 }
 .work-item-row_wrap {
-    background-color: var(--slds-g-color-surface-1, #ffffff);
+    background-color: rgba(243, 243, 243, 0.7);
 }
+/* Panel cell = card body + bottom. Tinted to match the expanded row, with the
+   bottom corners rounded to close the card. 40px left indent + 8px bottom
+   padding match Figma node 20248:28336. */
 .work-item-cell {
-    padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-3, 0.75rem) 40px !important;
+    /* Padding compensated by -4px on each side so the 4px transparent left/right
+       borders below inset the card background without shifting the work-item
+       cards (effective content inset stays 40px left / 16px right). */
+    padding: var(--slds-g-spacing-2, 0.5rem) 12px var(--slds-g-spacing-2, 0.5rem) 36px !important;
+    background-color: rgba(243, 243, 243, 0.7) !important;
+    background-clip: padding-box;
     border-top: 0 !important;
-    border-bottom: 2px solid var(--slds-g-color-border-1, #c9c9c9) !important;
+    /* 4px left/right margin: surface-coloured (white) borders + background-clip
+       inset the tinted, rounded background by 4px on each side. White matches
+       the listview card behind the table so the bottom rounded corners blend
+       cleanly (no gray arc showing through). */
+    border-left: 4px solid var(--slds-g-color-surface-1, #ffffff) !important;
+    border-right: 4px solid var(--slds-g-color-surface-1, #ffffff) !important;
+    /* 4px breathing room below the open card — surface-coloured bottom border
+       reads as a white gap before the next row. */
+    border-bottom: 4px solid var(--slds-g-color-surface-1, #ffffff) !important;
+    border-bottom-left-radius: var(--slds-g-radius-border-4, 20px);
+    border-bottom-right-radius: var(--slds-g-radius-border-4, 20px);
 }
-.work-item-row:hover,
-.work-item-row:hover > .work-item-cell {
-    background-color: var(--slds-g-color-surface-1, #ffffff);
-}
-.work-item-row:hover > .work-item-cell,
-.work-item-row:hover + tr > td,
-.work-item-row:hover + tr > th {
-    border-color: var(--slds-g-color-neutral-base-90, #e5e5e5) !important;
+/* ── Kill ALL hover/focus effects inside the open accordion ───────────────
+   The SLDS2 buttons inside the work-item cards (Monitor = .slds-button_neutral,
+   the flag = .slds-button_icon-border-filled) add a drop shadow + lift
+   transform on hover/focus, which reads as a shadow on the open card. Neutralise
+   the per-button custom properties so no shadow, border shift, or transform
+   fires anywhere within the expanded region. */
+.work-item-cell .slds-button:hover,
+.work-item-cell .slds-button:focus,
+.work-item-cell .slds-button:focus-visible,
+.work-item-cell lightning-button:hover,
+.work-item-cell lightning-button-icon:hover {
+    --slds-c-button-shadow-hover: none;
+    --slds-c-button-shadow-focus: none;
+    --slds-s-button-bordered-shadow-hover: none;
+    --slds-s-button-brand-shadow-hover: none;
+    --slds-c-button-transform-hover: none;
+    --slds-s-button-bordered-transform-hover: none;
+    --slds-s-button-brand-transform-hover: none;
     box-shadow: none !important;
+    transform: none !important;
 }
 
 /* ── Accordion open/close animation ────────────────────────────────────── */
@@ -391,14 +468,26 @@ th:hover .col-chevron { display: inline-flex; }
     animation: wi-panel-in 0.2s ease-out both;
 }
 
+/* ── Section header above the card stack (Figma node 20248:28338) ───────── */
+/* Body/font-scale-neg-2/Semibold (10px / 14px / 600). */
+.wi-section-header {
+    margin: 0 0 var(--slds-g-spacing-2, 0.5rem);
+    font-size: var(--slds-g-font-scale-neg-2, 0.625rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    line-height: 1.4;
+    letter-spacing: 0.0625em;
+    text-transform: uppercase;
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+}
+
 /* Card stack inside the accordion cell */
 .wi-stack {
     display: flex;
     flex-direction: column;
-    gap: var(--slds-g-spacing-3, 0.75rem);
+    gap: var(--slds-g-spacing-2, 0.5rem);
 }
 
-/* ── Work-item card (Figma node 19988:23624) ────────────────────────────── */
+/* ── Work-item card (Figma node 20248:28340) ────────────────────────────── */
 .wi-card {
     display: flex;
     align-items: center;
@@ -406,20 +495,15 @@ th:hover .col-chevron { display: inline-flex; }
     gap: var(--slds-g-spacing-3, 0.75rem);
     padding: var(--slds-g-spacing-3, 0.75rem) var(--slds-g-spacing-4, 1rem);
     background-color: var(--slds-g-color-surface-1, #ffffff);
-    border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+    border: 0.5px solid var(--slds-g-color-neutral-base-90, #e5e5e5);
     border-radius: 12px;
     min-width: 0;
-    width: 760px;
+    /* Extend the card to the right edge of the 8th column (Capacity): the
+       column widths checkbox(40)+Name(200)+Status(130)+Channels(100)+Work
+       Summary(200)+Flag(80)+Login(90)+State(90)+Capacity(150) sum to 1080px,
+       less the card's 40px left indent in .work-item-cell. */
+    width: 1040px;
     box-sizing: border-box;
-}
-.wi-card:hover {
-    background-color: var(--slds-g-color-surface-1, #ffffff) !important;
-    box-shadow: var(
-        --slds-g-shadow-1,
-        0 1px 2px 0 rgba(0, 0, 0, 0.10),
-        0 2px 2px 0 rgba(0, 0, 0, 0.08),
-        0 -1px 2px 0 rgba(0, 0, 0, 0.06)
-    );
 }
 .wi-content {
     display: flex;
@@ -434,27 +518,18 @@ th:hover .col-chevron { display: inline-flex; }
     gap: var(--slds-g-spacing-1, 0.25rem);
     min-width: 0;
 }
-.wi-customer {
-    font-size: var(--slds-g-font-scale-base, 0.8125rem);
-    font-weight: var(--slds-g-font-weight-6, 600);
-    line-height: 1.375;
-    color: var(--slds-g-color-on-surface-1, #5c5c5c);
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-.wi-summary-link {
-    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+/* Single navy summary line: "<subject> | <caseNumber> | <customer>". Plain
+   text per the mock (not a link). font-scale-1 / on-surface-3. */
+.wi-summary {
+    font-size: var(--slds-g-font-scale-1, 0.875rem);
     font-weight: var(--slds-g-font-weight-4, 400);
-    line-height: 1.375;
-    color: var(--slds-g-color-accent-2, #0250d9);
-    text-decoration: none;
+    line-height: 1.357;
+    color: var(--slds-g-color-on-surface-3, #001e5b);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 0;
 }
-.wi-summary-link:hover,
-.wi-summary-link:focus { text-decoration: underline; }
 
 .wi-meta-row {
     display: flex;
@@ -463,46 +538,13 @@ th:hover .col-chevron { display: inline-flex; }
     min-width: 0;
 }
 
-/* ── Channel icon box (18×18 coloured background) ───────────────────────── */
-.wi-ch-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    border-radius: 2px;
+/* ── Meta-row icons: plain neutral glyphs (channel, routing, check) ──────── */
+.wi-meta-icon {
     flex-shrink: 0;
-}
-.wi-ch-icon_cases {
-    background-color: var(--slds-g-color-palette-pink-95, #fdf2ff);
-    --slds-c-icon-color-foreground: var(--slds-g-color-palette-pink-60, #d47fff);
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-pink-60, #d47fff);
-    --sds-c-icon-color-foreground: var(--slds-g-color-palette-pink-60, #d47fff);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-pink-60, #d47fff);
-}
-.wi-ch-icon_call {
-    background-color: var(--slds-g-color-palette-green-95, #ebf7e6);
-    --slds-c-icon-color-foreground: var(--slds-g-color-palette-green-60, #3ba755);
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-green-60, #3ba755);
-    --sds-c-icon-color-foreground: var(--slds-g-color-palette-green-60, #3ba755);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-green-60, #3ba755);
-}
-.wi-ch-icon_chat {
-    background-color: var(--slds-g-color-palette-blue-95, #eaf5fe);
-    --slds-c-icon-color-foreground: var(--slds-g-color-palette-blue-60, #57a3fd);
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-60, #57a3fd);
-    --sds-c-icon-color-foreground: var(--slds-g-color-palette-blue-60, #57a3fd);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-60, #57a3fd);
-}
-.wi-ch-icon_email {
-    background-color: var(--slds-g-color-palette-orange-95, #fef6e6);
-    --slds-c-icon-color-foreground: var(--slds-g-color-warning-1, #a86304);
-    --sds-c-icon-color-foreground: var(--slds-g-color-warning-1, #a86304);
-}
-.wi-ch-icon_messaging {
-    background-color: var(--slds-g-color-info-container-1, #cfe5fc);
-    --slds-c-icon-color-foreground: var(--slds-g-color-palette-blue-40, 0250d9);
-    --sds-c-icon-color-foreground: var(--slds-g-color-palette-blue-40, #0250d9);
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
 }
 
 /* 4×4 separator dots */
@@ -521,17 +563,10 @@ th:hover .col-chevron { display: inline-flex; }
     flex-shrink: 0;
 }
 
-.wi-meta-label {
-    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-    font-weight: var(--slds-g-font-weight-4, 400);
-    line-height: 1.4167;
-    color: var(--slds-g-color-on-surface-1, #5c5c5c);
-    white-space: nowrap;
-    flex-shrink: 0;
-}
+/* All meta-row text: Body/font-scale-neg-1/Regular (12px / 17px / 400). */
 .wi-meta-value {
     font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-    font-weight: var(--slds-g-font-weight-6, 600);
+    font-weight: var(--slds-g-font-weight-4, 400);
     line-height: 1.4167;
     color: var(--slds-g-color-on-surface-1, #5c5c5c);
     white-space: nowrap;
@@ -554,6 +589,38 @@ th:hover .col-chevron { display: inline-flex; }
 .wi-flag-btn {
     flex-shrink: 0;
 }
+
+/* ── Paused Work Items: collapsible section (Figma node 20275:30685) ─────── */
+.wi-paused {
+    display: flex;
+    flex-direction: column;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    margin-top: var(--slds-g-spacing-2, 0.5rem);
+}
+/* Base-button look: link-blue label + chevron, no fill/border. */
+.wi-paused-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-1, 0.25rem);
+    align-self: flex-start;
+    padding: var(--slds-g-spacing-1, 0.25rem) 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--slds-g-color-accent-2, #0250d9);
+}
+.wi-paused-toggle-label {
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-5, 500);
+    line-height: 1.25;
+}
+.wi-paused-toggle-icon {
+    --slds-c-icon-color-foreground: var(--slds-g-color-accent-2, #0250d9);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-accent-2, #0250d9);
+    --sds-c-icon-color-foreground: var(--slds-g-color-accent-2, #0250d9);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-accent-2, #0250d9);
+}
+.wi-paused-toggle:hover .wi-paused-toggle-label { text-decoration: underline; }
 
 /* ── Flag popover — same style as ipt-flag-popover in inProgressTable ── */
 .ipt-flag-popover {
@@ -618,4 +685,193 @@ th:hover .col-chevron { display: inline-flex; }
 .wi-view-all {
     display: flex;
     align-items: center;
+}
+
+/* ── Queue / Skill chip spans in Queues / Skills columns ────────────────────
+   Comma-separated hoverable names. Named queues/skills get an underline on
+   hover; overflow "+N" tokens are not interactive. */
+.srt-chips-cell {
+    white-space: normal;
+    overflow: visible;
+    border-right: none !important;
+}
+
+/* Expanded row's last cell: restore the 4px white right margin border. */
+.slds-table tbody tr.rep-row_expanded > td.srt-chips-cell {
+    border-right: 4px solid var(--slds-g-color-surface-1, #ffffff) !important;
+    background-clip: padding-box;
+}
+.srt-chip {
+    display: inline;
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    cursor: default;
+}
+.srt-chip + .srt-chip::before {
+    content: ', ';
+}
+.qs-trigger.srt-chip {
+    cursor: pointer;
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+.qs-trigger.srt-chip:hover {
+    text-decoration: underline;
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+}
+.srt-chip--overflow {
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+/* Work-item meta-row route value: pointer on hoverable names */
+.wi-meta-value.qs-trigger {
+    cursor: pointer;
+}
+.wi-meta-value.qs-trigger:hover {
+    text-decoration: underline;
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+}
+
+/* ── Queue / Skill hover popover ─────────────────────────────── */
+/* Outer wrapper: position:absolute inside table-scroll-wrap so it scrolls with the page */
+.qs-popover {
+    position: absolute;
+    z-index: 9999;
+    width: 320px;
+}
+/* Nubbin row: full-width strip that holds the left-aligned triangle */
+.qs-popover__nubbin-row {
+    padding-left: 20px;
+}
+/* Triangle pointing up: a rotated square whose top-left borders are visible */
+.qs-popover__nubbin {
+    width: 16px;
+    height: 16px;
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    border-top: 1px solid var(--slds-g-color-border-1, #e5e5e5);
+    border-left: 1px solid var(--slds-g-color-border-1, #e5e5e5);
+    transform: rotate(45deg);
+    margin-bottom: -9px; /* overlap with card so the bottom half merges into the header */
+    position: relative;
+    z-index: 1;
+}
+/* Card body: rounded corners, shadow, clips section content */
+.qs-popover__body {
+    position: relative;
+    background: var(--slds-g-color-surface-1, #ffffff);
+    border-radius: 12px;
+    box-shadow:
+        0 0 10px rgba(0, 0, 0, 0.12),
+        0 7px 7px rgba(0, 0, 0, 0.12),
+        0 -1px 3px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+}
+/* Close button: absolute top-right, independent of header content flow */
+.qs-popover__close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 3;
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+.qs-popover__close:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+.qs-popover__header {
+    padding: 24px 48px 16px 24px; /* right padding leaves room for the close button */
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+.qs-popover__header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.qs-popover__header-icon {
+    flex-shrink: 0;
+}
+.qs-popover__name {
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    font-size: 20px;
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+/* Header grid: equal columns matching section grid so Work Size aligns with Busy */
+.qs-popover__header-grid {
+    display: flex;
+    gap: 12px;
+}
+.qs-popover__field {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+/* Section 1 (header) labels: semibold, on-surface-2 */
+.qs-popover__label--header {
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    line-height: 1.42;
+}
+/* Section 2 & 3 labels: regular weight, on-surface-1 */
+.qs-popover__label {
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
+    line-height: 1.42;
+}
+/* All value text: on-surface-2 */
+.qs-popover__value {
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    line-height: 1.38;
+}
+.qs-popover__value--error {
+    color: var(--slds-g-color-error-1, #b60554);
+}
+.qs-popover__section {
+    padding: 12px 24px;
+    border-top: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+}
+.qs-popover__section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: var(--slds-g-color-on-surface-3, #001e5b);
+    font-size: var(--slds-g-font-scale-2, 1rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+}
+.qs-popover__section-icon {
+    flex-shrink: 0;
+}
+.qs-popover__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.qs-popover__grid-row {
+    display: flex;
+    gap: 12px;
+}
+.qs-popover__col {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
 }

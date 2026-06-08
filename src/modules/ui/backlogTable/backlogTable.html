@@ -1,4 +1,83 @@
 <template>
+    <!-- Queue/Skill popover: position:fixed so it escapes overflow:hidden ancestors -->
+    <template if:true={popoverVisible}>
+        <div class="qs-popover" role="tooltip" style={popoverStyle}>
+            <div class="qs-popover__nubbin"></div>
+            <!-- Section 1: header -->
+            <div class="qs-popover__header">
+                <div class="qs-popover__header-content">
+                    <div class="qs-popover__header-title">
+                        <lightning-icon icon-name={popoverIcon} size="small" class="qs-popover__header-icon"></lightning-icon>
+                        <span class="qs-popover__name">{popoverName}</span>
+                    </div>
+                    <div class="qs-popover__header-grid">
+                        <div class="qs-popover__field">
+                            <span class="qs-popover__label">Priority</span>
+                            <span class="qs-popover__value">{popoverPriority}</span>
+                        </div>
+                        <div class="qs-popover__field">
+                            <span class="qs-popover__label">Work Size</span>
+                            <span class="qs-popover__value">{popoverWorkSize}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Section 2: service reps -->
+            <div class="qs-popover__section">
+                <div class="qs-popover__section-title">
+                    <lightning-icon icon-name="utility:questions_and_answers" size="small" class="qs-popover__section-icon"></lightning-icon>
+                    <span>Service reps</span>
+                </div>
+                <div class="qs-popover__grid">
+                    <div class="qs-popover__grid-row">
+                        <div class="qs-popover__col">
+                            <span class="qs-popover__label">Online</span>
+                            <span class="qs-popover__value">{popoverOnline}</span>
+                        </div>
+                        <div class="qs-popover__col">
+                            <span class="qs-popover__label">Busy</span>
+                            <span class="qs-popover__value">{popoverBusy}</span>
+                        </div>
+                    </div>
+                    <div class="qs-popover__grid-row">
+                        <div class="qs-popover__col">
+                            <span class="qs-popover__label">At Primary Capacity</span>
+                            <span class="qs-popover__value">{popoverAtCapacity}</span>
+                        </div>
+                        <div class="qs-popover__col">
+                            <span class="qs-popover__label">Idle</span>
+                            <span class="qs-popover__value">{popoverIdle}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Section 3: queue performance -->
+            <div class="qs-popover__section">
+                <div class="qs-popover__section-title">
+                    <lightning-icon icon-name="utility:indicator_performance_period" size="small" class="qs-popover__section-icon"></lightning-icon>
+                    <span>Queue Performance</span>
+                </div>
+                <div class="qs-popover__grid">
+                    <div class="qs-popover__grid-row">
+                        <div class="qs-popover__col">
+                            <span class="qs-popover__label">Total Waiting</span>
+                            <span class="qs-popover__value">{popoverTotalWaiting}</span>
+                        </div>
+                        <div class="qs-popover__col">
+                            <span class="qs-popover__label">Longest Wait Time</span>
+                            <span class="qs-popover__value qs-popover__value--error">{popoverLongestWait}</span>
+                        </div>
+                    </div>
+                    <div class="qs-popover__grid-row">
+                        <div class="qs-popover__col">
+                            <span class="qs-popover__label">Average Wait Time</span>
+                            <span class="qs-popover__value">{popoverAvgWait}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
     <div class="bkt-scroll-wrap">
     <div class="bkt-container">
         <table class="slds-table slds-table_bordered slds-table_col-bordered bkt-table">
@@ -60,7 +139,11 @@
                                         alternative-text="Route to"
                                         class="bkt-route-arrow">
                                     </lightning-icon>
-                                    <span class="bkt-route-link">{row.routeByDisplay}</span>
+                                    <span class="bkt-route-link qs-trigger"
+                                          data-qs-type={row.routeKind}
+                                          data-qs-name={row.routeByDisplay}
+                                          onmouseenter={handleQsEnter}
+                                          onmouseleave={handleQsLeave}>{row.routeByDisplay}</span>
                                 </template>
                             </div>
                         </td>

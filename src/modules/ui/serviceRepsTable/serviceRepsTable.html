@@ -4,8 +4,89 @@
          Positioned via JS with position: fixed (see serviceRepsTable.js). -->
     <div class="cap-tooltip" role="tooltip" aria-hidden="true"></div>
     <div class="table-scroll-wrap">
+    <!-- Queue/Skill popover: position:absolute inside table-scroll-wrap so it scrolls with the page -->
+    <template if:true={popoverVisible}>
+        <div class="qs-popover" role="dialog" style={popoverStyle}>
+            <div class="qs-popover__nubbin-row">
+                <div class="qs-popover__nubbin"></div>
+            </div>
+            <div class="qs-popover__body">
+                <button class="qs-popover__close" type="button" onclick={handleQsClose} title="Close">
+                    <lightning-icon icon-name="utility:close" size="xx-small"></lightning-icon>
+                </button>
+                <div class="qs-popover__header">
+                    <div class="qs-popover__header-title">
+                        <lightning-icon icon-name={popoverIcon} size="small" class="qs-popover__header-icon"></lightning-icon>
+                        <span class="qs-popover__name">{popoverName}</span>
+                    </div>
+                    <div class="qs-popover__header-grid">
+                        <div class="qs-popover__field">
+                            <span class="qs-popover__label qs-popover__label--header">Priority</span>
+                            <span class="qs-popover__value">{popoverPriority}</span>
+                        </div>
+                        <div class="qs-popover__field">
+                            <span class="qs-popover__label qs-popover__label--header">Work Size</span>
+                            <span class="qs-popover__value">{popoverWorkSize}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="qs-popover__section">
+                    <div class="qs-popover__section-title">
+                        <lightning-icon icon-name="utility:questions_and_answers" size="small" class="qs-popover__section-icon"></lightning-icon>
+                        <span>Service Reps</span>
+                    </div>
+                    <div class="qs-popover__grid">
+                        <div class="qs-popover__grid-row">
+                            <div class="qs-popover__col">
+                                <span class="qs-popover__label">Online</span>
+                                <span class="qs-popover__value">{popoverOnline}</span>
+                            </div>
+                            <div class="qs-popover__col">
+                                <span class="qs-popover__label">Busy</span>
+                                <span class="qs-popover__value">{popoverBusy}</span>
+                            </div>
+                        </div>
+                        <div class="qs-popover__grid-row">
+                            <div class="qs-popover__col">
+                                <span class="qs-popover__label">At Primary Capacity</span>
+                                <span class="qs-popover__value">{popoverAtCapacity}</span>
+                            </div>
+                            <div class="qs-popover__col">
+                                <span class="qs-popover__label">Idle</span>
+                                <span class="qs-popover__value">{popoverIdle}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="qs-popover__section">
+                    <div class="qs-popover__section-title">
+                        <lightning-icon icon-name="utility:indicator_performance_period" size="small" class="qs-popover__section-icon"></lightning-icon>
+                        <span>Queue Performance</span>
+                    </div>
+                    <div class="qs-popover__grid">
+                        <div class="qs-popover__grid-row">
+                            <div class="qs-popover__col">
+                                <span class="qs-popover__label">Total Waiting</span>
+                                <span class="qs-popover__value">{popoverTotalWaiting}</span>
+                            </div>
+                            <div class="qs-popover__col">
+                                <span class="qs-popover__label">Longest Wait Time</span>
+                                <span class="qs-popover__value qs-popover__value--error">{popoverLongestWait}</span>
+                            </div>
+                        </div>
+                        <div class="qs-popover__grid-row">
+                            <div class="qs-popover__col">
+                                <span class="qs-popover__label">Average Wait Time</span>
+                                <span class="qs-popover__value">{popoverAvgWait}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- /.qs-popover__body -->
+        </div>
+    </template>
     <div class="table-container">
-        <table class="slds-table slds-table_bordered slds-table_col-bordered">
+        <table class="slds-table slds-table_bordered slds-table_col-bordered slds-no-row-hover">
             <thead>
                 <tr class="slds-line-height_reset">
                     <th scope="col" class="slds-cell_shrink">
@@ -94,29 +175,55 @@
                         <td class="slds-text-align_right">{row.accept}</td>
                         <td class="slds-text-align_right">{row.workload}</td>
                         <td class="slds-text-align_right">{row.acw}</td>
-                        <td>{row.queuesDisplay}</td>
-                        <td>{row.skillsDisplay}</td>
+                        <td class="srt-chips-cell">
+                            <template for:each={row.queueItems} for:item="qi">
+                                <span key={qi.display} class={qi.chipClass}
+                                      data-qs-type="queue"
+                                      data-qs-name={qi.name}
+                                      onclick={handleQsClick}>{qi.display}</span>
+                            </template>
+                        </td>
+                        <td class="srt-chips-cell">
+                            <template for:each={row.skillItems} for:item="si">
+                                <span key={si.display} class={si.chipClass}
+                                      data-qs-type="skill"
+                                      data-qs-name={si.name}
+                                      onclick={handleQsClick}>{si.display}</span>
+                            </template>
+                        </td>
                     </tr>
-                    <!-- Expanded: stack of work-item cards matching Figma node 19988:23606. -->
+                    <!-- Expanded: rep row + this panel read as one rounded card.
+                         Layout matches Figma node 20248:28319 (Accordion container). -->
                     <template if:true={row.hasChildren}>
                         <tr key={row.wiPanelId} class={row.wiPanelClass}>
                             <td colspan="14" class="work-item-cell">
+                                <p class="wi-section-header">Active Work Items</p>
                                 <div class="wi-stack">
                                     <template for:each={row.workItems} for:item="wi">
                                         <article key={wi.id} class="wi-card">
                                             <div class="wi-content">
                                                 <div class="wi-top-row">
-                                                    <span class="wi-customer">{wi.customerLabel}</span>
-                                                    <a href="javascript:void(0)" class="wi-summary-link" title={wi.summaryLink}>{wi.summaryLink}</a>
+                                                    <span class="wi-summary" title={wi.summaryText}>{wi.summaryText}</span>
                                                 </div>
                                                 <div class="wi-meta-row">
-                                                    <span class={wi.channelIconClass} aria-hidden="true">
-                                                        <lightning-icon icon-name={wi.channelIcon} size="xx-small" alternative-text={wi.channelLabel}></lightning-icon>
+                                                    <lightning-icon icon-name={wi.channelIcon} size="xx-small" alternative-text={wi.channelLabel} class="wi-meta-icon"></lightning-icon>
+                                                    <span class="wi-meta-dot" aria-hidden="true"></span>
+                                                    <span class="wi-meta-value">{wi.workLoadText}</span>
+                                                    <span class="wi-meta-dot" aria-hidden="true"></span>
+                                                    <span class="wi-meta-pair">
+                                                        <lightning-icon icon-name={wi.routeIcon} size="xx-small" class="wi-meta-icon"></lightning-icon>
+                                                        <span class="wi-meta-value qs-trigger"
+                                                              data-qs-type={wi.routeType}
+                                                              data-qs-name={wi.routeValue}
+                                                              onclick={handleQsClick}>{wi.routeValue}</span>
                                                     </span>
-                                                    <span class="wi-meta-dot" aria-hidden="true"></span>
-                                                    <span class="wi-meta-pair"><span class="wi-meta-label">{wi.workLoadLabel}</span><span class="wi-meta-value">{wi.workLoadValue}</span></span>
-                                                    <span class="wi-meta-dot" aria-hidden="true"></span>
-                                                    <span class="wi-meta-pair"><span class="wi-meta-label">{wi.queueLabel}</span><span class="wi-meta-value">{wi.queueValue}</span></span>
+                                                    <template if:true={wi.isInterruptible}>
+                                                        <span class="wi-meta-dot" aria-hidden="true"></span>
+                                                        <span class="wi-meta-pair">
+                                                            <lightning-icon icon-name="utility:check" size="xx-small" class="wi-meta-icon"></lightning-icon>
+                                                            <span class="wi-meta-value">Interruptible</span>
+                                                        </span>
+                                                    </template>
                                                 </div>
                                             </div>
                                             <div class="wi-actions">
@@ -124,7 +231,7 @@
                                                     <div class="wi-flag-wrap">
                                                         <lightning-button-icon
                                                             icon-name="utility:priority"
-                                                            variant="brand"
+                                                            variant="border-filled"
                                                             size="medium"
                                                             alternative-text="Flag actions"
                                                             title="Flag actions"
@@ -157,6 +264,54 @@
                                         </article>
                                     </template>
                                 </div>
+
+                                <!-- Paused Work Items: base button toggles a collapsed
+                                     list of paused cards (Figma node 20275:30685). -->
+                                <template if:true={row.hasPausedItems}>
+                                    <div class="wi-paused">
+                                        <button type="button" class="wi-paused-toggle" data-id={row.id} onclick={handlePausedToggle} aria-expanded={row.isPausedOpen}>
+                                            <span class="wi-paused-toggle-label">Paused Work Items</span>
+                                            <lightning-icon icon-name={row.pausedToggleIcon} size="xx-small" class="wi-paused-toggle-icon"></lightning-icon>
+                                        </button>
+                                        <template if:true={row.isPausedOpen}>
+                                            <div class="wi-stack wi-paused-stack">
+                                                <template for:each={row.pausedItems} for:item="wi">
+                                                    <article key={wi.id} class="wi-card">
+                                                        <div class="wi-content">
+                                                            <div class="wi-top-row">
+                                                                <span class="wi-summary" title={wi.summaryText}>{wi.summaryText}</span>
+                                                            </div>
+                                                            <div class="wi-meta-row">
+                                                                <lightning-icon icon-name={wi.channelIcon} size="xx-small" alternative-text={wi.channelLabel} class="wi-meta-icon"></lightning-icon>
+                                                                <span class="wi-meta-dot" aria-hidden="true"></span>
+                                                                <span class="wi-meta-value">{wi.workLoadText}</span>
+                                                                <span class="wi-meta-dot" aria-hidden="true"></span>
+                                                                <span class="wi-meta-pair">
+                                                                    <lightning-icon icon-name={wi.routeIcon} size="xx-small" class="wi-meta-icon"></lightning-icon>
+                                                                    <span class="wi-meta-value qs-trigger"
+                                                                          data-qs-type={wi.routeType}
+                                                                          data-qs-name={wi.routeValue}
+                                                                          onmouseenter={handleQsEnter}
+                                                                          onmouseleave={handleQsLeave}>{wi.routeValue}</span>
+                                                                </span>
+                                                                <template if:true={wi.isInterruptible}>
+                                                                    <span class="wi-meta-dot" aria-hidden="true"></span>
+                                                                    <span class="wi-meta-pair">
+                                                                        <lightning-icon icon-name="utility:check" size="xx-small" class="wi-meta-icon"></lightning-icon>
+                                                                        <span class="wi-meta-value">Interruptible</span>
+                                                                    </span>
+                                                                </template>
+                                                            </div>
+                                                        </div>
+                                                        <div class="wi-actions">
+                                                            <lightning-button label="Monitor" variant="neutral" class="wi-monitor-btn"></lightning-button>
+                                                        </div>
+                                                    </article>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
                             </td>
                         </tr>
                     </template>

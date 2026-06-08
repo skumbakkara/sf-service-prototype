@@ -3,6 +3,31 @@ import { LightningElement, api, track } from 'lwc';
 const CHANNEL_ICONS  = { chat: 'utility:chat', call: 'utility:call', cases: 'utility:case', email: 'utility:email', messaging: 'utility:sms' };
 const CHANNEL_LABELS = { chat: 'Chat', call: 'Call', cases: 'Case', email: 'Email', messaging: 'Message' };
 
+// ── Queue & Skill detail maps (module-level constants) ───────────────────────
+const QUEUE_DETAILS = {
+    'Billing':          { priority: '#1', workSize: '1 unit', online: 12, busy: 8,  atCapacity: 7, idle: 4, totalWaiting: 4, longestWait: '4m 2s',  avgWait: '2m 5s'  },
+    'Tech Support':     { priority: '#2', workSize: '1 unit', online: 9,  busy: 5,  atCapacity: 3, idle: 2, totalWaiting: 2, longestWait: '1m 45s', avgWait: '1m 2s'  },
+    'Cancellations':    { priority: '#3', workSize: '1 unit', online: 6,  busy: 4,  atCapacity: 2, idle: 1, totalWaiting: 3, longestWait: '6m 10s', avgWait: '3m 30s' },
+    'Onboarding':       { priority: '#4', workSize: '2 units',online: 8,  busy: 3,  atCapacity: 3, idle: 5, totalWaiting: 1, longestWait: '2m 0s',  avgWait: '1m 15s' },
+    'Renewals':         { priority: '#5', workSize: '1 unit', online: 5,  busy: 2,  atCapacity: 1, idle: 3, totalWaiting: 0, longestWait: '—',      avgWait: '—'      },
+    'Returns':          { priority: '#6', workSize: '1 unit', online: 4,  busy: 3,  atCapacity: 2, idle: 1, totalWaiting: 5, longestWait: '8m 30s', avgWait: '4m 45s' },
+    'Enterprise':       { priority: '#1', workSize: '2 units',online: 7,  busy: 6,  atCapacity: 5, idle: 1, totalWaiting: 6, longestWait: '10m 0s', avgWait: '5m 30s' },
+    'General Inquiry':  { priority: '#7', workSize: '1 unit', online: 14, busy: 9,  atCapacity: 8, idle: 5, totalWaiting: 7, longestWait: '3m 20s', avgWait: '1m 50s' },
+};
+
+const SKILL_DETAILS = {
+    'Product Knowledge':  { priority: '#1', workSize: '1 unit', online: 10, busy: 7, atCapacity: 5, idle: 3, totalWaiting: 3, longestWait: '3m 15s', avgWait: '1m 45s' },
+    'Billing Expertise':  { priority: '#2', workSize: '1 unit', online: 8,  busy: 5, atCapacity: 4, idle: 3, totalWaiting: 2, longestWait: '2m 30s', avgWait: '1m 20s' },
+    'Technical Writing':  { priority: '#3', workSize: '1 unit', online: 4,  busy: 2, atCapacity: 1, idle: 2, totalWaiting: 1, longestWait: '1m 0s',  avgWait: '0m 45s' },
+    'Conflict Resolution':{ priority: '#4', workSize: '1 unit', online: 6,  busy: 4, atCapacity: 3, idle: 2, totalWaiting: 2, longestWait: '4m 0s',  avgWait: '2m 10s' },
+    'Spanish':            { priority: '#5', workSize: '1 unit', online: 5,  busy: 3, atCapacity: 2, idle: 2, totalWaiting: 1, longestWait: '2m 0s',  avgWait: '1m 0s'  },
+    'French':             { priority: '#6', workSize: '1 unit', online: 3,  busy: 1, atCapacity: 1, idle: 2, totalWaiting: 0, longestWait: '—',      avgWait: '—'      },
+    'Enterprise Sales':   { priority: '#2', workSize: '2 units',online: 5,  busy: 4, atCapacity: 3, idle: 1, totalWaiting: 3, longestWait: '5m 30s', avgWait: '3m 0s'  },
+    'Compliance':         { priority: '#3', workSize: '1 unit', online: 4,  busy: 2, atCapacity: 1, idle: 2, totalWaiting: 1, longestWait: '3m 0s',  avgWait: '1m 30s' },
+};
+
+const QS_GENERIC = { priority: '#—', workSize: '1 unit', online: 0, busy: 0, atCapacity: 0, idle: 0, totalWaiting: 0, longestWait: '—', avgWait: '—' };
+
 // ── Filter helpers ──────────────────────────────────────────────────────────
 // Facet ids must mirror the panel component. Defined here too because the
 // table owns the canonical applied state and produces the chip row. Agent
@@ -109,6 +134,9 @@ export default class InProgressTable extends LightningElement {
 
     // ID of the row whose flag popover is currently open; null = all closed.
     @track _openFlagRowId = null;
+
+    // Queue/Skill hover popover state: { type, name, top, left } or null
+    @track _openQsPopover = null;
 
     // Parent passes the id of the arriving row via this attribute so the
     // animation class is applied in the same render that draws the row.
@@ -369,6 +397,7 @@ export default class InProgressTable extends LightningElement {
                     .join('')
                     .toUpperCase(),
                 routeBy: item.routeBy,
+                routeKind: item.routeKind ?? 'queue',
                 routeByIcon: item.routeByIcon
                     || (item.routeBy === 'Direct to Agent' ? 'utility:forward' : null),
                 hasFlag: item.hasFlag,
@@ -406,6 +435,51 @@ export default class InProgressTable extends LightningElement {
             const bv = b[this.sortedBy] ?? '';
             return av < bv ? -dir : av > bv ? dir : 0;
         });
+    }
+
+    // ── Queue / Skill popover ────────────────────────────────────────────────
+    get popoverVisible() { return this._openQsPopover !== null; }
+
+    _qsData() {
+        const p = this._openQsPopover;
+        if (!p) return QS_GENERIC;
+        const map = p.type === 'skill' ? SKILL_DETAILS : QUEUE_DETAILS;
+        return map[p.name] ?? QS_GENERIC;
+    }
+
+    get popoverName()        { return this._openQsPopover?.name ?? ''; }
+    get popoverIcon()        { return this._openQsPopover?.type === 'skill' ? 'standard:skill' : 'standard:work_queue'; }
+    get popoverStyle() {
+        const p = this._openQsPopover;
+        if (!p) return '';
+        return `top:${p.top}px;left:${p.left}px;`;
+    }
+    get popoverPriority()    { return this._qsData().priority; }
+    get popoverWorkSize()    { return this._qsData().workSize; }
+    get popoverOnline()      { return this._qsData().online; }
+    get popoverBusy()        { return this._qsData().busy; }
+    get popoverAtCapacity()  { return this._qsData().atCapacity; }
+    get popoverIdle()        { return this._qsData().idle; }
+    get popoverTotalWaiting(){ return this._qsData().totalWaiting; }
+    get popoverLongestWait() { return this._qsData().longestWait; }
+    get popoverAvgWait()     { return this._qsData().avgWait; }
+
+    handleQsEnter(event) {
+        const el = event.currentTarget;
+        const type = el.dataset.qsType;
+        const name = el.dataset.qsName;
+        if (!type || !name) return;
+        const rect = el.getBoundingClientRect();
+        this._openQsPopover = {
+            type,
+            name,
+            top:  rect.bottom + 10,
+            left: rect.left,
+        };
+    }
+
+    handleQsLeave() {
+        this._openQsPopover = null;
     }
 
     handleSort(event) {

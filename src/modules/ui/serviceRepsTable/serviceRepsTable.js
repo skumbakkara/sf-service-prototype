@@ -3,6 +3,31 @@ import { LightningElement, api, track } from 'lwc';
 const FLAG_WHISPER_TITLE_DEFAULT = 'Latest Whisper from Rep';
 const FLAG_WHISPER_BODY_DEFAULT  = 'Help needed with this case';
 
+// ── Queue & Skill detail maps (module-level constants) ───────────────────────
+const QUEUE_DETAILS = {
+    'Billing':          { priority: '#1', workSize: '1 unit', online: 12, busy: 8,  atCapacity: 7, idle: 4, totalWaiting: 4, longestWait: '4m 2s',  avgWait: '2m 5s'  },
+    'Tech Support':     { priority: '#2', workSize: '1 unit', online: 9,  busy: 5,  atCapacity: 3, idle: 2, totalWaiting: 2, longestWait: '1m 45s', avgWait: '1m 2s'  },
+    'Cancellations':    { priority: '#3', workSize: '1 unit', online: 6,  busy: 4,  atCapacity: 2, idle: 1, totalWaiting: 3, longestWait: '6m 10s', avgWait: '3m 30s' },
+    'Onboarding':       { priority: '#4', workSize: '2 units',online: 8,  busy: 3,  atCapacity: 3, idle: 5, totalWaiting: 1, longestWait: '2m 0s',  avgWait: '1m 15s' },
+    'Renewals':         { priority: '#5', workSize: '1 unit', online: 5,  busy: 2,  atCapacity: 1, idle: 3, totalWaiting: 0, longestWait: '—',      avgWait: '—'      },
+    'Returns':          { priority: '#6', workSize: '1 unit', online: 4,  busy: 3,  atCapacity: 2, idle: 1, totalWaiting: 5, longestWait: '8m 30s', avgWait: '4m 45s' },
+    'Enterprise':       { priority: '#1', workSize: '2 units',online: 7,  busy: 6,  atCapacity: 5, idle: 1, totalWaiting: 6, longestWait: '10m 0s', avgWait: '5m 30s' },
+    'General Inquiry':  { priority: '#7', workSize: '1 unit', online: 14, busy: 9,  atCapacity: 8, idle: 5, totalWaiting: 7, longestWait: '3m 20s', avgWait: '1m 50s' },
+};
+
+const SKILL_DETAILS = {
+    'Product Knowledge':  { priority: '#1', workSize: '1 unit', online: 10, busy: 7, atCapacity: 5, idle: 3, totalWaiting: 3, longestWait: '3m 15s', avgWait: '1m 45s' },
+    'Billing Expertise':  { priority: '#2', workSize: '1 unit', online: 8,  busy: 5, atCapacity: 4, idle: 3, totalWaiting: 2, longestWait: '2m 30s', avgWait: '1m 20s' },
+    'Technical Writing':  { priority: '#3', workSize: '1 unit', online: 4,  busy: 2, atCapacity: 1, idle: 2, totalWaiting: 1, longestWait: '1m 0s',  avgWait: '0m 45s' },
+    'Conflict Resolution':{ priority: '#4', workSize: '1 unit', online: 6,  busy: 4, atCapacity: 3, idle: 2, totalWaiting: 2, longestWait: '4m 0s',  avgWait: '2m 10s' },
+    'Spanish':            { priority: '#5', workSize: '1 unit', online: 5,  busy: 3, atCapacity: 2, idle: 2, totalWaiting: 1, longestWait: '2m 0s',  avgWait: '1m 0s'  },
+    'French':             { priority: '#6', workSize: '1 unit', online: 3,  busy: 1, atCapacity: 1, idle: 2, totalWaiting: 0, longestWait: '—',      avgWait: '—'      },
+    'Enterprise Sales':   { priority: '#2', workSize: '2 units',online: 5,  busy: 4, atCapacity: 3, idle: 1, totalWaiting: 3, longestWait: '5m 30s', avgWait: '3m 0s'  },
+    'Compliance':         { priority: '#3', workSize: '1 unit', online: 4,  busy: 2, atCapacity: 1, idle: 2, totalWaiting: 1, longestWait: '3m 0s',  avgWait: '1m 30s' },
+};
+
+const QS_GENERIC = { priority: '#—', workSize: '1 unit', online: 0, busy: 0, atCapacity: 0, idle: 0, totalWaiting: 0, longestWait: '—', avgWait: '—' };
+
 const STATUS_ICON = {
     online:  'utility:record',
     break:   'utility:record',
@@ -11,23 +36,16 @@ const STATUS_ICON = {
 
 const CHANNEL_LABELS = { chat: 'Chat', call: 'Call', cases: 'Case', email: 'Email', messaging: 'Message' };
 const CHANNEL_ICONS  = { chat: 'utility:chat', call: 'utility:call', cases: 'utility:case', email: 'utility:email', messaging: 'utility:chat' };
-const CHANNEL_BG_CLASS = {
-    cases:     'wi-ch-icon wi-ch-icon_cases',
-    call:      'wi-ch-icon wi-ch-icon_call',
-    chat:      'wi-ch-icon wi-ch-icon_chat',
-    email:     'wi-ch-icon wi-ch-icon_email',
-    messaging: 'wi-ch-icon wi-ch-icon_messaging',
-};
 
-// Maps each work-item channel to its `Work Summary` bucket. `chat` and
-// `messaging` both roll up to "Message(s)" since they share an inbox in
-// the demo. `cases` is the catch-all bucket so unknown channels still
+// Maps each work-item channel to its `Work Summary` bucket. Only three work
+// item types surface: `chat`/`messaging` roll up to "Message(s)"; `email` is
+// logged as a case so it rolls up to "Case(s)" alongside `cases`; `call` is
+// its own type. `cases` is also the catch-all so unknown channels still
 // produce a sensible count rather than silently disappearing.
 const WORK_SUMMARY_BUCKETS = [
-    { key: 'cases',   match: ['cases'],            singular: 'Case',    plural: 'Cases' },
+    { key: 'cases',   match: ['cases', 'email'],     singular: 'Case',    plural: 'Cases' },
     { key: 'message', match: ['chat', 'messaging'], singular: 'Message', plural: 'Messages' },
-    { key: 'call',    match: ['call'],             singular: 'Call',    plural: 'Calls' },
-    { key: 'email',   match: ['email'],            singular: 'Email',   plural: 'Emails' },
+    { key: 'call',    match: ['call'],              singular: 'Call',    plural: 'Calls' },
 ];
 
 function summarizeWorkItems(children) {
@@ -90,6 +108,8 @@ export default class ServiceRepsTable extends LightningElement {
     @track expandedIds = new Set();
     @track selectedIds = new Set();
     @track _openFlagWiId = null;
+    @track _openPausedRepId = null;
+    @track _openQsPopover = null; // { type: 'queue'|'skill', name, top, left }
 
     @api
     get data() { return this._data; }
@@ -102,6 +122,7 @@ export default class ServiceRepsTable extends LightningElement {
         this._isLoading = false;
         this.expandedIds = new Set();
         this.selectedIds = new Set();
+        this._openPausedRepId = null;
     }
 
     // Seed array plus cloned pages, each clone has a unique `id` so selection
@@ -132,46 +153,55 @@ export default class ServiceRepsTable extends LightningElement {
         return total > 0 && this.selectedIds.size === total;
     }
 
+    // Build one work-item card view-model (shared by active + paused lists).
+    // Per Figma node 20248:28340: a single navy summary line
+    // "<subject> | <caseNumber> | <customer>", then a meta row of
+    // channel-icon · "N/20 Workload" · routing-icon + queue · (optional)
+    // check-icon + "Interruptible".
+    buildWorkItem(wi, wiId) {
+        const isFlagOpen = wiId === this._openFlagWiId;
+        // Show either the queue (work_queue icon) or the skill (skill icon)
+        // facet in the meta row, per the item's `routeBy`.
+        const bySkill = wi.routeBy === 'skill';
+        const routeValue = bySkill ? (wi.skill ?? wi.queue) : wi.queue;
+        return {
+            id: wiId,
+            summaryText: `${wi.subject} | ${wi.caseNumber} | ${wi.customer}`,
+            workLoadText: `${wi.workLoad ?? 0}/20 Workload`,
+            routeValue,
+            routeType: bySkill ? 'skill' : 'queue',
+            routeIcon: bySkill ? 'utility:skill' : 'utility:work_queue',
+            channelIcon: CHANNEL_ICONS[wi.channel] ?? 'utility:record',
+            channelLabel: CHANNEL_LABELS[wi.channel] ?? wi.channel,
+            isInterruptible: !!wi.isInterruptible,
+            hasFlagIcon: wi.hasFlag,
+            isFlagOpen,
+            flagPopoverTitleId: `wi-flag-popover-title-${wiId}`,
+            flagWhisperTitle: wi.flagWhisperTitle || FLAG_WHISPER_TITLE_DEFAULT,
+            flagWhisperBody:  wi.flagWhisperBody  || FLAG_WHISPER_BODY_DEFAULT,
+        };
+    }
+
     get tableRows() {
         const rows = (this.expandedData ?? []).map((rep) => {
             const isExpanded = this.expandedIds.has(String(rep.id));
-            // Cap children before *both* the accordion render and the
-            // Work Summary count so the two stay in lockstep.
-            const visibleChildren = (rep.children ?? []).slice(0, MAX_WORK_ITEMS_PER_REP);
-            const lastVisibleIdx = visibleChildren.length - 1;
-            const workItems = visibleChildren.map((wi, wiIdx) => {
-                // First / last position drives a CSS modifier class so the
-                // top and bottom of the entire accordion panel get the
-                // requested 8px breathing room (only the outermost cards
-                // pick up the extra padding; the cards between just butt
-                // against each other).
-                const isFirst = wiIdx === 0;
-                const isLast = wiIdx === lastVisibleIdx;
-                const positionClass = `${isFirst ? ' work-item-row_first' : ''}${isLast ? ' work-item-row_last' : ''}`;
-                // Compact card per Figma node 19738:44775. Top row composes
-                // "<customer> |" (semibold) + "<subject> | <caseNumber>" (link).
-                // Bottom row composes channel-icon · "Work load: N" · "Queue: <name>".
-                const wiId = `${rep.id}-wi-${wiIdx}`;
-                const isFlagOpen = wiId === this._openFlagWiId;
-                return {
-                    id: wiId,
-                    customerLabel: `${wi.customer} |`,
-                    summaryLink: `${wi.subject} | ${wi.caseNumber}`,
-                    workLoadLabel: 'Work load: ',
-                    workLoadValue: `${wi.workLoad ?? 0}/20`,
-                    queueLabel: 'Queue: ',
-                    queueValue: wi.queue,
-                    channelIcon: CHANNEL_ICONS[wi.channel] ?? 'utility:record',
-                    channelLabel: CHANNEL_LABELS[wi.channel] ?? wi.channel,
-                    channelIconClass: CHANNEL_BG_CLASS[wi.channel] ?? 'wi-ch-icon wi-ch-icon_cases',
-                    hasFlagIcon: wi.hasFlag,
-                    isFlagOpen,
-                    flagPopoverTitleId: `wi-flag-popover-title-${wiId}`,
-                    flagWhisperTitle: wi.flagWhisperTitle || FLAG_WHISPER_TITLE_DEFAULT,
-                    flagWhisperBody:  wi.flagWhisperBody  || FLAG_WHISPER_BODY_DEFAULT,
-                    rowClass: `work-item-row${positionClass}`,
-                };
-            });
+            // Flagged work-item cards are shown only when the row itself shows a
+            // flag icon (rep.hasFlag). When the row is unflagged, drop any
+            // flagged children so the cards never contradict the row indicator.
+            const flagFilter = (wi) => rep.hasFlag || !wi.hasFlag;
+            // Cap *active* children before both the accordion render and the
+            // Work Summary count so the two stay in lockstep. Paused items are
+            // shown in full (small set) and also counted.
+            const visibleChildren = (rep.children ?? []).filter(flagFilter).slice(0, MAX_WORK_ITEMS_PER_REP);
+            const visiblePaused = (rep.pausedChildren ?? []).filter(flagFilter);
+            const workItems = visibleChildren.map((wi, wiIdx) =>
+                this.buildWorkItem(wi, `${rep.id}-wi-${wiIdx}`)
+            );
+            // Paused work items power the collapsible "Paused Work Items"
+            // section below the active cards (same card shape, reused mapper).
+            const pausedItems = visiblePaused.map((wi, wiIdx) =>
+                this.buildWorkItem(wi, `${rep.id}-pwi-${wiIdx}`)
+            );
             return {
                 id: String(rep.id),
                 name: rep.name,
@@ -180,10 +210,10 @@ export default class ServiceRepsTable extends LightningElement {
                 statusIcon: STATUS_ICON[rep.status] ?? 'utility:record',
                 statusCellClass: `status-cell status-cell_${rep.status}`,
                 hasFlagIcon: rep.hasFlag,
-                // Computed from the *capped* children list (not the page-level
-                // `workSummary` string) so the column count is always in sync
-                // with the cards shown when the row is expanded.
-                workSummary: summarizeWorkItems(visibleChildren),
+                // Computed from the cards actually rendered on expand — active
+                // (capped) PLUS paused — so the column count always matches the
+                // total number of work-item cards shown, paused included.
+                workSummary: summarizeWorkItems([...visibleChildren, ...visiblePaused]),
                 channelIcons: rep.channels.map(c => ({ icon: CHANNEL_ICONS[c] ?? 'utility:record', label: CHANNEL_LABELS[c] ?? c })),
                 channelsDisplay: rep.channels.map(c => CHANNEL_LABELS[c] ?? c).join(' · '),
                 login: rep.login,
@@ -197,11 +227,38 @@ export default class ServiceRepsTable extends LightningElement {
                 acw: rep.acw,
                 queuesDisplay: rep.queues.join(', '),
                 skillsDisplay: rep.skills.join(', '),
+                // Individual hoverable items for Queues / Skills columns.
+                // "+N" overflow tokens are not hoverable (name: null).
+                queueItems: (rep.queues ?? [])
+                    .filter(q => !q.startsWith('+'))
+                    .map(q => ({ name: q, display: q, chipClass: 'srt-chip qs-trigger' }))
+                    .concat(
+                        (rep.queues ?? [])
+                            .filter(q => q.startsWith('+'))
+                            .map(q => ({ name: null, display: q, chipClass: 'srt-chip srt-chip--overflow' }))
+                    ),
+                skillItems: (rep.skills ?? [])
+                    .filter(s => !s.startsWith('+'))
+                    .map(s => ({ name: s, display: s, chipClass: 'srt-chip qs-trigger' }))
+                    .concat(
+                        (rep.skills ?? [])
+                            .filter(s => s.startsWith('+'))
+                            .map(s => ({ name: null, display: s, chipClass: 'srt-chip srt-chip--overflow' }))
+                    ),
                 hasChildren: workItems.length > 0,
-                hasMoreChildren: (rep.children ?? []).length > MAX_WORK_ITEMS_PER_REP,
+                hasMoreChildren: (rep.children ?? []).filter(flagFilter).length > MAX_WORK_ITEMS_PER_REP,
                 wiPanelId: `${String(rep.id)}-wi-panel`,
                 isExpanded,
                 wiPanelClass: `work-item-row work-item-row_wrap${isExpanded ? ' wi-panel_open' : ' wi-panel_closed'}`,
+                // Paused section: list + collapsed/expanded toggle state. The
+                // chevron icon and the "show/hide" affordance are driven from
+                // `isPausedOpen` (tracked per-rep via `_openPausedRepId`).
+                pausedItems,
+                hasPausedItems: pausedItems.length > 0,
+                isPausedOpen: this._openPausedRepId === String(rep.id),
+                pausedToggleIcon: this._openPausedRepId === String(rep.id)
+                    ? 'utility:chevronup'
+                    : 'utility:chevrondown',
                 // Add `rep-row_expanded` while the accordion is open so the
                 // parent row keeps the same neutral-base-95 fill as :hover —
                 // gives a clear visual link between the row and its expanded
@@ -220,6 +277,60 @@ export default class ServiceRepsTable extends LightningElement {
             const bv = b[this.sortedBy] ?? '';
             return av < bv ? -dir : av > bv ? dir : 0;
         });
+    }
+
+    // ── Queue / Skill popover ────────────────────────────────────────────────
+    get popoverVisible() { return this._openQsPopover !== null; }
+
+    _qsData() {
+        const p = this._openQsPopover;
+        if (!p) return QS_GENERIC;
+        const map = p.type === 'skill' ? SKILL_DETAILS : QUEUE_DETAILS;
+        return map[p.name] ?? QS_GENERIC;
+    }
+
+    get popoverName()        { return this._openQsPopover?.name ?? ''; }
+    get popoverIcon()        { return this._openQsPopover?.type === 'skill' ? 'standard:skill' : 'standard:work_queue'; }
+    get popoverStyle() {
+        const p = this._openQsPopover;
+        if (!p) return '';
+        return `top:${p.top}px;left:${p.left}px;`;
+    }
+    get popoverPriority()    { return this._qsData().priority; }
+    get popoverWorkSize()    { return this._qsData().workSize; }
+    get popoverOnline()      { return this._qsData().online; }
+    get popoverBusy()        { return this._qsData().busy; }
+    get popoverAtCapacity()  { return this._qsData().atCapacity; }
+    get popoverIdle()        { return this._qsData().idle; }
+    get popoverTotalWaiting(){ return this._qsData().totalWaiting; }
+    get popoverLongestWait() { return this._qsData().longestWait; }
+    get popoverAvgWait()     { return this._qsData().avgWait; }
+
+    handleQsClose(event) {
+        event.stopPropagation();
+        this._openQsPopover = null;
+    }
+
+    handleQsClick(event) {
+        event.stopPropagation();
+        const el = event.currentTarget;
+        const type = el.dataset.qsType;
+        const name = el.dataset.qsName;
+        if (!type || !name) return;
+        // Toggle: clicking the same chip again closes the popover
+        if (this._openQsPopover?.name === name && this._openQsPopover?.type === type) {
+            this._openQsPopover = null;
+            return;
+        }
+        const rect = el.getBoundingClientRect();
+        const wrap = this.template.querySelector('.table-scroll-wrap');
+        const wrapRect = wrap ? wrap.getBoundingClientRect() : { top: 0, left: 0 };
+        this._openQsPopover = {
+            type,
+            name,
+            top:  rect.bottom - wrapRect.top + 8,
+            left: rect.left  - wrapRect.left,
+        };
     }
 
     handleSort(event) {
@@ -310,8 +421,18 @@ export default class ServiceRepsTable extends LightningElement {
         this._openFlagWiId = null;
     }
 
+    // Collapse/expand the per-rep "Paused Work Items" section. Single-open:
+    // toggling one rep's paused list closes any other that was open.
+    handlePausedToggle(event) {
+        const id = event.currentTarget?.dataset?.id;
+        if (!id) return;
+        event.stopPropagation();
+        this._openPausedRepId = this._openPausedRepId === id ? null : id;
+    }
+
     _handleDocClick = () => {
         if (this._openFlagWiId !== null) this._openFlagWiId = null;
+        if (this._openQsPopover !== null) this._openQsPopover = null;
     };
 
     // ── Infinite scroll ─────────────────────────────────────────────────────

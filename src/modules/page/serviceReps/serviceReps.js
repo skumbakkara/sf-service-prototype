@@ -43,15 +43,26 @@ const IN_PROGRESS_ITEMS = [
 // the accordion shows (see serviceRepsTable.js) — surfaces all three work-item
 // types. That keeps the Work Summary column varied across rows instead of
 // reading "N Cases" everywhere.
+// `routeBy` decides which facet the work-item card's meta row shows: `'queue'`
+// renders the queue name (work_queue icon) and `'skill'` renders the skill name
+// (skill icon). The mix is baked into the data so it stays stable across
+// re-renders instead of re-rolling on every paint.
 const WORK_ITEMS = [
-    { id: 'wi-a', customer: 'Sarah Mitchell', subject: 'Billing dispute on recent invoice — overcharge on plan upgrade',  caseNumber: '100847321', status: 'Working',   priority: 'Medium', channel: 'cases', queue: 'Billing',  workLoad: 5, hasFlag: false },
-    { id: 'wi-b', customer: 'James Okafor',   subject: 'Live chat — unable to access account after password reset loop',  caseNumber: '100912456', status: 'New',       priority: 'High',   channel: 'chat',  queue: 'Account',  workLoad: 7, hasFlag: true  },
-    { id: 'wi-c', customer: 'Priya Nair',     subject: 'Inbound call — refund for duplicate transaction on 14 Apr',       caseNumber: '100863017', status: 'Working',   priority: 'Medium', channel: 'call',  queue: 'Billing',  workLoad: 3, hasFlag: false },
-    { id: 'wi-d', customer: 'Carlos Reyes',   subject: 'Card declined at checkout — payment method update needed',        caseNumber: '100779834', status: 'Working',   priority: '',       channel: 'cases', queue: 'Billing',  workLoad: 2, hasFlag: true  },
-    { id: 'wi-e', customer: 'Hannah Brooks',  subject: 'Chat — subscription auto-renewed despite cancellation email',     caseNumber: '101023881', status: 'New',       priority: 'High',   channel: 'chat',  queue: 'Renewals', workLoad: 6, hasFlag: false },
-    { id: 'wi-f', customer: 'Ahmed Hassan',   subject: 'Voice call — device repeatedly disconnects from wifi',            caseNumber: '101145672', status: 'Working',   priority: 'Medium', channel: 'call',  queue: 'Tech',     workLoad: 4, hasFlag: false },
-    { id: 'wi-g', customer: 'Lena Park',      subject: 'Loyalty points missing after qualifying purchase',                caseNumber: '101207334', status: 'Working',   priority: '',       channel: 'cases', queue: 'Loyalty',  workLoad: 1, hasFlag: false },
-    { id: 'wi-h', customer: 'Diego Alvarez',  subject: 'Bulk return shipment status — awaiting carrier confirmation',     caseNumber: '101289005', status: 'Escalated', priority: 'Medium', channel: 'cases', queue: 'Returns',  workLoad: 8, hasFlag: true  },
+    { id: 'wi-a', customer: 'Sarah Mitchell', subject: 'Billing dispute on recent invoice — overcharge on plan upgrade',  caseNumber: '100847321', status: 'Working',   priority: 'Medium', channel: 'cases', queue: 'Billing',  skill: 'Billing',       routeBy: 'queue', workLoad: 5, hasFlag: false, isInterruptible: true  },
+    { id: 'wi-b', customer: 'James Okafor',   subject: 'Live chat — unable to access account after password reset loop',  caseNumber: '100912456', status: 'New',       priority: 'High',   channel: 'chat',  queue: 'Account',  skill: 'Account Mgmt',  routeBy: 'skill', workLoad: 7, hasFlag: true,  isInterruptible: false },
+    { id: 'wi-c', customer: 'Priya Nair',     subject: 'Inbound call — refund for duplicate transaction on 14 Apr',       caseNumber: '100863017', status: 'Working',   priority: 'Medium', channel: 'call',  queue: 'Billing',  skill: 'Refunds',       routeBy: 'skill', workLoad: 3, hasFlag: false, isInterruptible: true  },
+    { id: 'wi-d', customer: 'Carlos Reyes',   subject: 'Card declined at checkout — payment method update needed',        caseNumber: '100779834', status: 'Working',   priority: '',       channel: 'cases', queue: 'Billing',  skill: 'Payments',      routeBy: 'queue', workLoad: 2, hasFlag: true,  isInterruptible: false },
+    { id: 'wi-e', customer: 'Hannah Brooks',  subject: 'Chat — subscription auto-renewed despite cancellation email',     caseNumber: '101023881', status: 'New',       priority: 'High',   channel: 'chat',  queue: 'Renewals', skill: 'Retention',     routeBy: 'skill', workLoad: 6, hasFlag: false, isInterruptible: true  },
+    { id: 'wi-f', customer: 'Ahmed Hassan',   subject: 'Voice call — device repeatedly disconnects from wifi',            caseNumber: '101145672', status: 'Working',   priority: 'Medium', channel: 'call',  queue: 'Tech',     skill: 'Diagnostics',   routeBy: 'queue', workLoad: 4, hasFlag: false, isInterruptible: false },
+    { id: 'wi-g', customer: 'Lena Park',      subject: 'Loyalty points missing after qualifying purchase',                caseNumber: '101207334', status: 'Working',   priority: '',       channel: 'cases', queue: 'Loyalty',  skill: 'Loyalty',       routeBy: 'skill', workLoad: 1, hasFlag: false, isInterruptible: true  },
+    { id: 'wi-h', customer: 'Diego Alvarez',  subject: 'Bulk return shipment status — awaiting carrier confirmation',     caseNumber: '101289005', status: 'Escalated', priority: 'Medium', channel: 'cases', queue: 'Returns',  skill: 'Logistics',     routeBy: 'queue', workLoad: 8, hasFlag: true,  isInterruptible: false },
+];
+
+// Paused work items — surfaced under the collapsible "Paused Work Items"
+// expander at the bottom of the accordion's Active Work Items column.
+const PAUSED_WORK_ITEMS = [
+    { id: 'pwi-a', customer: 'Nina Foster',   subject: 'Awaiting customer reply — escalation paused pending docs',        caseNumber: '101334072', status: 'Paused', priority: 'Medium', channel: 'email', queue: 'Escalations', skill: 'Escalations', routeBy: 'skill', workLoad: 2, hasFlag: false, isInterruptible: true  },
+    { id: 'pwi-b', customer: 'Tomás Rivera',  subject: 'On hold — waiting on warehouse stock confirmation',               caseNumber: '101356918', status: 'Paused', priority: '',       channel: 'cases', queue: 'Returns',     skill: 'Logistics',   routeBy: 'queue', workLoad: 1, hasFlag: false, isInterruptible: false },
 ];
 
 const REPS_DATA = [
@@ -87,7 +98,13 @@ const REPS_DATA = [
     { id: 30, name: 'Ralph Edwards',      status: 'break',   statusLabel: 'On Break',   statusTime: 'Since 11:20am',hasFlag: false, workSummary: '1 Case',            channels: ['cases'],              login: '7h 14m',  state: '25m 11s', capacityP: 0,   capacityI: 0,   accept: '—',       workload: '0/20', acw: '11m 47s', queues: ['Returns','Refunds','+1'],      skills: ['Returns','Refunds','+1'],            children: WORK_ITEMS.slice(7, 8) },
     { id: 31, name: 'Jane Cooper',        status: 'online',  statusLabel: 'All Online', statusTime: 'Since 8:25am', hasFlag: false, workSummary: '3 Cases 1 Call',    channels: ['call','cases'],       login: '5h 49m',  state: '8m 17s',  capacityP: 65,  capacityI: 100, accept: '5m 03s',  workload: '0/20', acw: '6m 38s',  queues: ['Sales','Loyalty','+2'],        skills: ['Sales','Italian','+2'],              children: WORK_ITEMS.slice(0, 3) },
     { id: 32, name: 'Pamela Howard',      status: 'online',  statusLabel: 'All Online', statusTime: 'Since 9:55am', hasFlag: true,  workSummary: '2 Cases',           channels: ['chat','cases'],       login: '2h 06m',  state: '9m 45s',  capacityP: 100, capacityI: 100, accept: '1m 58s',  workload: '0/20', acw: '3m 03s',  queues: ['Escalations','VIP','+2'],      skills: ['Escalations','Premium','+2'],        children: WORK_ITEMS.slice(0, 2) },
-];
+].map((rep) => ({
+    // Surface paused work items only on reps carrying the full active set, so
+    // the collapsible "Paused Work Items" section appears on the busier rows
+    // rather than every single rep in the demo.
+    ...rep,
+    pausedChildren: (rep.children?.length ?? 0) >= 3 ? PAUSED_WORK_ITEMS : [],
+}));
 
 // New-arrival items cycled into the In-Progress table on each tab visit.
 const NEW_IP_ARRIVALS = [

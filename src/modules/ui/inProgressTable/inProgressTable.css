@@ -514,3 +514,110 @@ th:hover .col-chevron { display: inline-flex; }
 .ipt-status_escalated {
     color: var(--slds-g-color-palette-red-40, #ba0517);
 }
+
+/* ── Queue / Skill hover popover ─────────────────────────────── */
+.qs-popover {
+    position: fixed;
+    z-index: 9999;
+    width: 320px;
+    background: var(--slds-g-color-surface-1, #ffffff);
+    border-radius: 12px;
+    box-shadow:
+        0 0 10px rgba(0, 0, 0, 0.12),
+        0 7px 7px rgba(0, 0, 0, 0.12),
+        0 -1px 3px rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    pointer-events: none;
+}
+.qs-popover__nubbin {
+    position: absolute;
+    top: -6px;
+    left: 16px;
+    width: 12px;
+    height: 12px;
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    border-top: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+    border-left: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+    transform: rotate(45deg);
+}
+.qs-popover__header {
+    display: flex;
+    align-items: flex-start;
+    padding: 20px 24px 16px 24px;
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+.qs-popover__header-content { flex: 1 1 auto; min-width: 0; }
+.qs-popover__header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.qs-popover__header-icon {
+    flex-shrink: 0;
+}
+.qs-popover__name {
+    color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
+    font-size: var(--slds-g-font-scale-4, 1.5rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 1.33;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+.qs-popover__header-grid {
+    display: flex;
+    gap: 24px;
+}
+.qs-popover__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+.qs-popover__label {
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-6, 600);
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    line-height: 1.42;
+}
+.qs-popover__value {
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    line-height: 1.38;
+}
+.qs-popover__value--error {
+    color: var(--slds-g-color-error-1, #b60554);
+}
+.qs-popover__section {
+    padding: 12px 24px;
+    border-top: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+}
+.qs-popover__section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: var(--slds-g-color-on-surface-3, #001e5b);
+    font-size: var(--slds-g-font-scale-2, 1rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+}
+.qs-popover__section-icon {
+    flex-shrink: 0;
+}
+.qs-popover__grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.qs-popover__grid-row {
+    display: flex;
+    gap: 12px;
+}
+.qs-popover__col {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
