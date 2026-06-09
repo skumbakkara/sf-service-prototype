@@ -615,7 +615,7 @@ th:hover .col-chevron { display: inline-flex; }
 }
 .qs-popover__label--header {
     font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-    font-weight: var(--slds-g-font-weight-6, 600);
+    font-weight: 600;
     color: var(--slds-g-color-on-surface-2, #2e2e2e);
     line-height: 1.42;
 }

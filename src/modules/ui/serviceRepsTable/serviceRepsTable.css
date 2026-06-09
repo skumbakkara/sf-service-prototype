@@ -186,6 +186,23 @@ th:hover .col-chevron { display: inline-flex; }
     --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-blue-40, #0250d9);
     fill: var(--slds-g-color-palette-blue-40, #0250d9);
 }
+/* ── Chevron rotation ───────────────────────────────────────────────────────
+   Single icon stays as chevronright; CSS rotates it 90° when expanded.
+   display:inline-flex on the host lets transform apply cleanly. */
+.toggle-chevron {
+    display: inline-flex;
+    transition: transform 0.2s ease;
+}
+.toggle-chevron_open {
+    transform: rotate(90deg);
+}
+/* Hover nudge: subtle scale pulse to signal the button is interactive */
+.toggle-btn:hover .toggle-chevron {
+    transform: scale(1.25);
+}
+.toggle-btn:hover .toggle-chevron_open {
+    transform: rotate(90deg) scale(1.25);
+}
 .toggle-spacer {
     display: inline-block;
     width: 1rem;
@@ -340,6 +357,10 @@ th:hover .col-chevron { display: inline-flex; }
 /* ── Row hover — neutral-base-95 fill ──────────────────────────────────
    Excludes the expanded row: once open it's a static card and must not
    change fill on hover. */
+.rep-row:not(.rep-row_expanded) td,
+.rep-row:not(.rep-row_expanded) td.slds-cell_shrink {
+    transition: background-color 0.15s ease;
+}
 .rep-row:hover:not(.rep-row_expanded) td,
 .rep-row:hover:not(.rep-row_expanded) td.slds-cell_shrink {
     background-color: var(--slds-g-color-neutral-base-95, #f3f3f3) !important;
@@ -356,6 +377,7 @@ th:hover .col-chevron { display: inline-flex; }
 .rep-row_expanded > td {
     background-color: rgba(243, 243, 243, 0.6) !important;
     box-shadow: none !important;
+    transition: background-color 0.18s ease;
 }
 /* 4px left/right margin on the open card without moving any content. A 4px
    SURFACE-coloured (white) border + background-clip:padding-box pulls the
@@ -454,22 +476,49 @@ th:hover .col-chevron { display: inline-flex; }
 }
 
 /* ── Accordion open/close animation ────────────────────────────────────── */
+/* fill-mode: backwards — applies the `from` state during the delay (so the
+   element starts invisible), but does NOT hold the `to` state after the
+   animation ends. This prevents transform/opacity from creating a persistent
+   stacking context on .work-item-cell or .wi-card that would trap the
+   absolutely-positioned flag popover behind sibling cards. */
 @keyframes wi-panel-in {
-    from {
-        opacity: 0;
-        transform: translateY(-6px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; }
+}
+
+/* Close animation keeps fill-mode: both — needs to hold opacity:0 after the
+   animation ends to prevent a flash before LWC flips the class to wi-panel_closed. */
+@keyframes wi-panel-out {
+    from { opacity: 1; }
+    to   { opacity: 0; transform: translateY(-6px); }
+}
+
+/* Card stagger: fade only, fill-mode: backwards. No transform in `to` and no
+   forwards fill means no stacking context persists after the animation ends. */
+@keyframes wi-card-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 .wi-panel_closed {
     display: none;
 }
+/* Closing state: plays the exit animation; pointer-events off prevents
+   interaction during the fade-out. `both` fill-mode holds opacity:0 at the
+   end so there's no flash before LWC removes the row. */
+.wi-panel_closing {
+    pointer-events: none;
+}
+.wi-panel_closing > .work-item-cell {
+    animation: wi-panel-out 0.15s ease-in both;
+}
 .wi-panel_open > .work-item-cell {
-    animation: wi-panel-in 0.2s ease-out both;
+    animation: wi-panel-in 0.2s ease-out backwards;
+}
+/* Staggered card entrance fires when the panel opens */
+.wi-panel_open .wi-card {
+    animation: wi-card-in 0.18s ease-out backwards;
+    animation-delay: calc(var(--wi-index, 0) * 60ms);
 }
 
 /* ── Section header above the card stack (Figma node 20248:28338) ───────── */
@@ -631,7 +680,7 @@ th:hover .col-chevron { display: inline-flex; }
     position: absolute;
     top: calc(100% + 4px);
     right: 0;
-    z-index: 999;
+    z-index: 9999;
     width: 310px;
     min-width: 310px;
     padding: var(--slds-g-spacing-4, 1rem);
@@ -839,7 +888,7 @@ th:hover .col-chevron { display: inline-flex; }
 /* Section 1 (header) labels: semibold, on-surface-2 */
 .qs-popover__label--header {
     font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
-    font-weight: var(--slds-g-font-weight-6, 600);
+    font-weight: 600;
     color: var(--slds-g-color-on-surface-2, #2e2e2e);
     line-height: 1.42;
 }

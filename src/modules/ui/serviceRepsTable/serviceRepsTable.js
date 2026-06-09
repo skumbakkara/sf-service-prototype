@@ -106,6 +106,7 @@ export default class ServiceRepsTable extends LightningElement {
     @track sortedBy;
     @track sortedDirection = 'asc';
     @track expandedIds = new Set();
+    @track closingIds = new Set();
     @track selectedIds = new Set();
     @track _openFlagWiId = null;
     @track _openPausedRepId = null;
@@ -121,6 +122,7 @@ export default class ServiceRepsTable extends LightningElement {
         this._pageCount = 0;
         this._isLoading = false;
         this.expandedIds = new Set();
+        this.closingIds = new Set();
         this.selectedIds = new Set();
         this._openPausedRepId = null;
     }
@@ -166,6 +168,7 @@ export default class ServiceRepsTable extends LightningElement {
         const routeValue = bySkill ? (wi.skill ?? wi.queue) : wi.queue;
         return {
             id: wiId,
+            staggerStyle: '',
             summaryText: `${wi.subject} | ${wi.caseNumber} | ${wi.customer}`,
             workLoadText: `${wi.workLoad ?? 0}/20 Workload`,
             routeValue,
@@ -194,9 +197,10 @@ export default class ServiceRepsTable extends LightningElement {
             // shown in full (small set) and also counted.
             const visibleChildren = (rep.children ?? []).filter(flagFilter).slice(0, MAX_WORK_ITEMS_PER_REP);
             const visiblePaused = (rep.pausedChildren ?? []).filter(flagFilter);
-            const workItems = visibleChildren.map((wi, wiIdx) =>
-                this.buildWorkItem(wi, `${rep.id}-wi-${wiIdx}`)
-            );
+            const workItems = visibleChildren.map((wi, wiIdx) => ({
+                ...this.buildWorkItem(wi, `${rep.id}-wi-${wiIdx}`),
+                staggerStyle: `--wi-index:${wiIdx};`,
+            }));
             // Paused work items power the collapsible "Paused Work Items"
             // section below the active cards (same card shape, reused mapper).
             const pausedItems = visiblePaused.map((wi, wiIdx) =>
@@ -249,7 +253,7 @@ export default class ServiceRepsTable extends LightningElement {
                 hasMoreChildren: (rep.children ?? []).filter(flagFilter).length > MAX_WORK_ITEMS_PER_REP,
                 wiPanelId: `${String(rep.id)}-wi-panel`,
                 isExpanded,
-                wiPanelClass: `work-item-row work-item-row_wrap${isExpanded ? ' wi-panel_open' : ' wi-panel_closed'}`,
+                wiPanelClass: `work-item-row work-item-row_wrap${isExpanded ? ' wi-panel_open' : this.closingIds.has(String(rep.id)) ? ' wi-panel_closing' : ' wi-panel_closed'}`,
                 // Paused section: list + collapsed/expanded toggle state. The
                 // chevron icon and the "show/hide" affordance are driven from
                 // `isPausedOpen` (tracked per-rep via `_openPausedRepId`).
@@ -263,7 +267,8 @@ export default class ServiceRepsTable extends LightningElement {
                 // parent row keeps the same neutral-base-95 fill as :hover —
                 // gives a clear visual link between the row and its expanded
                 // work-items panel.
-                repRowClass: `slds-hint-parent rep-row${isExpanded ? ' rep-row_expanded' : ''}`,
+                repRowClass: `slds-hint-parent rep-row${(isExpanded || this.closingIds.has(String(rep.id))) ? ' rep-row_expanded' : ''}`,
+                chevronClass: `toggle-chevron${isExpanded ? ' toggle-chevron_open' : ''}`,
                 workItems,
                 isSelected: this.selectedIds.has(String(rep.id)),
             };
@@ -355,26 +360,63 @@ export default class ServiceRepsTable extends LightningElement {
         }
     }
 
+    _collapseRow(id) {
+        if (!id || !this.expandedIds.has(id)) return;
+        const next = new Set(this.expandedIds);
+        next.delete(id);
+        this.expandedIds = next;
+        // Kick off the close animation: mark as closing so CSS plays wi-panel-out
+        const nextClosing = new Set(this.closingIds);
+        nextClosing.add(id);
+        this.closingIds = nextClosing;
+    }
+
+    _expandRow(id) {
+        if (!id) return;
+        // Clear any in-flight closing state for this row before expanding
+        if (this.closingIds.has(id)) {
+            const nextClosing = new Set(this.closingIds);
+            nextClosing.delete(id);
+            this.closingIds = nextClosing;
+        }
+        const next = new Set(this.expandedIds);
+        next.add(id);
+        this.expandedIds = next;
+    }
+
     handleRowClick(event) {
         // Ignore clicks on the checkbox or the chevron toggle button itself
         if (event.target.type === 'checkbox') return;
         if (event.target.closest?.('.toggle-btn')) return;
         const id = event.currentTarget.dataset.id;
         if (!id) return;
-        const next = new Set(this.expandedIds);
-        if (next.has(id)) { next.delete(id); } else { next.add(id); }
-        this.expandedIds = next;
+        if (this.expandedIds.has(id)) {
+            this._collapseRow(id);
+        } else {
+            this._expandRow(id);
+        }
     }
 
     handleExpandToggle(event) {
+        event.stopPropagation();
         const id = event.currentTarget.dataset.id;
-        const next = new Set(this.expandedIds);
-        if (next.has(id)) {
-            next.delete(id);
+        if (!id) return;
+        if (this.expandedIds.has(id)) {
+            this._collapseRow(id);
         } else {
-            next.add(id);
+            this._expandRow(id);
         }
-        this.expandedIds = next;
+    }
+
+    // When the close animation ends, remove the closing marker so the panel
+    // switches from wi-panel_closing → wi-panel_closed (display:none).
+    handlePanelAnimationEnd(event) {
+        const tr = event.currentTarget.parentElement;
+        const id = tr?.dataset?.panelId;
+        if (!id || !this.closingIds.has(id)) return;
+        const next = new Set(this.closingIds);
+        next.delete(id);
+        this.closingIds = next;
     }
 
     handleSelectAll(event) {

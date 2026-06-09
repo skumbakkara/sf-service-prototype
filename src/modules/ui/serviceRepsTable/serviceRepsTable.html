@@ -118,12 +118,7 @@
                             <div class="rep-name-inner">
                                 <template if:true={row.hasChildren}>
                                     <button class="toggle-btn" data-id={row.id} onclick={handleExpandToggle} aria-expanded={row.isExpanded}>
-                                        <template if:false={row.isExpanded}>
-                                            <lightning-icon icon-name="utility:chevronright" size="xx-small"></lightning-icon>
-                                        </template>
-                                        <template if:true={row.isExpanded}>
-                                            <lightning-icon icon-name="utility:chevrondown" size="xx-small"></lightning-icon>
-                                        </template>
+                                        <lightning-icon icon-name="utility:chevronright" size="xx-small" class={row.chevronClass}></lightning-icon>
                                     </button>
                                 </template>
                                 <template if:false={row.hasChildren}>
@@ -195,12 +190,12 @@
                     <!-- Expanded: rep row + this panel read as one rounded card.
                          Layout matches Figma node 20248:28319 (Accordion container). -->
                     <template if:true={row.hasChildren}>
-                        <tr key={row.wiPanelId} class={row.wiPanelClass}>
-                            <td colspan="14" class="work-item-cell">
+                        <tr key={row.wiPanelId} class={row.wiPanelClass} data-panel-id={row.id}>
+                            <td colspan="14" class="work-item-cell" onanimationend={handlePanelAnimationEnd}>
                                 <p class="wi-section-header">Active Work Items</p>
                                 <div class="wi-stack">
                                     <template for:each={row.workItems} for:item="wi">
-                                        <article key={wi.id} class="wi-card">
+                                        <article key={wi.id} class="wi-card" style={wi.staggerStyle}>
                                             <div class="wi-content">
                                                 <div class="wi-top-row">
                                                     <span class="wi-summary" title={wi.summaryText}>{wi.summaryText}</span>
