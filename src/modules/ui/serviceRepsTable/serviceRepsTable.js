@@ -29,9 +29,19 @@ const SKILL_DETAILS = {
 const QS_GENERIC = { priority: '#—', workSize: '1 unit', online: 0, busy: 0, atCapacity: 0, idle: 0, totalWaiting: 0, longestWait: '—', avgWait: '—' };
 
 const STATUS_ICON = {
-    online:  'utility:record',
-    break:   'utility:record',
-    offline: 'utility:record',
+    'available-all':  'utility:record',
+    'available-call': 'utility:record',
+    'available-case': 'utility:record',
+    break:            'utility:record',
+    offline:          'utility:record',
+};
+
+const STATUS_LABEL = {
+    'available-all':  'Available for All',
+    'available-call': 'Available for Call',
+    'available-case': 'Available for Case',
+    break:            'On Break',
+    offline:          'Offline',
 };
 
 const CHANNEL_LABELS = { chat: 'Chat', call: 'Call', cases: 'Case', email: 'Email', messaging: 'Message' };
@@ -71,7 +81,7 @@ function summarizeWorkItems(children) {
 // names like "Savannah Nguyen".
 const COLUMN_DEFS = [
     { label: 'Service Rep Name', fieldName: 'name',             sortable: true,  width: 200 },
-    { label: 'Status',           fieldName: 'statusLabel',      sortable: true,  width: 130 },
+    { label: 'Status',           fieldName: 'statusLabel',      sortable: true,  width: 180 },
     { label: 'Work Summary',     fieldName: 'workSummary',      sortable: true,  width: 200 },
     { label: 'Flag',             fieldName: 'flagLabel',        sortable: false, width: 80  },
     { label: 'Login',            fieldName: 'login',            sortable: true,  width: 90  },
@@ -213,7 +223,7 @@ export default class ServiceRepsTable extends LightningElement {
                 statusLabel: rep.statusLabel,
                 statusTime: rep.statusTime,
                 statusIcon: STATUS_ICON[rep.status] ?? 'utility:record',
-                statusCellClass: `status-cell status-cell_${rep.status}`,
+                statusCellClass: `status-cell status-cell_${rep.status?.startsWith('available') ? 'online' : rep.status}`,
                 hasFlagIcon: rep.hasFlag,
                 // Computed from the cards actually rendered on expand — active
                 // (capped) PLUS paused — so the column count always matches the
@@ -362,9 +372,11 @@ export default class ServiceRepsTable extends LightningElement {
         const rep = repId ? (this._data ?? []).find(r => String(r.id) === repId) : null;
         const current = rep?.status ?? '';
         return [
-            { value: 'online',  label: 'All Online', dotClass: 'status-menu-dot status-menu-dot_online'  },
-            { value: 'break',   label: 'On Break',   dotClass: 'status-menu-dot status-menu-dot_break'   },
-            { value: 'offline', label: 'Offline',    dotClass: 'status-menu-dot status-menu-dot_offline' },
+            { value: 'available-all',  label: 'Available for All',  dotClass: 'status-menu-dot status-menu-dot_online'  },
+            { value: 'available-call', label: 'Available for Call', dotClass: 'status-menu-dot status-menu-dot_online'  },
+            { value: 'available-case', label: 'Available for Case', dotClass: 'status-menu-dot status-menu-dot_online'  },
+            { value: 'break',          label: 'On Break',           dotClass: 'status-menu-dot status-menu-dot_break'   },
+            { value: 'offline',        label: 'Offline',            dotClass: 'status-menu-dot status-menu-dot_offline' },
         ].map(item => ({
             ...item,
             menuItemClass: `status-menu-item${item.value === current ? ' status-menu-item_active' : ''}`,
@@ -397,7 +409,7 @@ export default class ServiceRepsTable extends LightningElement {
         const repId    = event.currentTarget.dataset.repId;
         if (!newStatus || !repId) return;
         this._data = (this._data ?? []).map(r =>
-            String(r.id) === repId ? { ...r, status: newStatus, statusLabel: { online: 'Online', break: 'On Break', offline: 'Offline' }[newStatus] } : r
+            String(r.id) === repId ? { ...r, status: newStatus, statusLabel: STATUS_LABEL[newStatus] ?? newStatus } : r
         );
         this._statusMenu = null;
     }
