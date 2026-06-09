@@ -54,6 +54,14 @@
     filter: none !important;
 }
 
+/* Remove outer left/right borders from the table header */
+.slds-table thead th:first-child {
+    border-left: none !important;
+}
+.slds-table thead th:last-child {
+    border-right: none !important;
+}
+
 /* Pin column headers while the body scrolls. position: sticky targets the
    nearest scrolling ancestor (.table-container). Background fills the cell
    so rows beneath don't bleed through; the inset box-shadow replaces the
