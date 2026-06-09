@@ -6,6 +6,7 @@
    padding so the bordered scroll-container doesn't run edge-to-edge. */
 .bkt-scroll-wrap {
     padding: 0 var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-4, 1rem);
+    position: relative; /* anchor for position:absolute qs-popover */
 }
 
 /* Scroll container for the table:
@@ -244,11 +245,39 @@
     --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
 }
 
-/* ── Queue / Skill hover popover ─────────────────────────────── */
+/* ── Queue / Skill popover ───────────────────────────────────── */
 .qs-popover {
-    position: fixed;
+    position: absolute;
     z-index: 9999;
     width: 320px;
+    display: flex;
+    flex-direction: column;
+}
+.qs-popover__nubbin-row {
+    order: 1;
+    padding-left: 20px;
+}
+.qs-popover__nubbin {
+    width: 16px;
+    height: 16px;
+    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
+    transform: rotate(45deg);
+    margin-bottom: -9px;
+    position: relative;
+    z-index: 1;
+}
+.qs-popover--above .qs-popover__nubbin-row {
+    order: 3;
+}
+.qs-popover--above .qs-popover__nubbin {
+    transform: rotate(225deg);
+    margin-bottom: 0;
+    margin-top: -9px;
+    background: var(--slds-g-color-surface-1, #ffffff);
+}
+.qs-popover__body {
+    order: 2;
+    position: relative;
     background: var(--slds-g-color-surface-1, #ffffff);
     border-radius: 12px;
     box-shadow:
@@ -256,40 +285,44 @@
         0 7px 7px rgba(0, 0, 0, 0.12),
         0 -1px 3px rgba(0, 0, 0, 0.07);
     overflow: hidden;
-    pointer-events: none;
 }
-.qs-popover__nubbin {
+.qs-popover__close {
     position: absolute;
-    top: -6px;
-    left: 16px;
-    width: 12px;
-    height: 12px;
-    background: var(--slds-g-color-neutral-base-95, #f3f3f3);
-    border-top: 1px solid var(--slds-g-color-border-1, #c9c9c9);
-    border-left: 1px solid var(--slds-g-color-border-1, #c9c9c9);
-    transform: rotate(45deg);
+    top: 8px;
+    right: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 3;
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+.qs-popover__close:hover {
+    background: rgba(0, 0, 0, 0.06);
 }
 .qs-popover__header {
-    display: flex;
-    align-items: flex-start;
-    padding: 20px 24px 16px 24px;
+    padding: 24px 48px 16px 24px;
     background: var(--slds-g-color-neutral-base-95, #f3f3f3);
 }
-.qs-popover__header-content { flex: 1 1 auto; min-width: 0; }
 .qs-popover__header-title {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 12px;
 }
-.qs-popover__header-icon {
-    flex-shrink: 0;
-}
+.qs-popover__header-icon { flex-shrink: 0; }
 .qs-popover__name {
     color: var(--slds-g-color-palette-electric-blue-40, #0250d9);
-    font-size: var(--slds-g-font-scale-4, 1.5rem);
+    font-size: 20px;
     font-weight: var(--slds-g-font-weight-4, 400);
-    line-height: 1.33;
+    line-height: 1.3;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -297,17 +330,24 @@
 }
 .qs-popover__header-grid {
     display: flex;
-    gap: 24px;
+    gap: 12px;
 }
 .qs-popover__field {
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
     gap: 0;
 }
-.qs-popover__label {
+.qs-popover__label--header {
     font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
     font-weight: var(--slds-g-font-weight-6, 600);
     color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    line-height: 1.42;
+}
+.qs-popover__label {
+    font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    color: var(--slds-g-color-on-surface-1, #5c5c5c);
     line-height: 1.42;
 }
 .qs-popover__value {
@@ -332,9 +372,7 @@
     font-size: var(--slds-g-font-scale-2, 1rem);
     font-weight: var(--slds-g-font-weight-4, 400);
 }
-.qs-popover__section-icon {
-    flex-shrink: 0;
-}
+.qs-popover__section-icon { flex-shrink: 0; }
 .qs-popover__grid {
     display: flex;
     flex-direction: column;

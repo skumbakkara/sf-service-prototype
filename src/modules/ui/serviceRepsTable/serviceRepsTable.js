@@ -291,6 +291,8 @@ export default class ServiceRepsTable extends LightningElement {
 
     get popoverName()        { return this._openQsPopover?.name ?? ''; }
     get popoverIcon()        { return this._openQsPopover?.type === 'skill' ? 'standard:skill' : 'standard:work_queue'; }
+    get popoverPerfTitle()   { return this._openQsPopover?.type === 'skill' ? 'Skill Performance' : 'Queue Performance'; }
+    get popoverClass()       { return `qs-popover${this._openQsPopover?.above ? ' qs-popover--above' : ''}`; }
     get popoverStyle() {
         const p = this._openQsPopover;
         if (!p) return '';
@@ -325,11 +327,17 @@ export default class ServiceRepsTable extends LightningElement {
         const rect = el.getBoundingClientRect();
         const wrap = this.template.querySelector('.table-scroll-wrap');
         const wrapRect = wrap ? wrap.getBoundingClientRect() : { top: 0, left: 0 };
+        const POPOVER_H = 360; // estimated max popover height in px
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const above = spaceBelow < POPOVER_H && rect.top > POPOVER_H;
         this._openQsPopover = {
             type,
             name,
-            top:  rect.bottom - wrapRect.top + 8,
-            left: rect.left  - wrapRect.left,
+            above,
+            top:  above
+                ? rect.top - wrapRect.top - POPOVER_H
+                : rect.bottom - wrapRect.top + 8,
+            left: rect.left - wrapRect.left,
         };
     }
 

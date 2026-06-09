@@ -736,25 +736,37 @@ th:hover .col-chevron { display: inline-flex; }
     position: absolute;
     z-index: 9999;
     width: 320px;
+    display: flex;
+    flex-direction: column;
 }
-/* Nubbin row: full-width strip that holds the left-aligned triangle */
+/* Nubbin row: holds the triangle, before the card body by default */
 .qs-popover__nubbin-row {
+    order: 1;
     padding-left: 20px;
 }
-/* Triangle pointing up: a rotated square whose top-left borders are visible */
+/* Triangle pointing up: borderless rotated square */
 .qs-popover__nubbin {
     width: 16px;
     height: 16px;
     background: var(--slds-g-color-neutral-base-95, #f3f3f3);
-    border-top: 1px solid var(--slds-g-color-border-1, #e5e5e5);
-    border-left: 1px solid var(--slds-g-color-border-1, #e5e5e5);
     transform: rotate(45deg);
-    margin-bottom: -9px; /* overlap with card so the bottom half merges into the header */
+    margin-bottom: -9px; /* overlap bottom half into card header */
     position: relative;
     z-index: 1;
 }
+/* When popover opens above the trigger: nubbin moves to bottom, points down */
+.qs-popover--above .qs-popover__nubbin-row {
+    order: 3;
+}
+.qs-popover--above .qs-popover__nubbin {
+    transform: rotate(225deg);
+    margin-bottom: 0;
+    margin-top: -9px; /* overlap top half into card bottom */
+    background: var(--slds-g-color-surface-1, #ffffff);
+}
 /* Card body: rounded corners, shadow, clips section content */
 .qs-popover__body {
+    order: 2;
     position: relative;
     background: var(--slds-g-color-surface-1, #ffffff);
     border-radius: 12px;

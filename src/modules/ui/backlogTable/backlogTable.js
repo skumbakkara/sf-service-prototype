@@ -234,6 +234,8 @@ export default class BacklogTable extends LightningElement {
 
     get popoverName()        { return this._openQsPopover?.name ?? ''; }
     get popoverIcon()        { return this._openQsPopover?.type === 'skill' ? 'standard:skill' : 'standard:work_queue'; }
+    get popoverPerfTitle()   { return this._openQsPopover?.type === 'skill' ? 'Skill Performance' : 'Queue Performance'; }
+    get popoverClass()       { return `qs-popover${this._openQsPopover?.above ? ' qs-popover--above' : ''}`; }
     get popoverStyle() {
         const p = this._openQsPopover;
         if (!p) return '';
@@ -249,22 +251,36 @@ export default class BacklogTable extends LightningElement {
     get popoverLongestWait() { return this._qsData().longestWait; }
     get popoverAvgWait()     { return this._qsData().avgWait; }
 
-    handleQsEnter(event) {
+    handleQsClose(event) {
+        event.stopPropagation();
+        this._openQsPopover = null;
+    }
+
+    handleQsClick(event) {
+        event.stopPropagation();
         const el = event.currentTarget;
         const type = el.dataset.qsType;
         const name = el.dataset.qsName;
         if (!type || !name) return;
+        if (this._openQsPopover?.name === name && this._openQsPopover?.type === type) {
+            this._openQsPopover = null;
+            return;
+        }
         const rect = el.getBoundingClientRect();
+        const wrap = this.template.querySelector('.bkt-scroll-wrap');
+        const wrapRect = wrap ? wrap.getBoundingClientRect() : { top: 0, left: 0 };
+        const POPOVER_H = 360;
+        const spaceBelow = window.innerHeight - rect.bottom;
+        const above = spaceBelow < POPOVER_H && rect.top > POPOVER_H;
         this._openQsPopover = {
             type,
             name,
-            top:  rect.bottom + 10,
-            left: rect.left,
+            above,
+            top:  above
+                ? rect.top - wrapRect.top - POPOVER_H
+                : rect.bottom - wrapRect.top + 8,
+            left: rect.left - wrapRect.left,
         };
-    }
-
-    handleQsLeave() {
-        this._openQsPopover = null;
     }
 
     handleSort(event) {
@@ -298,18 +314,24 @@ export default class BacklogTable extends LightningElement {
         this.selectedIds = next;
     }
 
+    _handleDocClick = () => {
+        if (this._openQsPopover !== null) this._openQsPopover = null;
+    };
+
     // ── Infinite scroll ─────────────────────────────────────────────────────
     renderedCallback() {
         if (this._scrollAttached) return;
         const container = this.template.querySelector('.bkt-container');
         if (!container) return;
         container.addEventListener('scroll', this._onScroll);
+        document.addEventListener('click', this._handleDocClick);
         this._scrollAttached = true;
     }
 
     disconnectedCallback() {
         const container = this.template.querySelector('.bkt-container');
         if (container) container.removeEventListener('scroll', this._onScroll);
+        document.removeEventListener('click', this._handleDocClick);
         this._scrollAttached = false;
     }
 

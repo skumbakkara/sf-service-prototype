@@ -6,7 +6,7 @@
     <div class="table-scroll-wrap">
     <!-- Queue/Skill popover: position:absolute inside table-scroll-wrap so it scrolls with the page -->
     <template if:true={popoverVisible}>
-        <div class="qs-popover" role="dialog" style={popoverStyle}>
+        <div class={popoverClass} role="dialog" style={popoverStyle}>
             <div class="qs-popover__nubbin-row">
                 <div class="qs-popover__nubbin"></div>
             </div>
@@ -61,7 +61,7 @@
                 <div class="qs-popover__section">
                     <div class="qs-popover__section-title">
                         <lightning-icon icon-name="utility:indicator_performance_period" size="small" class="qs-popover__section-icon"></lightning-icon>
-                        <span>Queue Performance</span>
+                        <span>{popoverPerfTitle}</span>
                     </div>
                     <div class="qs-popover__grid">
                         <div class="qs-popover__grid-row">
