@@ -27,7 +27,7 @@
     overflow-x: auto;
     overflow-y: auto;
     max-height: 60vh;
-    padding: 0 var(--slds-g-spacing-4, 1rem);
+    padding: 0;
 }
 
 /* Inline filter drawer column. Width tuned to the new Figma mock — wide
@@ -47,7 +47,7 @@
    the drawer butts up against the card edge with only its own border-left
    acting as the visual divider (matches the new mock). */
 .ipt-shell_panel-open .ipt-container {
-    padding-right: 0;
+    padding: 0;
 }
 
 
@@ -66,6 +66,9 @@
 .slds-table {
     table-layout: fixed;
     min-width: max-content;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0 !important;
 }
 
 /* ── Header corner radius ────────────────────────────────────── */

@@ -5,7 +5,7 @@
 /* Outer wrapper: provides the horizontal inset that matches the card header
    padding so the bordered scroll-container doesn't run edge-to-edge. */
 .bkt-scroll-wrap {
-    padding: 0 var(--slds-g-spacing-4, 1rem) var(--slds-g-spacing-4, 1rem);
+    padding: 0 0 var(--slds-g-spacing-4, 1rem);
     position: relative; /* anchor for position:absolute qs-popover */
 }
 
@@ -21,7 +21,7 @@
     overflow-y: auto;
     max-height: 60vh;
     border: none;
-    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+    border-radius: 0;
 }
 
 /* ── Table borders (scoped to .bkt-table — same element as .slds-table) ── */
@@ -39,6 +39,9 @@
 .bkt-container .bkt-table {
     table-layout: fixed;
     min-width: max-content;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0 !important;
 }
 
 /* ── Header corner radius ────────────────────────────────────── */
