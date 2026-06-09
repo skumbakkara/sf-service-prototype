@@ -46,23 +46,6 @@
     border-color: var(--slds-g-color-neutral-base-90, #e5e5e5);
 }
 
-/* Remove outer left/right borders and corner radii from the table edges */
-.slds-table thead th:first-child,
-.slds-table tbody td:first-child,
-.slds-table tbody th:first-child,
-.slds-table tfoot td:first-child {
-    border-left: none !important;
-    border-top-left-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
-}
-.slds-table thead th:last-child,
-.slds-table tbody td:last-child,
-.slds-table tfoot td:last-child {
-    border-right: none !important;
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-}
-
 
 /* Suppress SLDS's default sticky-header drop shadow under the thead row */
 .slds-table thead,
@@ -379,12 +362,12 @@ th:hover .col-chevron { display: inline-flex; }
    two get inset. */
 .rep-row_expanded > td:first-child {
     border-top-left-radius: var(--slds-g-radius-border-4, 20px);
-    border-left: 4px solid var(--slds-g-color-surface-1, #ffffff) !important;
+    border-left: 4px solid var(--slds-g-color-surface-1, #ffffff);
     background-clip: padding-box;
 }
 .rep-row_expanded > td:last-child {
     border-top-right-radius: var(--slds-g-radius-border-4, 20px);
-    border-right: 4px solid var(--slds-g-color-surface-1, #ffffff) !important;
+    border-right: 4px solid var(--slds-g-color-surface-1, #ffffff);
     background-clip: padding-box;
 }
 /* Re-centre the checkbox: the 4px left border shifts the centred wrapper 2px
