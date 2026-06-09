@@ -72,8 +72,8 @@
 }
 
 /* ── Header corner radius ────────────────────────────────────── */
-thead tr th:first-child { border-top-left-radius: var(--slds-g-radius-border-2, 0.5rem); }
-thead tr th:last-child  { border-top-right-radius: var(--slds-g-radius-border-2, 0.5rem); }
+thead tr th:first-child { border-top-left-radius: 0; }
+thead tr th:last-child  { border-top-right-radius: 0; }
 
 /* Suppress SLDS's default sticky-header drop shadow under the thead row */
 .slds-table thead,

@@ -45,8 +45,8 @@
 }
 
 /* ── Header corner radius ────────────────────────────────────── */
-.bkt-container thead tr th:first-child { border-top-left-radius: var(--slds-g-radius-border-2, 0.5rem); }
-.bkt-container thead tr th:last-child  { border-top-right-radius: var(--slds-g-radius-border-2, 0.5rem); }
+.bkt-container thead tr th:first-child { border-top-left-radius: 0; }
+.bkt-container thead tr th:last-child  { border-top-right-radius: 0; }
 
 /* Suppress the default sticky-header drop shadow under the thead row. */
 .bkt-container .bkt-table thead,
