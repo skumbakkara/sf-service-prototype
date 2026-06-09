@@ -72,12 +72,12 @@ function summarizeWorkItems(children) {
 const COLUMN_DEFS = [
     { label: 'Service Rep Name', fieldName: 'name',             sortable: true,  width: 200 },
     { label: 'Status',           fieldName: 'statusLabel',      sortable: true,  width: 130 },
-    { label: 'Channels',         fieldName: 'channelsDisplay',  sortable: false, width: 100 },
     { label: 'Work Summary',     fieldName: 'workSummary',      sortable: true,  width: 200 },
     { label: 'Flag',             fieldName: 'flagLabel',        sortable: false, width: 80  },
     { label: 'Login',            fieldName: 'login',            sortable: true,  width: 90  },
     { label: 'State',            fieldName: 'state',            sortable: true,  width: 90  },
     { label: 'Capacity',         fieldName: 'capacityP',        sortable: true,  width: 150 },
+    { label: 'Channels',         fieldName: 'channelsDisplay',  sortable: false, width: 100 },
     { label: 'Accept',           fieldName: 'accept',           sortable: true,  width: 90  },
     { label: 'Workload',         fieldName: 'workload',         sortable: true,  width: 100 },
     { label: 'ACW',              fieldName: 'acw',              sortable: true,  width: 90  },

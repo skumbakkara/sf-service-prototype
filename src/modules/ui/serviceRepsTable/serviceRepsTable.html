@@ -148,14 +148,6 @@
                                 <lightning-icon icon-name="utility:down" size="xx-small" class="status-down-icon"></lightning-icon>
                             </div>
                         </td>
-                        <!-- Channels (moved left of Work Summary). Icons replace text per design. -->
-                        <td>
-                            <div class="channel-icons">
-                                <template for:each={row.channelIcons} for:item="ch">
-                                    <lightning-icon key={ch.icon} icon-name={ch.icon} size="xx-small" title={ch.label} class="channel-icon"></lightning-icon>
-                                </template>
-                            </div>
-                        </td>
                         <td>{row.workSummary}</td>
                         <!-- Flag (moved right of Work Summary). -->
                         <td class="slds-text-align_left">
@@ -177,6 +169,14 @@
                                     onmouseenter={handleTooltipShow} onmouseleave={handleTooltipHide}
                                     onfocus={handleTooltipShow} onblur={handleTooltipHide}
                                     tabindex="0">{row.capacityILabel}</span>
+                            </div>
+                        </td>
+                        <!-- Channels column (moved right of Capacity). -->
+                        <td>
+                            <div class="channel-icons">
+                                <template for:each={row.channelIcons} for:item="ch">
+                                    <lightning-icon key={ch.icon} icon-name={ch.icon} size="xx-small" title={ch.label} class="channel-icon"></lightning-icon>
+                                </template>
                             </div>
                         </td>
                         <td class="slds-text-align_right">{row.accept}</td>
