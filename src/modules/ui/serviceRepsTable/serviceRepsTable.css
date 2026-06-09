@@ -34,6 +34,9 @@
        below its natural content width (horizontal scroll handles overflow). */
     width: 100%;
     min-width: max-content;
+    border-left: none !important;
+    border-right: none !important;
+    border-radius: 0 !important;
 }
 
 /* ── Table borders use SLDS 2 Neutral Base 90 ───────────── */
@@ -54,9 +57,6 @@
     filter: none !important;
 }
 
-/* Remove left/right border and corner radius from the table header edges */
-.slds-table thead th:first-child { border-left: none !important; border-radius: 0 !important; }
-.slds-table thead th:last-child  { border-right: none !important; border-radius: 0 !important; }
 
 /* Pin column headers while the body scrolls. position: sticky targets the
    nearest scrolling ancestor (.table-container). Background fills the cell
