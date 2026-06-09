@@ -235,9 +235,6 @@ th:hover .col-chevron { display: inline-flex; }
 .status-down-icon {
     flex-shrink: 0;
     margin-left: auto;
-    /* Smaller than xx-small (14px) — force to 10px to match the Figma mock */
-    --slds-c-icon-sizing-xx-small: 10px;
-    --sds-c-icon-sizing-xx-small: 10px;
     --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
     --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
     --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
@@ -733,7 +730,7 @@ th:hover .col-chevron { display: inline-flex; }
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--slds-g-color-accent-2, #0250d9);
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
 }
 .wi-paused-toggle-label {
     font-size: var(--slds-g-font-scale-base, 0.8125rem);
@@ -741,12 +738,25 @@ th:hover .col-chevron { display: inline-flex; }
     line-height: 1.25;
 }
 .wi-paused-toggle-icon {
-    --slds-c-icon-color-foreground: var(--slds-g-color-accent-2, #0250d9);
-    --slds-c-icon-color-foreground-default: var(--slds-g-color-accent-2, #0250d9);
-    --sds-c-icon-color-foreground: var(--slds-g-color-accent-2, #0250d9);
-    --sds-c-icon-color-foreground-default: var(--slds-g-color-accent-2, #0250d9);
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #2e2e2e);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #2e2e2e);
+    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-2, #2e2e2e);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-2, #2e2e2e);
 }
 .wi-paused-toggle:hover .wi-paused-toggle-label { text-decoration: underline; }
+
+/* ── Paused stack open/close animations (mirrors wi-panel-in/out) ────────── */
+.wi-paused-stack_open {
+    animation: wi-panel-in 0.2s ease-out backwards;
+}
+.wi-paused-stack_closing {
+    pointer-events: none;
+    animation: wi-panel-out 0.15s ease-in both;
+}
+.wi-paused-stack_open .wi-card {
+    animation: wi-card-in 0.18s ease-out backwards;
+    animation-delay: calc(var(--wi-index, 0) * 60ms);
+}
 
 /* ── Flag popover — same style as ipt-flag-popover in inProgressTable ── */
 .ipt-flag-popover {

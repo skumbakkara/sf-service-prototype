@@ -120,6 +120,7 @@ export default class ServiceRepsTable extends LightningElement {
     @track selectedIds = new Set();
     @track _openFlagWiId = null;
     @track _openPausedRepId = null;
+    @track _closingPausedIds = new Set();
     @track _openQsPopover = null; // { type: 'queue'|'skill', name, top, left }
     @track _statusMenu = null;   // { repId, top, left }
 
@@ -136,6 +137,7 @@ export default class ServiceRepsTable extends LightningElement {
         this.closingIds = new Set();
         this.selectedIds = new Set();
         this._openPausedRepId = null;
+        this._closingPausedIds = new Set();
     }
 
     // Seed array plus cloned pages, each clone has a unique `id` so selection
@@ -214,9 +216,10 @@ export default class ServiceRepsTable extends LightningElement {
             }));
             // Paused work items power the collapsible "Paused Work Items"
             // section below the active cards (same card shape, reused mapper).
-            const pausedItems = visiblePaused.map((wi, wiIdx) =>
-                this.buildWorkItem(wi, `${rep.id}-pwi-${wiIdx}`)
-            );
+            const pausedItems = visiblePaused.map((wi, wiIdx) => ({
+                ...this.buildWorkItem(wi, `${rep.id}-pwi-${wiIdx}`),
+                staggerStyle: `--wi-index:${wiIdx};`,
+            }));
             return {
                 id: String(rep.id),
                 name: rep.name,
@@ -271,6 +274,12 @@ export default class ServiceRepsTable extends LightningElement {
                 pausedItems,
                 hasPausedItems: pausedItems.length > 0,
                 isPausedOpen: this._openPausedRepId === String(rep.id),
+                isPausedVisible: this._openPausedRepId === String(rep.id) || this._closingPausedIds.has(String(rep.id)),
+                pausedStackClass: this._openPausedRepId === String(rep.id)
+                    ? 'wi-stack wi-paused-stack wi-paused-stack_open'
+                    : this._closingPausedIds.has(String(rep.id))
+                        ? 'wi-stack wi-paused-stack wi-paused-stack_closing'
+                        : 'wi-stack wi-paused-stack',
                 pausedToggleIcon: this._openPausedRepId === String(rep.id)
                     ? 'utility:chevronup'
                     : 'utility:chevrondown',
@@ -364,7 +373,9 @@ export default class ServiceRepsTable extends LightningElement {
     get statusMenuStyle() {
         const m = this._statusMenu;
         if (!m) return '';
-        return `top:${m.top}px;left:${m.left}px;`;
+        // left is the icon's right edge; translateX(-100%) pulls the menu's
+        // own right edge to align with it.
+        return `top:${m.top}px;left:${m.left}px;transform:translateX(-100%);`;
     }
 
     get statusMenuItems() {
@@ -394,12 +405,15 @@ export default class ServiceRepsTable extends LightningElement {
             return;
         }
         const rect = td.getBoundingClientRect();
+        const iconEl = td.querySelector('.status-down-icon');
+        const iconRect = iconEl ? iconEl.getBoundingClientRect() : rect;
         const wrap = this.template.querySelector('.table-scroll-wrap');
         const wrapRect = wrap ? wrap.getBoundingClientRect() : { top: 0, left: 0 };
         this._statusMenu = {
             repId: id,
             top:  rect.bottom - wrapRect.top + 4,
-            left: rect.left   - wrapRect.left,
+            // Align menu's right edge with the right edge of the down icon
+            left: iconRect.right - wrapRect.left,
         };
     }
 
@@ -545,7 +559,29 @@ export default class ServiceRepsTable extends LightningElement {
         const id = event.currentTarget?.dataset?.id;
         if (!id) return;
         event.stopPropagation();
-        this._openPausedRepId = this._openPausedRepId === id ? null : id;
+        if (this._openPausedRepId === id) {
+            // Closing: kick off exit animation
+            this._openPausedRepId = null;
+            const next = new Set(this._closingPausedIds);
+            next.add(id);
+            this._closingPausedIds = next;
+        } else {
+            // Opening: clear any in-flight closing state first
+            if (this._closingPausedIds.has(id)) {
+                const next = new Set(this._closingPausedIds);
+                next.delete(id);
+                this._closingPausedIds = next;
+            }
+            this._openPausedRepId = id;
+        }
+    }
+
+    handlePausedAnimationEnd(event) {
+        const id = event.currentTarget.dataset.pausedId;
+        if (!id || !this._closingPausedIds.has(id)) return;
+        const next = new Set(this._closingPausedIds);
+        next.delete(id);
+        this._closingPausedIds = next;
     }
 
     _handleDocClick = () => {

@@ -280,10 +280,10 @@
                                             <span class="wi-paused-toggle-label">Paused Work Items</span>
                                             <lightning-icon icon-name={row.pausedToggleIcon} size="xx-small" class="wi-paused-toggle-icon"></lightning-icon>
                                         </button>
-                                        <template if:true={row.isPausedOpen}>
-                                            <div class="wi-stack wi-paused-stack">
+                                        <template if:true={row.isPausedVisible}>
+                                            <div class={row.pausedStackClass} data-paused-id={row.id} onanimationend={handlePausedAnimationEnd}>
                                                 <template for:each={row.pausedItems} for:item="wi">
-                                                    <article key={wi.id} class="wi-card">
+                                                    <article key={wi.id} class="wi-card" style={wi.staggerStyle}>
                                                         <div class="wi-content">
                                                             <div class="wi-top-row">
                                                                 <span class="wi-summary" title={wi.summaryText}>{wi.summaryText}</span>
@@ -309,9 +309,6 @@
                                                                     </span>
                                                                 </template>
                                                             </div>
-                                                        </div>
-                                                        <div class="wi-actions">
-                                                            <lightning-button label="Monitor" variant="neutral" class="wi-monitor-btn"></lightning-button>
                                                         </div>
                                                     </article>
                                                 </template>
