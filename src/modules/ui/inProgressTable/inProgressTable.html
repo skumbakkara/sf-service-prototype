@@ -217,10 +217,15 @@
                                     <template if:true={row.routeByIcon}>
                                         <lightning-icon icon-name={row.routeByIcon} size="xx-small" class="ipt-route-icon"></lightning-icon>
                                     </template>
-                                    <span class="qs-trigger"
-                                          data-qs-type={row.routeKind}
-                                          data-qs-name={row.routeBy}
-                                          onclick={handleQsClick}>{row.routeBy}</span>
+                                    <template if:true={row.isDirectRoute}>
+                                        <span>{row.routeBy}</span>
+                                    </template>
+                                    <template if:false={row.isDirectRoute}>
+                                        <span class="qs-trigger"
+                                              data-qs-type={row.routeKind}
+                                              data-qs-name={row.routeBy}
+                                              onclick={handleQsClick}>{row.routeBy}</span>
+                                    </template>
                                 </div>
                             </td>
                         </template>

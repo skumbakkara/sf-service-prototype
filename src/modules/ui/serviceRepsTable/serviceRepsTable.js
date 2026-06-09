@@ -327,16 +327,17 @@ export default class ServiceRepsTable extends LightningElement {
         const rect = el.getBoundingClientRect();
         const wrap = this.template.querySelector('.table-scroll-wrap');
         const wrapRect = wrap ? wrap.getBoundingClientRect() : { top: 0, left: 0 };
-        const POPOVER_H = 360; // estimated max popover height in px
+        const POPOVER_H = 290; // estimated max popover height in px
+        const GAP = 4;
         const spaceBelow = window.innerHeight - rect.bottom;
-        const above = spaceBelow < POPOVER_H && rect.top > POPOVER_H;
+        const above = spaceBelow < POPOVER_H + GAP && rect.top > POPOVER_H + GAP;
         this._openQsPopover = {
             type,
             name,
             above,
             top:  above
-                ? rect.top - wrapRect.top - POPOVER_H
-                : rect.bottom - wrapRect.top + 8,
+                ? rect.top - wrapRect.top - POPOVER_H - GAP
+                : rect.bottom - wrapRect.top + GAP,
             left: rect.left - wrapRect.left,
         };
     }

@@ -142,8 +142,9 @@ export default class BacklogTable extends LightningElement {
             //   'queue' → forward arrow icon + blue link
             //   'skill' → skill icon         + blue link
             //   'human' → avatar             + plain text (uses `routeDisplay`)
-            const routeKind = item.routeKind || (item.isAgent ? 'queue' : 'human');
-            const isHumanRoute = routeKind === 'human';
+            const routeKind = item.routeKind
+                || (item.routeBy === 'Direct to Agent' ? 'direct' : item.isAgent ? 'queue' : 'human');
+            const isHumanRoute = routeKind === 'human' || routeKind === 'direct';
             const routeIconName = routeKind === 'skill' ? 'utility:skill' : 'utility:work_queue';
             const routeByDisplay = item.routeDisplay
                 ?? (isHumanRoute ? (item.assignedTo ?? '') : (item.routeBy ?? ''));
@@ -269,16 +270,17 @@ export default class BacklogTable extends LightningElement {
         const rect = el.getBoundingClientRect();
         const wrap = this.template.querySelector('.bkt-scroll-wrap');
         const wrapRect = wrap ? wrap.getBoundingClientRect() : { top: 0, left: 0 };
-        const POPOVER_H = 360;
+        const POPOVER_H = 290;
+        const GAP = 4;
         const spaceBelow = window.innerHeight - rect.bottom;
-        const above = spaceBelow < POPOVER_H && rect.top > POPOVER_H;
+        const above = spaceBelow < POPOVER_H + GAP && rect.top > POPOVER_H + GAP;
         this._openQsPopover = {
             type,
             name,
             above,
             top:  above
-                ? rect.top - wrapRect.top - POPOVER_H
-                : rect.bottom - wrapRect.top + 8,
+                ? rect.top - wrapRect.top - POPOVER_H - GAP
+                : rect.bottom - wrapRect.top + GAP,
             left: rect.left - wrapRect.left,
         };
     }

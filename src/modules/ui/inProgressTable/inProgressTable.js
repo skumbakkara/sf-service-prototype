@@ -397,9 +397,13 @@ export default class InProgressTable extends LightningElement {
                     .join('')
                     .toUpperCase(),
                 routeBy: item.routeBy,
-                routeKind: item.routeKind ?? 'queue',
-                routeByIcon: item.routeByIcon
-                    || (item.routeBy === 'Direct to Agent' ? 'utility:forward' : null),
+                isDirectRoute: item.routeBy === 'Direct to Agent',
+                routeKind: item.routeBy === 'Direct to Agent'
+                    ? 'direct'
+                    : item.routeByIcon === 'utility:skill' ? 'skill' : 'queue',
+                routeByIcon: item.routeBy === 'Direct to Agent'
+                    ? 'utility:forward'
+                    : (item.routeByIcon || null),
                 hasFlag: item.hasFlag,
                 // Flag popover title id is unique per row so the dialog can
                 // be labelled by it. lightning-button-menu manages its own
@@ -484,16 +488,17 @@ export default class InProgressTable extends LightningElement {
         const rect = el.getBoundingClientRect();
         const wrap = this.template.querySelector('.ipt-shell');
         const wrapRect = wrap ? wrap.getBoundingClientRect() : { top: 0, left: 0 };
-        const POPOVER_H = 360;
+        const POPOVER_H = 290;
+        const GAP = 4;
         const spaceBelow = window.innerHeight - rect.bottom;
-        const above = spaceBelow < POPOVER_H && rect.top > POPOVER_H;
+        const above = spaceBelow < POPOVER_H + GAP && rect.top > POPOVER_H + GAP;
         this._openQsPopover = {
             type,
             name,
             above,
             top:  above
-                ? rect.top - wrapRect.top - POPOVER_H
-                : rect.bottom - wrapRect.top + 8,
+                ? rect.top - wrapRect.top - POPOVER_H - GAP
+                : rect.bottom - wrapRect.top + GAP,
             left: rect.left - wrapRect.left,
         };
     }
