@@ -85,6 +85,17 @@
             </div><!-- /.qs-popover__body -->
         </div>
     </template>
+    <!-- Status menu: position:absolute inside table-scroll-wrap so it scrolls with the page -->
+    <template if:true={statusMenuVisible}>
+        <div class="status-menu" role="menu" style={statusMenuStyle}>
+            <template for:each={statusMenuItems} for:item="item">
+                <button key={item.value} class={item.menuItemClass} role="menuitem" data-value={item.value} data-rep-id={statusMenuRepId} onclick={handleStatusMenuSelect}>
+                    <lightning-icon icon-name="utility:record" size="xx-small" class={item.dotClass}></lightning-icon>
+                    <span>{item.label}</span>
+                </button>
+            </template>
+        </div>
+    </template>
     <div class="table-container">
         <table class="slds-table slds-table_bordered slds-table_col-bordered slds-no-row-hover">
             <thead>
@@ -127,13 +138,14 @@
                                 <span class="rep-name">{row.name}</span>
                             </div>
                         </td>
-                        <td class={row.statusCellClass}>
+                        <td class={row.statusCellClass} data-id={row.id} onclick={handleStatusClick}>
                             <div class="status-inner">
                                 <lightning-icon icon-name={row.statusIcon} size="xx-small" class="status-dot"></lightning-icon>
                                 <div class="status-text">
                                     <span class="status-label">{row.statusLabel}</span>
                                     <span class="status-time">{row.statusTime}</span>
                                 </div>
+                                <lightning-icon icon-name="utility:down" size="xx-small" class="status-down-icon"></lightning-icon>
                             </div>
                         </td>
                         <!-- Channels (moved left of Work Summary). Icons replace text per design. -->

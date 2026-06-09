@@ -210,6 +210,9 @@ th:hover .col-chevron { display: inline-flex; }
 }
 
 /* ── Status cell: dot + stacked label/timestamp ─────────── */
+.status-cell {
+    cursor: pointer;
+}
 .status-cell .status-inner {
     display: flex;
     align-items: center;
@@ -228,6 +231,76 @@ th:hover .col-chevron { display: inline-flex; }
     font-size: var(--slds-g-font-size-1, 0.625rem);
     color: var(--slds-g-color-palette-gray-40, #706e6b);
     font-weight: var(--slds-g-font-weight-4, 400);
+}
+.status-down-icon {
+    flex-shrink: 0;
+    margin-left: auto;
+    /* Smaller than xx-small (14px) — force to 10px to match the Figma mock */
+    --slds-c-icon-sizing-xx-small: 10px;
+    --sds-c-icon-sizing-xx-small: 10px;
+    --slds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --sds-c-icon-color-foreground: var(--slds-g-color-on-surface-1, #5c5c5c);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-on-surface-1, #5c5c5c);
+}
+
+/* ── Status menu dropdown ────────────────────────────────────────────────── */
+.status-menu {
+    position: absolute;
+    z-index: 9999;
+    min-width: 160px;
+    background: var(--slds-g-color-surface-1, #ffffff);
+    border-radius: var(--slds-g-radius-border-2, 0.5rem);
+    box-shadow:
+        0 -1px 2px 0 rgba(0, 0, 0, 0.06),
+        0 3px 3px 0 rgba(0, 0, 0, 0.08),
+        0 0 5px 0 rgba(0, 0, 0, 0.06);
+    padding: var(--slds-g-spacing-1, 0.25rem) 0;
+    overflow: hidden;
+}
+.status-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--slds-g-spacing-2, 0.5rem);
+    width: 100%;
+    padding: var(--slds-g-spacing-2, 0.5rem) var(--slds-g-spacing-3, 0.75rem);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: var(--slds-g-font-scale-base, 0.8125rem);
+    font-weight: var(--slds-g-font-weight-4, 400);
+    line-height: 1.38;
+    color: var(--slds-g-color-on-surface-2, #2e2e2e);
+    text-align: left;
+    white-space: nowrap;
+}
+.status-menu-item:hover,
+.status-menu-item_active {
+    background-color: var(--slds-g-color-neutral-base-95, #f3f3f3);
+}
+/* Record dot colors per status */
+.status-menu-dot {
+    flex-shrink: 0;
+    --slds-c-icon-sizing-xx-small: 12px;
+    --sds-c-icon-sizing-xx-small: 12px;
+}
+.status-menu-dot_online {
+    --slds-c-icon-color-foreground: var(--slds-g-color-palette-green-50, #45c65a);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-palette-green-50, #45c65a);
+    --sds-c-icon-color-foreground: var(--slds-g-color-palette-green-50, #45c65a);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-palette-green-50, #45c65a);
+}
+.status-menu-dot_break {
+    --slds-c-icon-color-foreground: var(--slds-g-color-warning-1, #a86304);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-warning-1, #a86304);
+    --sds-c-icon-color-foreground: var(--slds-g-color-warning-1, #a86304);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-warning-1, #a86304);
+}
+.status-menu-dot_offline {
+    --slds-c-icon-color-foreground: var(--slds-g-color-error-1, #ba0517);
+    --slds-c-icon-color-foreground-default: var(--slds-g-color-error-1, #ba0517);
+    --sds-c-icon-color-foreground: var(--slds-g-color-error-1, #ba0517);
+    --sds-c-icon-color-foreground-default: var(--slds-g-color-error-1, #ba0517);
 }
 .status-cell_online  .status-label { color: var(--slds-g-color-palette-green-30, #14524b); }
 .status-cell_break   .status-label { color: var(--slds-g-color-warning-1, #a86304); }

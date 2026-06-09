@@ -111,6 +111,7 @@ export default class ServiceRepsTable extends LightningElement {
     @track _openFlagWiId = null;
     @track _openPausedRepId = null;
     @track _openQsPopover = null; // { type: 'queue'|'skill', name, top, left }
+    @track _statusMenu = null;   // { repId, top, left }
 
     @api
     get data() { return this._data; }
@@ -347,6 +348,60 @@ export default class ServiceRepsTable extends LightningElement {
         };
     }
 
+    // ── Status menu ─────────────────────────────────────────────────────────
+    get statusMenuVisible() { return this._statusMenu !== null; }
+    get statusMenuRepId()   { return this._statusMenu?.repId ?? ''; }
+    get statusMenuStyle() {
+        const m = this._statusMenu;
+        if (!m) return '';
+        return `top:${m.top}px;left:${m.left}px;`;
+    }
+
+    get statusMenuItems() {
+        const repId = this._statusMenu?.repId;
+        const rep = repId ? (this._data ?? []).find(r => String(r.id) === repId) : null;
+        const current = rep?.status ?? '';
+        return [
+            { value: 'online',  label: 'All Online', dotClass: 'status-menu-dot status-menu-dot_online'  },
+            { value: 'break',   label: 'On Break',   dotClass: 'status-menu-dot status-menu-dot_break'   },
+            { value: 'offline', label: 'Offline',    dotClass: 'status-menu-dot status-menu-dot_offline' },
+        ].map(item => ({
+            ...item,
+            menuItemClass: `status-menu-item${item.value === current ? ' status-menu-item_active' : ''}`,
+        }));
+    }
+
+    handleStatusClick(event) {
+        event.stopPropagation();
+        const td = event.currentTarget;
+        const id = td.dataset.id;
+        if (!id) return;
+        // Toggle: clicking the same cell again closes the menu
+        if (this._statusMenu?.repId === id) {
+            this._statusMenu = null;
+            return;
+        }
+        const rect = td.getBoundingClientRect();
+        const wrap = this.template.querySelector('.table-scroll-wrap');
+        const wrapRect = wrap ? wrap.getBoundingClientRect() : { top: 0, left: 0 };
+        this._statusMenu = {
+            repId: id,
+            top:  rect.bottom - wrapRect.top + 4,
+            left: rect.left   - wrapRect.left,
+        };
+    }
+
+    handleStatusMenuSelect(event) {
+        event.stopPropagation();
+        const newStatus = event.currentTarget.dataset.value;
+        const repId    = event.currentTarget.dataset.repId;
+        if (!newStatus || !repId) return;
+        this._data = (this._data ?? []).map(r =>
+            String(r.id) === repId ? { ...r, status: newStatus, statusLabel: { online: 'Online', break: 'On Break', offline: 'Offline' }[newStatus] } : r
+        );
+        this._statusMenu = null;
+    }
+
     handleSort(event) {
         const field = event.currentTarget.dataset.field;
         if (!field) return;
@@ -484,6 +539,7 @@ export default class ServiceRepsTable extends LightningElement {
     _handleDocClick = () => {
         if (this._openFlagWiId !== null) this._openFlagWiId = null;
         if (this._openQsPopover !== null) this._openQsPopover = null;
+        if (this._statusMenu !== null) this._statusMenu = null;
     };
 
     // ── Infinite scroll ─────────────────────────────────────────────────────
